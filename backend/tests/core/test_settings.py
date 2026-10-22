@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from snook.core.clock import Clock, FakeClock, SystemClock
-from snook.core.settings import Settings, SettingsError, load_settings
+from snook.core.settings import SettingsError, load_settings
 from tests.conftest import VALID_MASTER_KEY
 
 
@@ -54,7 +54,9 @@ def test_master_key_is_not_leaked_by_repr(monkeypatch: pytest.MonkeyPatch) -> No
     assert settings.snook_master_key.get_secret_value() == VALID_MASTER_KEY
 
 
-def test_defaults_follow_deployment_spec(settings: Settings) -> None:
+def test_defaults_follow_deployment_spec(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
+    settings = load_settings(env_file=None)
     assert settings.snook_master_key_previous is None
     assert settings.hf_token is None
     assert settings.session_cookie_secure == "auto"

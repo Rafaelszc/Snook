@@ -166,13 +166,13 @@
 **Description:** `lifespan` em `main.py` executa a sequência de `02-architecture.md`, "Retry e reinício": trava, backup e `alembic upgrade head`, limpeza de `/audios/.tmp/`. Ganchos para "marcar interrompidas" e "reenfileirar" ficam vazios até a Task 21.2.
 
 **Acceptance criteria:**
-- [ ] A app pega `/data/snook.lock` na subida; uma segunda app sobre o mesmo caminho falha (SEC-24, A06).
-- [ ] Antes de migrar, existe `snook.db.bak-<rev>`; fica só o último backup depois de migração bem-sucedida (SEC-22; `03-security.md`, "Backups").
-- [ ] `/audios/.tmp/` é esvaziado na subida.
+- [x] A app pega `/data/snook.lock` na subida; uma segunda app sobre o mesmo caminho falha (SEC-24, A06).
+- [x] Antes de migrar, existe `snook.db.bak-<rev>`; fica só o último backup depois de migração bem-sucedida (SEC-22; `03-security.md`, "Backups").
+- [x] `/audios/.tmp/` é esvaziado na subida.
 
 **Verification:**
-- [ ] Testes: `cd backend && uv run pytest tests/core/test_lifespan.py -q`.
-- [ ] Gate backend.
+- [x] Testes: `cd backend && uv run pytest tests/core/test_lifespan.py -q`.
+- [x] Gate backend.
 
 **Dependencies:** Tasks 3.3, 3.4
 
