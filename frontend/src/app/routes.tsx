@@ -1,6 +1,7 @@
 import type { RouteObject } from "react-router"
 
 import { Layout } from "./Layout"
+import { SamplePage } from "./SamplePage"
 
 function Placeholder({ title }: { title: string }) {
   return <h1>{title}</h1>
@@ -14,6 +15,9 @@ export const routes: RouteObject[] = [
     element: <Layout />,
     children: [
       { index: true, element: <Placeholder title="Reuniões" /> },
+      ...(import.meta.env.DEV
+        ? [{ path: "dev/components", element: <SamplePage /> }]
+        : []),
       { path: "settings", element: <Placeholder title="Configurações" /> },
       { path: "*", element: <Placeholder title="Página não encontrada" /> },
     ],
