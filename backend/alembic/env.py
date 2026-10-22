@@ -1,0 +1,34 @@
+from pathlib import Path
+
+from alembic import context
+
+from snook.core.db import Base, create_db_engine
+from snook.core.settings import load_settings
+
+# Cada tarefa que cria tabela importa aqui o `models` do módulo dono, para o autogenerate ver.
+
+config = context.config
+target_metadata = Base.metadata
+
+
+def _database_path() -> Path:
+    path = config.attributes.get("database_path")
+    return path if path is not None else load_settings().database_path
+
+
+def run_migrations() -> None:
+    engine = create_db_engine(_database_path())
+    try:
+        with engine.connect() as connection:
+            context.configure(
+                connection=connection,
+                target_metadata=target_metadata,
+                render_as_batch=True,
+            )
+            with context.begin_transaction():
+                context.run_migrations()
+    finally:
+        engine.dispose()
+
+
+run_migrations()
