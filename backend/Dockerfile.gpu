@@ -1,0 +1,39 @@
+# Imagem GPU do backend (base CUDA). Bases fixadas por digest (SEC-21).
+# torch CUDA, faster-whisper e pyannote entram quando forem dependências do projeto (Task 22+).
+FROM docker.io/nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04@sha256:8aef630a54bc5c5146ae5ce68e6af5caa3df0fb690bb91544175c91f307e4356
+
+COPY --from=ghcr.io/astral-sh/uv@sha256:538e0b39736e7feae937a65983e49d2ab75e1559d35041f9878b7b7e51de91e4 /uv /bin/uv
+
+ENV DEBIAN_FRONTEND=noninteractive
+# A imagem Ubuntu 24.04 já traz o usuário `ubuntu` com UID 1000; troca por `snook`.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends python3.12 ffmpeg \
+    && rm -rf /var/lib/apt/lists/* \
+    && userdel --remove ubuntu \
+    && useradd --uid 1000 --user-group --no-create-home --shell /usr/sbin/nologin snook \
+    && mkdir -p /data /audios /models /app \
+    && chown 1000:1000 /data /audios /models /app
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_NO_CACHE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON=/usr/bin/python3.12 \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+COPY --chown=1000:1000 pyproject.toml uv.lock ./
+RUN mkdir /opt/venv && chown 1000:1000 /opt/venv
+USER 1000:1000
+RUN uv sync --frozen --no-dev --no-install-project
+COPY --chown=1000:1000 alembic.ini ./
+COPY --chown=1000:1000 alembic ./alembic
+COPY --chown=1000:1000 src ./src
+RUN uv sync --frozen --no-dev
+
+EXPOSE 8000
+# 1 worker: pipeline em processo e trava /data/snook.lock (ADR-0006, ADR-0007).
+CMD ["uvicorn", "snook.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

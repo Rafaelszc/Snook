@@ -363,13 +363,13 @@
 **Description:** `backend/Dockerfile` (Python 3.12 slim, ffmpeg, torch CPU) e `backend/Dockerfile.gpu` (base CUDA), usuário UID 1000, imagens fixadas por digest.
 
 **Acceptance criteria:**
-- [ ] As duas imagens constroem e rodam como UID 1000 (SEC-23).
-- [ ] Imagem base fixada por digest; `uv sync --frozen` no build (SEC-21).
-- [ ] Nenhum segredo nem `.env` entra na imagem (`.dockerignore`; SEC-08).
+- [x] As duas imagens constroem e rodam como UID 1000 (SEC-23).
+- [x] Imagem base fixada por digest; `uv sync --frozen` no build (SEC-21).
+- [x] Nenhum segredo nem `.env` entra na imagem (`.dockerignore`; SEC-08).
 
 **Verification:**
-- [ ] `docker build -f backend/Dockerfile backend` termina; `docker run --rm <img> id -u` imprime `1000`.
-- [ ] `docker build -f backend/Dockerfile.gpu backend` termina (execução em GPU fica para a Task 26.4).
+- [x] `docker build -f backend/Dockerfile backend` termina; `docker run --rm <img> id -u` imprime `1000`.
+- [x] `docker build -f backend/Dockerfile.gpu backend` termina (execução em GPU fica para a Task 26.4).
 
 **Dependencies:** Task 3.5
 
