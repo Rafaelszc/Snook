@@ -25,6 +25,7 @@ Sem ambiente na internet (Q60).
 
 - Perfil padrão: `.env.example` traz `COMPOSE_PROFILES=cpu`. Assim, `docker compose up` sobe CPU sem flag (critério transversal 1). GPU: trocar para `COMPOSE_PROFILES=gpu`.
 - `backend` e `backend-gpu` nunca sobem juntos. Ambos usam alias de rede `backend`, e o nginx aponta para `backend:8000`.
+- `backend` e `backend-gpu` declaram `extra_hosts: ["host.docker.internal:host-gateway"]`, para a URL padrão do Ollama (ADR-0013) resolver no Linux. Sem porta nova exposta. Teste manual: Ollama no host alcançado de dentro do container.
 - Rede `snook-net` com sub-rede fixa `172.28.0.0/24`. IPs fixos: `frontend` `172.28.0.10`, `caddy` `172.28.0.11`. Os IPs alimentam `TRUSTED_PROXY_IPS` e o `map` do nginx.
 - `snook-db` e `snook-models`: volumes nomeados. Sobrevivem a `docker compose down`; somem só com `down -v` (Q40).
 - `snook-db` guarda também a trava `/data/snook.lock` (ADR-0006).
