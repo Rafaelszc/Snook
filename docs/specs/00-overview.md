@@ -1,7 +1,7 @@
 # 00 - Visão geral: Snook
 
-> Status: rascunho aprovado em decisões. Q1 a Q69 fechadas. Sem decisões do usuário pendentes. Nenhuma marca "proposto" de decisão de produto.
-> Fontes: briefing do usuário de 2026-10-21, rodadas 1 a 5 e decisões Q53 a Q69. Repo sem código no momento da escrita.
+> Status: rascunho aprovado em decisões. Q1 a Q73 fechadas. Nenhuma marca "proposto" de decisão de produto.
+> Fontes: briefing do usuário de 2026-10-21, rodadas 1 a 5, decisões Q53 a Q69, Q70 (mudanças do planner aprovadas em 2026-10-22), Q71 e Q72 (2026-10-22). Repo sem código no momento da escrita.
 
 ## Visão
 
@@ -14,7 +14,7 @@
 - Etapa falha: usuário tenta novamente a partir dela.
 - Usuário revisa, cria, edita, exclui, regenera e exporta o backlog. Renomeia participantes sem gerar de novo.
 - Provedores: OpenAI, Anthropic, DeepSeek e Ollama. Cada usuário informa a própria chave em tela de configurações. App guarda chave cifrada e nunca a mostra de volta.
-- App roda somente local: máquina do usuário ou rede confiável, sem exposição à internet (Q60).
+- App roda somente local: máquina do usuário ou rede confiável, sem exposição à internet (Q60). Na rede, usa HTTPS pelo perfil `lan` (Q70).
 
 ## Problema
 
@@ -28,7 +28,10 @@
   - Cria conta sozinho na tela inicial. Entra com email ou nome de usuário e senha (Q2, Q20).
   - Vê só as próprias Reuniões (Q19).
   - Configura as próprias chaves de LLM e paga o próprio uso (Q33).
+  - Obtém o consentimento dos participantes antes de gravar ou enviar uma reunião. App mostra aviso (LGPD, Q70).
 - **Operador**: instala o app na máquina local ou na rede confiável. Preenche o `.env` com `HF_TOKEN` e a chave-mestra que cifra as chaves de LLM (Q17, Q33, Q60). Pode ser o mesmo Usuário.
+  - Para uso na rede, sobe o perfil `lan`, que serve o app em HTTPS (Q70, ADR-0016).
+  - Exclui a conta de um Usuário pelo comando `python -m snook.cli delete-user <username>` (LGPD, Q70).
 
 ## Glossário
 
@@ -40,9 +43,11 @@ Nome em código sugerido entre parênteses. Planner confirma no modelo de dados.
 | Reunião (`Meeting`) | Gravação enviada ou capturada pelo Usuário e tudo o que deriva dela. Pertence a um único Usuário. Tem título (`title`) editável, pré-preenchido com o nome do arquivo. A data da Reunião é a data de envio (Q53). |
 | Status da Reunião (`status`) | Um de `pending`, `processing`, `transcribed`, `needs_split`, `generating`, `done`, `failed` (Q8, Q45). Em `failed`, a Reunião guarda a etapa que falhou (`failed_stage`: `transcription` ou `generation`) e a mensagem. |
 | Aviso | Notificação interna, emitida uma única vez por um módulo e consumida pelo módulo seguinte do pipeline, sem que o emissor dependa do consumidor. Avisos existentes: "Reunião criada", "Nova tentativa", "Participantes confirmados" e "Partes prontas". |
+| Aviso de consentimento | Texto na tela de upload e na de gravação que lembra o Usuário de obter o consentimento dos participantes antes de gravar ou enviar a reunião (LGPD, Q70). Texto literal fixado pela Q72 (`01-prd/meetings.md`, critério 52). Não é um "Aviso" do pipeline. |
 | Tentar novamente | Ação numa Reunião em `failed` que retoma da etapa que falhou. Na etapa `transcription`, reprocessa o áudio. Na etapa `generation`, reaproveita a Transcrição e os nomes e chama a LLM de novo (Q54). |
 | Processamento interrompido | Reunião que estava em `processing`, em `generating`, ou em `transcribed` com Participantes confirmados quando o backend parou. Ao subir de novo, ela vai para `failed` com essa mensagem, e "Tentar novamente" fica disponível (Q58, Q69). |
-| Gravação de tela | Captura feita no navegador pelo app. Capta o som da aba ou do sistema e o microfone numa trilha só; descarta o vídeo; para sozinha em 1h59m50s; vira uma Reunião (Q36, Q42, Q61). |
+| Gravação de tela | Captura feita no navegador pelo app. Capta o som da aba ou do sistema e o microfone numa trilha só; descarta o vídeo; para sozinha em 1h59m50s; vira uma Reunião (Q36, Q42, Q61). Exige contexto seguro: `http://localhost` ou HTTPS (Q70). |
+| Perfil `lan` | Perfil do `docker compose` para uso em rede confiável. Serve o app em HTTPS com certificado de CA local (ADR-0016, Q70). |
 | Tratamento de áudio | Edição e ajustes automáticos do áudio antes da diarização e transcrição. O usuário não faz nada manual. |
 | Speaker (`speaker_label`) | Rótulo anônimo que a diarização atribui a uma voz, por exemplo `SPEAKER_00`. |
 | Amostra de speaker | Trecho de até 10 s do maior segmento de um speaker, já tratado, tocado na UI para o usuário reconhecer a pessoa. |
@@ -88,10 +93,13 @@ Nome em código sugerido entre parênteses. Planner confirma no modelo de dados.
 12. Consulta, criação, edição, exclusão, movimentação de US entre Epics e regeneração do backlog.
 13. Renomear participante na revisão do backlog, com união por nome igual.
 14. Exportação do backlog em Markdown e JSON.
+15. Aviso de consentimento dos participantes (LGPD) na tela de upload e na de gravação (Q70, Q72).
+16. Comando de Operador `python -m snook.cli delete-user <username>`, que exclui um Usuário e todos os dados dele (LGPD, Q70).
+17. Uso em rede confiável por HTTPS, pelo perfil `lan` (Q70, ADR-0016).
 
 ## Não-objetivos
 
-Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q69:
+Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q70:
 
 - Exposição à internet. App roda somente local, na máquina do usuário ou em rede confiável (Q60).
 - Outras entradas além de upload de áudio e gravação de tela.
@@ -102,7 +110,7 @@ Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q69:
 - Identificar a mesma pessoa entre Reuniões diferentes por voz.
 - Treinar ou ajustar (fine-tuning) modelos.
 - Recuperação de senha (Q20).
-- Troca de senha, edição de perfil, exclusão de conta e verificação de email (Q39).
+- Troca de senha, edição de perfil, exclusão de conta pela UI e verificação de email (Q39). A exclusão de conta existe só pelo comando de Operador `python -m snook.cli delete-user <username>`, para cobrir a LGPD (Q70).
 - Histórico de versões do backlog (Q30).
 - Exportação em CSV para o Jira e envio direto ao Jira (Q31).
 - Cortar ou reprocessar o áudio para dividir Reunião longa. Divisão é feita sobre a Transcrição (Q43).
@@ -139,14 +147,16 @@ Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q69:
 - Spec-Driven Development: spec aprovada antes do plano; plano antes das tarefas; tarefas antes do código.
 - TDD: teste que falha antes do código de produção.
 
-### Implantação (fonte: Q60)
+### Implantação (fonte: Q60, Q70)
 
 - App roda somente local: máquina do usuário ou rede confiável. Não é exposto à internet.
-- Mesmo assim: limite de tentativas no login e no "Testar conexão"; limite de Reuniões processando ao mesmo tempo por Usuário. Valores com o planner.
+- Mesmo assim: limite de tentativas no login e no "Testar conexão"; limite de Reuniões processando ao mesmo tempo por Usuário. Resolvido: ADR-0010 (valores padrão, configuráveis por `.env`).
 - URL do Ollama aceita qualquer host, inclusive rede privada, só com `http` ou `https`, sem seguir redirecionamento.
-- Nível ASVS de referência: planner (03-security).
+- Nível ASVS de referência. Resolvido: `03-security.md` (ASVS 5.0, L2).
+- Uso na rede exige HTTPS, pelo perfil `lan` (Q70, ADR-0016). Motivo: `getDisplayMedia` e `getUserMedia` só funcionam em contexto seguro (`https://` ou `http://localhost`). Em `http://<ip-da-rede>`, a gravação de tela não funciona.
+- Sem o perfil `lan`, a porta do app fica ligada a `127.0.0.1` por padrão. Acesso pela rede em HTTP, sem o perfil, aceita upload, mas não grava tela (ADR-0016).
 
-### Decisões do usuário (fonte: rodadas 1 a 5 e decisões Q53 a Q69)
+### Decisões do usuário (fonte: rodadas 1 a 5 e decisões Q53 a Q73)
 
 | Q | Decisão |
 |---|---|
@@ -155,7 +165,7 @@ Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q69:
 | Q3 | Whisper transcreve só pt-BR na primeira versão. |
 | Q4 | Whisper roda localmente. |
 | Q5 | CPU por padrão, GPU NVIDIA opcional via perfil do `docker compose`. |
-| Q6 | Formatos aceitos: mp3, wav, m4a, ogg, webm e mp4 (extraindo o áudio). Limites: 2 h e 500 MB. |
+| Q6 | Formatos aceitos: mp3, wav, m4a, ogg, webm e mp4 (extraindo o áudio). Limites: 2 h e 500 MB. O limite de tamanho foi fixado pela Q70 em 500 MiB (524.288.000 bytes). |
 | Q7 | Arquivo da Reunião armazenado na pasta `/audios`. |
 | Q8, Q45 | Processamento assíncrono, com status consultado por polling: `pending`, `processing`, `transcribed`, `needs_split`, `generating`, `done`, `failed`. `needs_split` fica entre `transcribed` e `generating`. |
 | Q9, Q10 | Após a transcrição, o usuário ouve um trecho da voz de cada speaker (já tratado) e nomeia cada um. Em seguida, a Reunião segue para a LLM. |
@@ -174,7 +184,7 @@ Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q69:
 | Q23 | Ollama externo, com URL e modelo configuráveis na tela de configuração de LLM. |
 | Q24 | **Substituída pela Q36 e pela Q42.** (Era: gravação com "som da tela inteira por enquanto", sem microfone; vídeo, limite e navegadores em aberto.) |
 | Q25, Q41 | Arquivo guardado até o Usuário excluir a Reunião; a exclusão apaga o arquivo. `/audios` é mapeado para `./audios` no host, fora do git. |
-| Q26, Q35 | Amostra de até 10 s do maior segmento; todos os speakers nomeados; mesmo nome junta no mesmo Participante; campo opcional de número de participantes no upload; geração começa sozinha ao confirmar os nomes, sempre com o provedor ativo; a tela de nomeação só exibe qual provedor será usado. |
+| Q26, Q35 | Amostra de até 10 s do maior segmento; todos os speakers nomeados; mesmo nome junta no mesmo Participante; campo opcional de número de participantes no upload; geração começa sozinha ao confirmar os nomes, sempre com o provedor ativo; a tela de nomeação só exibe qual provedor será usado. O intervalo do número de participantes foi fixado pela Q70 em 1 a 20. |
 | Q27 | Nome da Epic em texto livre, sem descrição; `US-id` sequencial por Reunião (`US-01`, `US-02`...). |
 | Q28 | **Substituída pela Q37**, que a detalha. (Era: Fibonacci passa a medir Story Points, e a prioridade passa a ser Low, Medium ou High, corrigindo a Q11.) |
 | Q29 | Um único Participante solicitante, vazio quando não identificado; "quando" é o instante da fala na gravação, validado dentro da duração do áudio. |
@@ -186,7 +196,7 @@ Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q69:
 | Q36 | Gravação capta o som da aba ou do sistema e também a voz do usuário (microfone). Vídeo descartado, só áudio guardado (webm). Limite de 2 h. Suporte oficial em Chrome e Edge. Aceita áudio da aba ou do sistema, conforme o navegador oferecer. |
 | Q37 | Story Points na escala Fibonacci (1, 2, 3, 5, 8, 13); prioridade Low, Medium ou High, exibida em inglês. A LLM sugere os dois e o usuário edita os dois. "Story Points" fica logo abaixo de "Prioridade". |
 | Q38 | Reunião longa: o áudio fica armazenado e o usuário divide a reunião em pedaços que caibam na LLM. A forma da divisão foi **redefinida pela Q43**. |
-| Q39 | Email e nome de usuário únicos sem diferenciar maiúsculas de minúsculas; nome de usuário com 3 a 30 caracteres (letras, dígitos, `_`, `.`, `-`); login automático após o cadastro; sem troca de senha, edição de perfil, exclusão de conta e verificação de email. |
+| Q39 | Email e nome de usuário únicos sem diferenciar maiúsculas de minúsculas; nome de usuário com 3 a 30 caracteres (letras, dígitos, `_`, `.`, `-`); login automático após o cadastro; sem troca de senha, edição de perfil, exclusão de conta e verificação de email. A Q70 acrescentou a exclusão de conta só pelo comando de Operador. |
 | Q40 | SQLite num volume Docker nomeado, fora do git; sobrevive a `docker compose down` e `up` (some só com `down -v`). |
 | Q42 | Gravação em uma trilha só, misturada no navegador. Se faltar uma das fontes (som da tela ou microfone), o app avisa e deixa o usuário gravar só com a fonte disponível ou cancelar. Sem nenhuma fonte de áudio, a gravação é recusada com mensagem. |
 | Q43 | Opção (c). A checagem acontece na geração, com a Transcrição real comparada à janela de contexto do modelo ativo. Se não couber, o usuário divide a Transcrição por intervalos de tempo dentro do app, na mesma Reunião. A LLM gera por Parte, e o backlog sai unificado na Reunião, com `US-id` contínuo e os nomes de speakers mantidos. O áudio não é reprocessado. |
@@ -204,16 +214,20 @@ Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q69:
 | Q57 | Epic pertence a uma Reunião. Nomes de Epic são únicos só dentro da Reunião. Criar uma Epic com nome já existente na mesma Reunião mescla com a existente (mesma regra de comparação da Q47; sobrevive a Epic que já tinha o nome), em vez de recusar. Reuniões distintas podem ter Epics de mesmo nome. |
 | Q58 | Ao subir o backend, toda Reunião em `processing` vai para `failed` (etapa `transcription`) e toda Reunião em `generating` vai para `failed` (etapa `generation`), com a mensagem "processamento interrompido". "Tentar novamente" fica disponível. |
 | Q59 | Saídas de `needs_split`: (a) cancelar volta a Reunião para `done` com o backlog anterior (ampliado pela Q68); (b) na confirmação da divisão, a Reunião vai para `failed` (etapa `generation`) se não houver provedor ativo ou se um segmento sozinho passar do orçamento; (c) se a Transcrição passar a caber inteira, a Reunião segue sozinha com Parte única. |
-| Q60 | O app roda somente local (máquina do usuário ou rede confiável), sem exposição à internet. URL do Ollama: qualquer host, inclusive rede privada, só `http` ou `https`, sem seguir redirecionamento. Limite de tentativas no login e no "Testar conexão"; limite de Reuniões processando ao mesmo tempo por Usuário. Valores e nível ASVS com o planner. |
+| Q60 | O app roda somente local (máquina do usuário ou rede confiável), sem exposição à internet. URL do Ollama: qualquer host, inclusive rede privada, só `http` ou `https`, sem seguir redirecionamento. Limite de tentativas no login e no "Testar conexão"; limite de Reuniões processando ao mesmo tempo por Usuário. Valores e nível ASVS com o planner (resolvido: ADR-0010 e `03-security.md`). A Q70 acrescentou HTTPS na rede, pelo perfil `lan`. |
 | Q61 | A gravação de tela para sozinha em 1h59m50s. A leitura de duração em `meetings` funciona com o webm do `MediaRecorder`, cujo cabeçalho não traz a duração. |
 | Q62 | Reunião que passa do limite de processamento do Usuário espera em `pending` e começa quando abre vaga, na ordem de criação. Não é recusada no envio. |
 | Q63 | URL do Ollama com credenciais embutidas (`http://usuario:senha@host`) é recusada. |
 | Q64 | Chave com menos de 12 caracteres aparece só como `...`. |
 | Q65 | "Reajustar cortes" numa Reunião cuja Transcrição passou a caber inteira segue direto com Parte única, sem abrir a tela de divisão. |
-| Q66 | A regra "passou a caber, segue sozinha" roda ao abrir a tela de divisão e ao confirmar. |
+| Q66 | A regra "passou a caber, segue sozinha" roda ao abrir a tela de divisão e ao confirmar. Pela Q70, ao abrir a tela ela roda em `POST /meetings/{id}/split/refresh`, não no `GET`. |
 | Q67 | Abrir a divisão sem provedor ativo mostra a mensagem com link para as configurações, sem orçamento e sem cortes sugeridos. |
 | Q68 | "Cancelar divisão" vale sempre que a Reunião tem backlog gravado (`needs_split` → `done`, sem mudar nada), não só quando a divisão veio de "reajustar cortes". `split_reason` fica só para exibição. |
-| Q69 | Ao subir o backend, Reunião em `transcribed` com Participantes confirmados (aviso "Participantes confirmados" ou "Nova tentativa" ainda não consumido) vai para `failed` (etapa `generation`) com "processamento interrompido", pela mesma regra da Q58. Reuniões em `pending` após reinício ficam como questão para o planner. |
+| Q69 | Ao subir o backend, Reunião em `transcribed` com Participantes confirmados (aviso "Participantes confirmados" ou "Nova tentativa" ainda não consumido) vai para `failed` (etapa `generation`) com "processamento interrompido", pela mesma regra da Q58. Reuniões em `pending` após reinício ficaram como questão para o planner (resolvido: ADR-0007, reenfileiradas no startup em ordem de criação). |
+| Q70 | Aprovadas as 9 mudanças sugeridas pelo planner em 2026-10-22: (1) a regra "passou a caber" sai do `GET` e vai para `POST /meetings/{id}/split/refresh`, chamado pelo frontend ao abrir a tela de divisão (ADR-0019); (2) toda rota HTTP tem o prefixo `/api`; (3) aviso de consentimento dos participantes (LGPD) antes de gravar ou enviar; (4) comando de Operador `python -m snook.cli delete-user <username>`; (5) uso na rede exige HTTPS, pelo perfil `lan` (ADR-0016); (6) senha acima de 72 bytes recusada com HTTP 422 (ADR-0021); (7) `expected_speakers` de 1 a 20 e limite de tamanho de 500 MiB (524.288.000 bytes) (ADR-0018); (8) o critério 30 de `diarized-transcription` só vale com `TRANSCRIPTION_WORKERS` maior que `TRANSCRIPTION_MAX_PER_USER` (ADR-0010); (9) NFRs de performance do frontend (ADR-0023). |
+| Q71 | Aviso de consentimento dos participantes é só texto visível junto de "Gravar reunião" e do botão de envio, sem confirmação obrigatória e sem bloquear a ação (2026-10-22). |
+| Q72 | Texto literal do aviso de consentimento (2026-10-22): "Antes de gravar ou enviar, obtenha o consentimento de todos os participantes da reunião (LGPD). O áudio fica só neste servidor; o texto da transcrição vai ao provedor de LLM ativo." O texto vem de uma constante única do frontend, usada na tela de upload e na de gravação (`meetings`, critério 52; `screen-recording`, critério 26). |
+| Q73 | LCP (NFR-03) medido na tela de login, a mesma rota do NFR-01 (2026-10-22). |
 
 Mudanças em relação ao briefing e a rodadas anteriores:
 - Briefing: usuário fornece o próprio token da LLM. Após idas e vindas (Q15, Q21, Q22), a Q33 confirmou: cada Usuário informa a própria chave na UI; app guarda cifrada.
@@ -223,6 +237,9 @@ Mudanças em relação ao briefing e a rodadas anteriores:
 - Q38 previa dividir o áudio fora do app e reenviar pedaços. Q43 (c) trocou por divisão da Transcrição dentro do app, na mesma Reunião.
 - Item "criar Epic com nome existente é recusado" virou mesclagem (Q57).
 - "Cancelar reajuste" (Q59 a) virou "Cancelar divisão", válido sempre que há backlog gravado (Q68).
+- Q6 dizia 500 MB sem definir a unidade. Q70 fixou 500 MiB (524.288.000 bytes).
+- Q39 tirava a exclusão de conta. Q70 a devolveu só como comando de Operador, para a LGPD.
+- Q66 rodava "passou a caber" no `GET` da divisão. Q70 moveu para `POST /meetings/{id}/split/refresh`.
 
 ## Capability map (aprovado: Q18 e Q52)
 
@@ -251,6 +268,7 @@ Ajustes após a aprovação:
   - chamada vai de `backlog-review` para `participants`, de baixo para cima na cadeia, sem ciclo.
 - Coluna "Depende de" lista todas as dependências diretas, inclusive `meetings` (status, marcas) e `auth` (Usuário atual).
 - Marcas de Participantes confirmados (Q69) e de backlog gravado (Q68) ficam em `meetings`, registradas por `participants` e `backlog-generation`.
+- Comando `delete-user` (Q70) apaga dados de `auth`, `llm-providers` e `meetings`, inclusive arquivos em `/audios`. Fica fora dos módulos de rota, como ferramenta de Operador. Resolvido: `02-architecture.md`, "Exclusão de Usuário pelo Operador". Mora em `cli.py`, que importa os módulos; nenhum módulo importa `cli.py`, então não há ciclo.
 
 Nenhum ajuste muda a build order.
 
@@ -268,7 +286,7 @@ Nenhum ajuste muda a build order.
 
 1. Usuário cria conta (já fica autenticado) ou entra.
 2. Usuário cadastra chave (ou URL do Ollama), modelo e janela de contexto de pelo menos um provedor, testa a conexão e marca um provedor ativo.
-3. Usuário envia arquivo de áudio ou grava som da tela e microfone, e confere o título. Sistema cria a Reunião em `pending` e guarda o arquivo em `/audios`.
+3. Usuário vê o aviso de consentimento, envia arquivo de áudio ou grava som da tela e microfone, e confere o título. Sistema cria a Reunião em `pending` e guarda o arquivo em `/audios`.
 4. Sistema trata o áudio, diariza e transcreve de forma assíncrona (`processing`, depois `transcribed`).
 5. Usuário ouve amostra de cada speaker e dá nome a todos. Tela mostra qual provedor ativo será usado.
 6. Nomes confirmados: sistema compara a Transcrição com o orçamento do modelo ativo.
@@ -280,23 +298,6 @@ Nenhum ajuste muda a build order.
 
 ## Decisões pendentes
 
-Sem decisões do usuário pendentes (Q1 a Q69 fechadas).
+Q1 a Q73 fechadas. Nenhuma decisão do usuário em aberto.
 
-Para o planner:
-- quais tratamentos de áudio aplicar (conversão, normalização, redução de ruído) e onde guardar o áudio tratado;
-- algoritmo de cifra e nome da variável da chave-mestra;
-- destino das chaves salvas se a chave-mestra mudar ou se perder;
-- método de estimativa de tokens e cálculo da reserva do orçamento de cada Parte;
-- onde o System Prompt mora, se `transcript-split` precisar do tamanho dele;
-- padrões de modelo e de janela de contexto por provedor;
-- mecanismo dos avisos, e Reuniões em `pending` após reinício (fila durável ou novo aviso ao subir);
-- aviso velho depois de "Marcar interrompidas", se a fila for durável: descartar os avisos das Reuniões marcadas, ou levar um identificador de tentativa no aviso;
-- transação entre módulos de "Registrar Participantes confirmados" (com a confirmação em `participants`) e de "Registrar backlog gravado" (com a gravação em `backlog-generation`): mesma conexão SQLite, unidade de trabalho compartilhada ou outro mecanismo;
-- valores dos limites de tentativas (login, "Testar conexão") e de Reuniões processando por Usuário (Q60);
-- nível ASVS de referência (03-security, Q60);
-- comandos, estrutura de pastas, estilo de código e CI;
-- framework de teste do frontend;
-- worker de processamento e concorrência entre Reuniões;
-- biblioteca Whisper, tamanho do modelo e versão do Pyannote;
-- mecanismo e duração da sessão (cookie ou JWT);
-- metas de tempo de processamento.
+Pendências do planner: todas resolvidas. Ver `02-architecture.md`, seção "Respostas às decisões pendentes do spec", que liga cada pendência ao ADR ou documento que a responde. Meta de tempo de processamento: sem meta na v1; o spike da Task 1 mede (`02-architecture.md`, "Questões em aberto").

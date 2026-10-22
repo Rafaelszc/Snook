@@ -92,6 +92,7 @@ Endpoints sugeridos (planner confirma):
 | Epic pertence a uma Reunião; nome único só dentro dela; criar Epic com nome existente na mesma Reunião mescla. | Q57 |
 | "Cancelar divisão" vale sempre que há backlog gravado. | Q68 |
 | Reinício com nomes confirmados leva `transcribed` a `failed`; antes disso, a Reunião pode ficar em `transcribed` com backlog gravado. | Q69 |
+| INP da tela de revisão até 200 ms, medido com backlog de fixture de 30 Epics e 200 US. | Q70 (ADR-0023); 01-prd, NFR-04 |
 | FastAPI, SQLite, Pytest, React + TypeScript + shadcn/ui. | briefing |
 
 ## Regras por status
@@ -208,9 +209,13 @@ Edição liberada em `failed` = usuário editaria backlog que a próxima tentati
 
 - **Seam:** API HTTP via `TestClient` no Pytest, SQLite temporário, Reuniões montadas no setup com backlog, Participantes, marcas e status de cada caso. "Preparar geração" de `transcript-split` é fake que registra o modo. "Renomear Participante" usa a implementação real de `participants`, para testar a transação da união. Cobre critérios 1 a 38 e 47, um teste por critério. Critério 30 roda uma vez por status.
 - **Exportação (critérios 32 a 36):** snapshot do Markdown e do JSON para um backlog de fixture.
-- **Frontend (critérios 39 a 46 e 48):** framework não decidido. Questão para o planner.
+- **Frontend (critérios 39 a 46 e 48):** Vitest + React Testing Library + MSW. Resolvido: ADR-0015.
+- **Performance (01-prd, NFR-04):** INP da tela de revisão medido no DevTools Performance com backlog de fixture de 30 Epics e 200 US, no checkpoint manual.
 
 ## Questões em aberto
 
-1. Para o planner: nome do arquivo exportado (por exemplo `<titulo>-backlog.md`); como este módulo escreve nas tabelas de `backlog-generation`; edição concorrente em duas abas.
+1. Respondidas pelo planner:
+   - nome do arquivo exportado: `<slug-do-titulo>-backlog.md` ou `.json`. Resolvido: `05-api.md`.
+   - como este módulo escreve nas tabelas de `backlog-generation`: interface `BacklogRepository` e `next_us_number`. Resolvido: `02-architecture.md`, "Interfaces internas".
+   - edição concorrente em duas abas: último a gravar vence, sem bloqueio otimista na v1. Resolvido: `05-api.md`.
 2. Códigos HTTP 200, 201, 404, 409 e 422 e endpoints são sugestões, não decisões.

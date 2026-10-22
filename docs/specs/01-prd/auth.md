@@ -1,7 +1,7 @@
 # 01-prd/auth - PRD do módulo `auth`
 
-> Status: completo. Decisões fechadas: Q2, Q19, Q20, Q39, Q56, Q60.
-> Visão e capability map: `docs/specs/00-overview.md`. Requisitos transversais: `docs/specs/01-prd.md`.
+> Status: completo. Decisões fechadas: Q2, Q19, Q20, Q39, Q56, Q60, Q70 (ADR-0021).
+> Visão e capability map: `docs/specs/00-overview.md`. Requisitos transversais: `docs/specs/01-prd.md`. Rotas sem o prefixo `/api` (ver `01-prd.md`, "Convenção de rotas").
 > Depende de: nenhum módulo. Dependentes: todos os módulos com rota (`llm-providers`, `meetings`, `diarized-transcription`, `participants`, `transcript-split`, `backlog-review`).
 
 ## Problem Statement
@@ -20,7 +20,7 @@
 ## User Stories
 
 1. Como visitante, quero criar uma conta com email, nome de usuário e senha, para usar o app.
-2. Como visitante, quero ver por que meu cadastro foi recusado (email inválido, email ou nome de usuário já usado, nome de usuário fora da regra, senha curta), para corrigir e tentar de novo.
+2. Como visitante, quero ver por que meu cadastro foi recusado (email inválido, email ou nome de usuário já usado, nome de usuário fora da regra, senha curta ou longa demais), para corrigir e tentar de novo.
 3. Como visitante, quero já estar autenticado ao concluir o cadastro, para não digitar os dados de novo no login.
 4. Como usuário, quero entrar com meu email e senha, para acessar minhas reuniões.
 5. Como usuário, quero entrar com meu nome de usuário e senha, para não precisar digitar o email.
@@ -36,7 +36,7 @@
 - Limite de tentativas de login (Q60).
 - Logout.
 - Consulta do Usuário autenticado.
-- Proteção de todas as rotas, exceto cadastro e login (RT-03).
+- Proteção de todas as rotas, exceto cadastro, login e `GET /health` (RT-03).
 - Contrato de identidade para demais módulos (seção abaixo).
 - Telas de cadastro e login; redirecionamento ao login.
 
@@ -45,7 +45,7 @@ Endpoints sugeridos (planner confirma): `POST /auth/register`, `POST /auth/login
 ## Fora de escopo
 
 - Recuperação de senha (Q20).
-- Troca de senha, edição de perfil, exclusão de conta, verificação de email (Q39).
+- Troca de senha, edição de perfil, exclusão de conta pela UI, verificação de email (Q39). A exclusão de conta existe só pelo comando de Operador `python -m snook.cli delete-user <username>` (Q70; `01-prd.md`, RT-16 e critério transversal 21).
 - Papéis e permissões (admin, operador). Todo Usuário tem os mesmos direitos sobre os próprios dados.
 - Exposição à internet (Q60).
 
@@ -58,6 +58,7 @@ Endpoints sugeridos (planner confirma): `POST /auth/register`, `POST /auth/login
 | Cadastro aberto na tela inicial. | rodada 2, Q20 |
 | Login por email ou nome de usuário; email e nome de usuário únicos. | rodada 2, Q20 |
 | Senha com no mínimo 8 caracteres. | rodada 2, Q20 |
+| Senha com no máximo 72 bytes em UTF-8; acima disso, HTTP 422. Motivo: bcrypt usa só os primeiros 72 bytes. | Q70 (ADR-0021) |
 | Sem recuperação de senha na primeira versão. | rodada 2, Q20 |
 | Cada Usuário vê só os próprios dados; recurso de outro Usuário responde como inexistente. | rodada 2, Q19 |
 | Unicidade de email e nome de usuário sem diferenciar maiúsculas de minúsculas. | rodada 3, Q39 |
@@ -65,12 +66,12 @@ Endpoints sugeridos (planner confirma): `POST /auth/register`, `POST /auth/login
 | Login automático após o cadastro. | rodada 3, Q39 |
 | Login sem diferenciar maiúsculas no email e no nome de usuário. | Q56 |
 | Banco SQLite dentro do container e fora do git. | rodada 3, Q33 |
-| App somente local; limite de tentativas no login (valores com o planner). | Q60 |
+| App somente local; limite de tentativas no login (valores padrão no ADR-0010). | Q60; ADR-0010 |
 | FastAPI, SQLite, Pytest, React + TypeScript + shadcn/ui. | briefing |
 
 ## Contrato com outros módulos
 
-- `auth` entrega, a cada requisição autenticada, o Usuário atual (no mínimo `id`). No FastAPI: dependência reutilizável (nome do planner).
+- `auth` entrega, a cada requisição autenticada, o Usuário atual (no mínimo `id`). No FastAPI: dependência reutilizável `current_user` (`02-architecture.md`, "Interfaces internas").
 - Rota protegida sem autenticação válida: HTTP 401, antes de qualquer lógica do módulo.
 - Cada módulo dono de dados grava o `id` do Usuário e filtra por ele. Teste de isolamento (HTTP 404 para recurso de outro Usuário) fica no PRD de cada módulo.
 
@@ -119,24 +120,27 @@ Endpoints sugeridos (planner confirma): `POST /auth/register`, `POST /auth/login
 
 ### Limite de tentativas (Q60)
 
-27. Depois de N tentativas de login com falha dentro de uma janela de tempo, as tentativas seguintes recebem HTTP 429 até a janela passar, mesmo com a senha correta. N e a janela vêm de configuração (valores com o planner). Um login correto antes do limite zera a contagem.
+27. Depois de N tentativas de login com falha dentro de uma janela de tempo, as tentativas seguintes recebem HTTP 429 até a janela passar, mesmo com a senha correta. N e a janela vêm de configuração (valores padrão no ADR-0010). Um login correto antes do limite zera a contagem.
+
+### Tamanho máximo da senha (Q70, ADR-0021)
+
+28. Cadastro com senha de mais de 72 bytes em UTF-8 é recusado com HTTP 422 e mensagem "senha com no máximo 72 bytes", e nenhum Usuário é criado. Uma senha de exatamente 72 bytes é aceita. O limite conta bytes, não caracteres: 37 caracteres acentuados de 2 bytes cada (74 bytes) são recusados.
 
 ## Estratégia de testes (seam confirmado na Q32)
 
-- **Seam:** API HTTP via `TestClient` no Pytest, SQLite temporário. Cobre critérios 1 a 21 e 27, um teste por critério. Critério 27 usa limite pequeno e relógio falso por configuração de teste.
-- **Senha:** critério 9 lê o registro direto no SQLite de teste e confere com `bcrypt.checkpw`. Critério 10 captura logs (`caplog`) e busca o texto da senha.
+- **Seam:** API HTTP via `TestClient` no Pytest, SQLite temporário. Cobre critérios 1 a 21, 27 e 28, um teste por critério. Critério 27 usa limite pequeno e relógio falso por configuração de teste.
+- **Senha:** critério 9 lê o registro direto no SQLite de teste e confere com `bcrypt.checkpw`. Critério 10 captura logs (`caplog`) e busca o texto da senha. Critério 28 testa 72 bytes ASCII (aceito), 73 bytes ASCII (recusado) e senha acentuada acima de 72 bytes com menos de 72 caracteres (recusada).
 - **Isolamento:** dependência de Usuário atual testada aqui (401). O 404 entre Usuários fica em cada módulo dono de dados.
-- **Frontend (critérios 22 a 26):** framework não decidido. Questão para o planner.
-- Custo do bcrypt pode cair nos testes para suíte rápida. Decisão do planner.
+- **Frontend (critérios 22 a 26):** Vitest + React Testing Library + MSW. Resolvido: ADR-0015.
+- Custo do bcrypt: 12 em produção, 4 nos testes, por configuração (`BCRYPT_ROUNDS`). Resolvido: ADR-0021.
 
 ## Questões em aberto
 
-1. Para o planner (02-architecture e 03-security):
-   - mecanismo de sessão (cookie ou JWT) e duração;
-   - mensagem genérica de login, para não revelar se o email existe;
-   - valores do limite de tentativas e chave da contagem (conta, IP ou ambos);
-   - custo do bcrypt;
-   - tamanho máximo da senha (bcrypt usa só os primeiros 72 bytes);
-   - nível ASVS de referência (Q60).
-2. Para o 03-security: HTTP 409 do cadastro (critérios 3 e 4) revela email ou nome de usuário existente. Risco aceito: app roda somente local, sem exposição à internet (Q60). Se a implantação mudar, rever.
+1. Respondidas pelo planner:
+   - sessão: cookie com token opaco no servidor, 24 h de inatividade ou 7 dias. Resolvido: ADR-0008 e `03-security.md`, SEC-03.
+   - mensagem genérica de login: "email, nome de usuário ou senha inválidos", com tempo parecido para conta inexistente. Resolvido: ADR-0021 e `03-security.md`, SEC-05.
+   - limite de tentativas: 5 falhas por identificador e 20 por IP em 15 min. Resolvido: ADR-0010.
+   - custo do bcrypt: 12. Resolvido: ADR-0021.
+   - nível ASVS: 5.0, L2. Resolvido: `03-security.md`.
+2. HTTP 409 do cadastro (critérios 3 e 4) revela email ou nome de usuário existente. Risco aceito em `03-security.md` (exceções conscientes de L2): app roda somente local, sem exposição à internet (Q60). Se a implantação mudar, rever.
 3. Códigos HTTP 409, 422 e 429 seguem padrão FastAPI e REST. Planner pode ajustar, desde que o critério continue verificável.

@@ -201,10 +201,10 @@ Nos testes, "Gerar" de `llm-providers` é fake: devolve respostas prontas e regi
 
 ## Questões em aberto
 
-1. Para o planner:
-   - onde o System Prompt mora, se `transcript-split` precisar do tamanho dele para a reserva do orçamento (sem ciclo);
-   - modo JSON ou saída estruturada de cada provedor;
-   - timeout por chamada e tempo máximo de geração com várias Partes;
-   - como `backlog-review` altera as tabelas deste módulo (repositório compartilhado ou interface);
-   - como registrar a geração em andamento para o critério 33 (por exemplo identificador de geração no aviso);
-   - transação entre módulos da gravação do backlog com "Registrar backlog gravado" de `meetings` (mesma conexão SQLite, unidade de trabalho compartilhada ou outro mecanismo).
+1. Respondidas pelo planner:
+   - onde o System Prompt mora, sem ciclo com `transcript-split`: `shared/prompts`. Resolvido: ADR-0020.
+   - modo JSON ou saída estruturada por provedor. Resolvido: ADR-0012.
+   - timeout por chamada: leitura `LLM_READ_TIMEOUT` padrão 300 s, sem retry automático. Resolvido: ADR-0012. Tempo máximo de geração com várias Partes: sem meta na v1 (`02-architecture.md`, "Questões em aberto").
+   - como `backlog-review` altera as tabelas deste módulo: interface `BacklogRepository` e `next_us_number`. Resolvido: `02-architecture.md`, "Interfaces internas".
+   - geração em andamento (critério 33): `run_id` no aviso; consumidor ignora `run_id` que não bate. Resolvido: ADR-0007.
+   - transação da gravação do backlog com "Registrar backlog gravado": unidade de trabalho compartilhada, um commit. Resolvido: ADR-0006.

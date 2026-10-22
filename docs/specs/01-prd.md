@@ -1,8 +1,13 @@
 # 01 - PRD: requisitos transversais e índice de módulos
 
-> Status: rascunho aprovado em decisões. Q1 a Q69 fechadas. Todos os PRDs de módulo escritos. Nenhuma marca "proposto" de decisão de produto.
+> Status: rascunho aprovado em decisões. Q1 a Q73 fechadas. Todos os PRDs de módulo escritos. Nenhuma marca "proposto" de decisão de produto.
 > Visão, glossário, decisões e capability map: `docs/specs/00-overview.md`.
 > Cada módulo tem PRD próprio em `docs/specs/01-prd/<id-do-modulo>.md`.
+
+## Convenção de rotas
+
+- Toda rota HTTP fica sob o prefixo `/api` (Q70; `05-api.md`).
+- Nos PRDs, rotas aparecem sem o prefixo. `/meetings/{id}` significa `/api/meetings/{id}`, e `POST /auth/login` significa `POST /api/auth/login`.
 
 ## Problem Statement
 
@@ -20,7 +25,7 @@
 - Etapa falha: usuário tenta novamente a partir dela.
 - Cada US registra quem pediu, de qual Reunião e quando.
 - Usuário revisa, cria, edita, exclui, move, regenera e exporta (Markdown ou JSON). Renomeia participantes sem gerar de novo.
-- Tudo local, sem exposição à internet.
+- Tudo local, sem exposição à internet. Na rede, HTTPS pelo perfil `lan`.
 
 ## User Stories (fim a fim)
 
@@ -47,6 +52,10 @@
 21. Como usuário, quero renomear um participante na revisão do backlog, unindo-o a outro quando dou o mesmo nome, para corrigir o solicitante sem gerar o backlog de novo.
 22. Como usuário, quero regenerar o backlog, com aviso de que minhas edições se perdem e, numa reunião dividida, com a chance de reajustar os cortes ou cancelar a divisão, para tentar uma nova interpretação.
 23. Como usuário, quero exportar o backlog em Markdown e JSON, para levá-lo a outra ferramenta.
+24. Como usuário, quero ser lembrado de obter o consentimento dos participantes antes de gravar ou enviar uma reunião, para cumprir a LGPD.
+25. Como operador, quero excluir a conta de um Usuário e todos os dados dele por um comando, para atender um pedido de eliminação (LGPD).
+26. Como usuário na rede confiável, quero abrir o app em HTTPS, para que a gravação de tela funcione e a sessão não trafegue em texto claro.
+27. Como usuário, quero que as telas carreguem e respondam rápido, mesmo com uma Transcrição de 2 h, para trabalhar sem espera.
 
 ## Formato do backlog
 
@@ -92,6 +101,7 @@ Então <resposta>
 - Cadastro aberto, login e logout, com isolamento por Usuário.
 - Configuração de LLM por Usuário: chave cifrada, janela de contexto, "Testar conexão", provedor ativo.
 - Entrada por upload de áudio ou gravação de tela (som da tela e microfone numa trilha só), com título opcional.
+- Aviso de consentimento dos participantes (LGPD) no upload e na gravação.
 - Arquivo em `/audios` até a Reunião ser excluída.
 - Tratamento de áudio, diarização e transcrição, assíncronos e com status.
 - "Tentar novamente" a partir da etapa que falhou, inclusive após reinício.
@@ -101,6 +111,9 @@ Então <resposta>
 - Criação, edição, exclusão, movimentação, regeneração e exportação (Markdown e JSON).
 - Renomear participante na revisão, com união por nome igual.
 - Persistência e consulta de Usuários, Configurações de LLM, Reuniões, Participantes, Transcrições, Partes, Epics e User Stories.
+- Comando de Operador `python -m snook.cli delete-user <username>`.
+- Uso na rede confiável por HTTPS, pelo perfil `lan`.
+- NFRs de performance do frontend.
 
 ## Fora de escopo
 
@@ -122,7 +135,7 @@ Ver "Não-objetivos" em `00-overview.md`.
 | Login com email, nome de usuário e senha; senha no banco só como hash bcrypt. | rodada 1, Q2 |
 | Whisper local, idioma pt-BR. | rodada 1, Q3 e Q4 |
 | CPU por padrão; GPU NVIDIA opcional via perfil do `docker compose`. | rodada 1, Q5 |
-| Formatos mp3, wav, m4a, ogg, webm e mp4; máximo de 2 h e 500 MB. | rodada 1, Q6 |
+| Formatos mp3, wav, m4a, ogg, webm e mp4; máximo de 2 h e 500 MiB (524.288.000 bytes). | rodada 1, Q6; Q70 (ADR-0018) |
 | Arquivo da Reunião em `/audios`, mapeado para `./audios` no host, fora do git; apagado junto com a Reunião. | rodada 1, Q7; rodada 2, Q25; rodada 4, Q41 |
 | Status: `pending`, `processing`, `transcribed`, `needs_split`, `generating`, `done`, `failed`, consultados por polling. | rodada 1, Q8; rodada 5, Q45 |
 | Provedores: OpenAI, Anthropic, DeepSeek e Ollama. | rodada 1, Q15 |
@@ -161,6 +174,17 @@ Ver "Não-objetivos" em `00-overview.md`.
 | "Reajustar cortes" que passou a caber segue com Parte única; "passou a caber" roda ao abrir e ao confirmar a divisão; divisão sem provedor ativo mostra só a mensagem. | Q65, Q66, Q67 |
 | "Cancelar divisão" vale sempre que há backlog gravado; `split_reason` só para exibição. | Q68 |
 | Ao subir o backend, `transcribed` com Participantes confirmados vai para `failed` com "processamento interrompido". | Q69 |
+| "Passou a caber" ao abrir a divisão roda em `POST /meetings/{id}/split/refresh`; `GET /meetings/{id}/split` só lê. | Q70 (ADR-0019) |
+| Toda rota HTTP sob o prefixo `/api`. | Q70 (`05-api.md`) |
+| Aviso de consentimento dos participantes (LGPD) antes de gravar ou enviar. | Q70 (`03-security.md`, LGPD) |
+| Aviso de consentimento só em texto, sem confirmação obrigatória e sem bloquear a ação. | Q71 |
+| Texto literal do aviso de consentimento, numa constante única do frontend (`meetings`, critério 52). | Q72 |
+| Exclusão de conta só pelo comando de Operador `python -m snook.cli delete-user <username>`. | Q70 (`03-security.md`, LGPD) |
+| Uso na rede exige HTTPS, pelo perfil `lan`; `getDisplayMedia` exige contexto seguro. | Q70 (ADR-0016) |
+| Senha de 8 caracteres a 72 bytes em UTF-8; acima de 72 bytes, HTTP 422. | Q70 (ADR-0021) |
+| `expected_speakers` de 1 a 20. | Q70 (`05-api.md`) |
+| Critério 30 de `diarized-transcription` só vale com `TRANSCRIPTION_WORKERS` maior que `TRANSCRIPTION_MAX_PER_USER`. | Q70 (ADR-0010) |
+| NFRs de performance do frontend (seção "NFRs de performance do frontend"). | Q70 (ADR-0023) |
 
 ## Requisitos transversais
 
@@ -170,7 +194,7 @@ Ver "Não-objetivos" em `00-overview.md`.
   - Chaves de LLM ficam no SQLite, cifradas com a chave-mestra.
   - Chave de LLM salva só volta para a UI como máscara.
   - Nenhum segredo aparece em texto claro em respostas da API, logs, SQLite ou arquivo versionado no git.
-- **RT-03 Autenticação.** Todas as rotas exigem Usuário autenticado, exceto cadastro e login. Senha no banco só como hash bcrypt.
+- **RT-03 Autenticação.** Todas as rotas exigem Usuário autenticado, exceto `POST /auth/register` (cadastro), `POST /auth/login` (login) e `GET /health` (`03-security.md`, SEC-01; `05-api.md`). Senha no banco só como hash bcrypt.
 - **RT-04 Isolamento por Usuário.** Cada Usuário lê e altera só as próprias Configurações de LLM, Reuniões e tudo que deriva delas. Recurso de outro Usuário responde como inexistente.
 - **RT-05 Persistência.**
   - Usuários, Configurações de LLM, Reuniões, Participantes, Transcrições, Partes, Epics, User Stories e critérios ficam no SQLite.
@@ -188,9 +212,13 @@ Ver "Não-objetivos" em `00-overview.md`.
 - **RT-15 Somente local.** App roda na máquina do usuário ou em rede confiável, sem exposição à internet (Q60). Mesmo assim:
   - login e "Testar conexão" têm limite de tentativas;
   - cada Usuário tem limite de Reuniões processando ao mesmo tempo;
-  - URL do Ollama só aceita `http` e `https` e não segue redirecionamento.
+  - URL do Ollama só aceita `http` e `https` e não segue redirecionamento;
+  - uso na rede exige HTTPS, pelo perfil `lan` (Q70, ADR-0016). `getDisplayMedia` e `getUserMedia` só funcionam em contexto seguro (`https://` ou `http://localhost`).
 
-  Valores dos limites e nível ASVS: planner.
+  Valores dos limites: resolvido no ADR-0010. Nível ASVS: resolvido em `03-security.md` (ASVS 5.0, L2).
+- **RT-16 Privacidade (LGPD).** (Q70; `03-security.md`, seção "Privacidade (LGPD)")
+  - Tela de upload e tela de gravação mostram aviso de consentimento dos participantes antes de enviar ou gravar, com o texto literal da Q72. Critérios em `meetings` (52) e `screen-recording` (26).
+  - Exclusão de conta não existe pela UI (Q39). Operador exclui um Usuário e todos os dados dele com `python -m snook.cli delete-user <username>`.
 
 ## Critérios de aceite transversais
 
@@ -203,7 +231,7 @@ Ver "Não-objetivos" em `00-overview.md`.
 7. Com segredos de teste conhecidos (chaves de LLM, `HF_TOKEN`, chave-mestra), nenhum desses valores aparece em texto claro em respostas da API, nos logs da aplicação ou no SQLite.
 8. O repositório versiona um `.env.example` sem valores secretos. O `.gitignore` cobre o `.env`, arquivos de banco SQLite e `./audios`, e nenhum desses entra em commit.
 9. A coluna de senha guarda só hash bcrypt, e nenhuma resposta da API devolve senha ou hash.
-10. Requisição sem Usuário autenticado a rota protegida recebe HTTP 401.
+10. Requisição sem Usuário autenticado a qualquer rota sob `/api` recebe HTTP 401, exceto `POST /auth/register`, `POST /auth/login` e `GET /health`, que respondem sem sessão (RT-03).
 11. Isolamento:
     - Requisição de um Usuário a `/meetings/{id}` de uma Reunião de outro Usuário, ou a qualquer rota aninhada nela (Transcrição, speakers, Participantes, divisão, backlog, exportação, tentar novamente), recebe HTTP 404, e nada muda.
     - As rotas de `/llm-configs/{provider}` sempre leem e alteram a configuração do Usuário autenticado. Nenhuma requisição lê, altera ou usa a configuração de outro Usuário.
@@ -224,12 +252,34 @@ Ver "Não-objetivos" em `00-overview.md`.
 18. `pytest` roda sem GPU, sem rede e sem chave real, usando fakes para Whisper, Pyannote e provedores de LLM.
 19. Cada User Story de PRD de módulo tem pelo menos um teste automatizado que a cobre.
 20. Depois de um reinício do backend, nenhuma Reunião fica parada sem trabalho em andamento: todas as que estavam em `processing`, em `generating` ou em `transcribed` com Participantes confirmados aparecem em `failed`, com "processamento interrompido" (Q58, Q69).
+21. `python -m snook.cli delete-user <username>` apaga o Usuário e todos os dados dele: sessões, Configurações de LLM (com as chaves cifradas), Reuniões, dados derivados das Reuniões e arquivos em `/audios`. Depois do comando, login com aquele email ou nome de usuário responde HTTP 401, e os dados de outros Usuários não mudam. Com `<username>` inexistente, o comando termina com erro e não apaga nada (Q70).
+22. Com o perfil `lan` ativo, o app responde em `https://` na rede confiável. Num cliente da rede que confia na CA local, a gravação de tela funciona como em `http://localhost` (Q70, ADR-0016).
+
+## NFRs de performance do frontend (Q70, ADR-0023)
+
+| Id | Métrica | Meta | Como medir |
+|---|---|---|---|
+| NFR-01 | JS inicial (rota de login) | até 200 KB gzip | relatório do build do frontend no CI |
+| NFR-02 | JS total da app | até 500 KB gzip | relatório do build do frontend no CI |
+| NFR-03 | LCP em `localhost`, com CPU 4x mais lenta no DevTools (rota medida: tela de login, mesma do NFR-01; Q73) | até 2,5 s | Lighthouse manual no checkpoint |
+| NFR-04 | INP nas telas de divisão e de revisão do backlog | até 200 ms | DevTools Performance. Tela de divisão: Transcrição de 2 h de fixture. Tela de revisão: backlog de fixture com 30 Epics e 200 US. |
+| NFR-05 | CLS | até 0,1 | Lighthouse |
+| NFR-06 | Elementos com vidro (`backdrop-filter`) visíveis ao mesmo tempo | no máximo 3 | revisão de código e de tela |
+| NFR-07 | Listas da tela da Transcrição e da tela de divisão | virtualizadas: só os itens perto da área visível ficam no DOM | teste de componente com Transcrição de 2 h de fixture |
+| NFR-08 | Quadros com mouse-tracking ativo | nenhum quadro acima de 16 ms por causa do efeito | DevTools Performance, checkpoint manual |
+
+- NFR-01 e NFR-02: o CI falha se o build passar dos limites (ADR-0023).
+- NFR-07 cobre `diarized-transcription` (tela da Transcrição) e `transcript-split` (tela de divisão).
+- NFR-08 cobre as telas com mouse-tracking: card de login e cadastro (`auth`) e área de upload (`meetings`) (`02-architecture.md`, "Mapa de superfícies").
 
 ## Estratégia de testes (confirmada na Q32)
 
 - **Seam principal:** API HTTP do FastAPI via `TestClient` no Pytest, SQLite temporário, pasta de áudio temporária, fakes nas interfaces de Whisper, Pyannote e LLM. Um teste por critério de aceite de módulo, do request à resposta e ao estado no banco.
 - **Adapters externos:** cada adapter de LLM testado contra respostas HTTP gravadas, sem rede. Adapters de Whisper e Pyannote testados com áudio curto de fixture, em suíte separada e opcional (exige modelos).
-- **Frontend e gravação de tela:** framework de teste não decidido. Questão para o planner. Seam da gravação: interfaces sobre as APIs do navegador, com fakes (ver `01-prd/screen-recording.md`).
+- **Frontend e gravação de tela:** Vitest + React Testing Library + MSW. Resolvido: ADR-0015. Seam da gravação: interfaces sobre as APIs do navegador, com fakes (ver `01-prd/screen-recording.md`).
+- **Comando `delete-user` (critério 21):** Pytest chama a função do comando com SQLite e pasta de áudio temporários, dois Usuários com Reuniões e arquivos, e confere o banco e a pasta depois.
+- **Perfil `lan` (critério 22):** checagem manual, fora do `pytest` padrão.
+- **NFRs (NFR-01 a NFR-08):** NFR-01 e NFR-02 no CI; NFR-03 a NFR-06 e NFR-08 em checagem manual a cada checkpoint de tela; NFR-07 em teste de componente do frontend.
 
 ## Índice de módulos
 
@@ -249,5 +299,6 @@ Build order e dependências: `00-overview.md`, seção "Capability map".
 
 ## Questões em aberto
 
-1. Nenhuma decisão do usuário pendente (Q1 a Q69 fechadas).
-2. Para o planner: ver `00-overview.md`, "Decisões pendentes".
+1. Nenhuma decisão de produto pendente. Q1 a Q73 fechadas.
+2. Pendências do planner: todas resolvidas. Ver `02-architecture.md`, "Respostas às decisões pendentes do spec". Inclui onde mora o comando `delete-user`, sem ciclo entre módulos (`02-architecture.md`, "Exclusão de Usuário pelo Operador").
+3. **Rota do LCP (NFR-03).** Resolvido (Q73): tela de login, a mesma rota do NFR-01.

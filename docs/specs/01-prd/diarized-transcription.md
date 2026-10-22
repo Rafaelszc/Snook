@@ -1,7 +1,7 @@
 # 01-prd/diarized-transcription - PRD do módulo `diarized-transcription`
 
-> Status: completo. Decisões fechadas: Q3, Q4, Q5, Q8, Q13, Q17, Q25, Q26, Q43, Q54, Q56, Q58, Q60, Q62.
-> Visão e capability map: `docs/specs/00-overview.md`. Requisitos transversais: `docs/specs/01-prd.md`.
+> Status: completo. Decisões fechadas: Q3, Q4, Q5, Q8, Q13, Q17, Q25, Q26, Q43, Q54, Q56, Q58, Q60, Q62, Q70 (ADR-0010, ADR-0023).
+> Visão e capability map: `docs/specs/00-overview.md`. Requisitos transversais: `docs/specs/01-prd.md`. Rotas sem o prefixo `/api` (ver `01-prd.md`, "Convenção de rotas").
 > Depende de: `meetings` (avisos, arquivo, status) e `auth` (rota da Transcrição). Dependentes: `participants` e `transcript-split`.
 
 ## Problem Statement
@@ -36,18 +36,19 @@
 12. Como operador, quero usar GPU NVIDIA quando houver, e CPU quando não houver, para rodar em qualquer máquina.
 13. Como módulo do sistema (`participants`), quero ler os segmentos e o áudio tratado de uma Reunião, para montar a amostra de cada speaker.
 14. Como módulo do sistema (`transcript-split`), quero ler os segmentos de uma Reunião em ordem, para checar o tamanho e montar o texto enviado à LLM.
+15. Como usuário, quero rolar a transcrição de uma reunião de 2 h sem travar a tela, para conferir qualquer trecho sem espera.
 
 ## Escopo
 
 - Consumo dos avisos "Reunião criada" e "Nova tentativa" (etapa `transcription`) de `meetings`.
 - Status: `pending` para `processing`; depois `transcribed` ou `failed` com etapa `transcription`.
 - Limite de Reuniões em `processing` ao mesmo tempo por Usuário (Q60), com espera em `pending` (Q62).
-- Tratamento automático do áudio (quais tratamentos: planner).
+- Tratamento automático do áudio (quais tratamentos: ADR-0014).
 - Diarização com Pyannote; `expected_speakers` como dica quando informado.
 - Transcrição com Whisper, idioma fixo pt-BR.
 - Junção das saídas em segmentos com speaker, início, fim e texto.
 - Persistência da Transcrição e do áudio tratado.
-- Consulta da Transcrição pela API e tela da Transcrição.
+- Consulta da Transcrição pela API e tela da Transcrição, com lista virtualizada (01-prd, NFR-07).
 - Cache dos modelos num volume Docker; CPU por padrão, GPU opcional.
 
 Endpoint sugerido (planner confirma): `GET /meetings/{id}/transcript`.
@@ -64,7 +65,7 @@ Campos sugeridos de cada segmento: `id`, `meeting_id`, `speaker_label`, `start_s
 - Retomar sozinho, após reinício, transcrição interrompida. `meetings` leva a Reunião a `failed` ao subir (Q58).
 - Recusar envio quando o Usuário já está no limite de processamento (Q62).
 - Reconhecer a mesma voz entre Reuniões diferentes.
-- Metas de tempo de processamento (ainda não definidas).
+- Metas de tempo de processamento. Sem meta na v1; o spike da Task 1 mede e registra no README (`02-architecture.md`, "Questões em aberto").
 
 ## Restrições
 
@@ -79,13 +80,15 @@ Campos sugeridos de cada segmento: `id`, `meeting_id`, `speaker_label`, `start_s
 | `HF_TOKEN` no `.env`; modelos do Pyannote em cache num volume Docker. | rodada 1, Q17 |
 | O usuário ouve um trecho da voz de cada speaker já tratado. | rodada 1, Q9 e Q10 |
 | Arquivo original guardado até a exclusão da Reunião. | rodada 2, Q25 |
-| Número de participantes opcional como dica. | rodada 2, Q26 |
+| Número de participantes opcional como dica, de 1 a 20. | rodada 2, Q26; Q70 (`05-api.md`) |
 | O áudio não é reprocessado para dividir uma Reunião longa. | rodada 4, Q43 |
 | Falha na transcrição ou diarização: "Tentar novamente" reprocessa o áudio. | Q54 |
 | Trecho fora de qualquer turno vai para o speaker mais próximo; áudio sem fala leva a `failed`. | Q56 |
 | Reinício no meio do processamento: `meetings` leva a Reunião a `failed` (etapa `transcription`). | Q58 |
-| Limite de Reuniões processando ao mesmo tempo por Usuário (valor com o planner). | Q60 |
+| Limite de Reuniões processando ao mesmo tempo por Usuário (`TRANSCRIPTION_MAX_PER_USER`) e capacidade global do servidor (`TRANSCRIPTION_WORKERS`). | Q60; Q70 (ADR-0010) |
+| Isolamento entre Usuários (critério 30) só vale com `TRANSCRIPTION_WORKERS` maior que `TRANSCRIPTION_MAX_PER_USER`. | Q70 (ADR-0010) |
 | Reunião acima do limite espera em `pending`, sem recusa. | Q62 |
+| Lista de segmentos da tela da Transcrição virtualizada. | Q70 (ADR-0023); 01-prd, NFR-07 |
 | O áudio não sai do servidor; com modelos em cache, funciona sem internet. | 01-prd, RT-06 e critério transversal 14 |
 | Pytest sem GPU, sem rede e sem modelos, com fakes. | rodada 2, Q32; 01-prd, RT-13 |
 
@@ -157,27 +160,31 @@ Interface interna (nomes do planner):
 
 28. Com o limite configurado em N, um Usuário nunca tem mais de N Reuniões em `processing` ao mesmo tempo.
 29. Uma Reunião que chega ao limite não é recusada. Ela fica em `pending` e começa quando uma Reunião do mesmo Usuário sai de `processing`, na ordem de criação.
-30. O limite de um Usuário não atrasa as Reuniões de outro Usuário.
+30. Com `TRANSCRIPTION_WORKERS` maior que `TRANSCRIPTION_MAX_PER_USER`, o limite de um Usuário não atrasa as Reuniões de outro Usuário. Com valores que não cumprem essa relação, este critério não vale: um Usuário pode ocupar toda a capacidade global e o outro espera (ADR-0010).
+
+### Lista virtualizada (Q70, ADR-0023)
+
+31. Com uma Transcrição de 2 h de fixture, a tela da Transcrição mantém no DOM só os segmentos perto da área visível, e não todos os segmentos. Rolar até o fim da lista mostra o último segmento com instante, speaker e texto (01-prd, NFR-07).
 
 ## Estratégia de testes (seam confirmado na Q32)
 
-- **Seam:** API HTTP via `TestClient` no Pytest, SQLite temporário, pasta `/audios` temporária, fakes nas interfaces de tratamento, diarização e transcrição. Avisos de `meetings` disparados no próprio teste; processamento síncrono. Cobre critérios 1 a 4, 7 a 20 e 28 a 30, um teste por critério. Critérios 28 a 30 usam fake de transcrição que só termina quando o teste libera.
+- **Seam:** API HTTP via `TestClient` no Pytest, SQLite temporário, pasta `/audios` temporária, fakes nas interfaces de tratamento, diarização e transcrição. Avisos de `meetings` disparados no próprio teste; processamento síncrono. Cobre critérios 1 a 4, 7 a 20 e 28 a 30, um teste por critério. Critérios 28 a 30 usam fake de transcrição que só termina quando o teste libera. Critério 30 roda com `TRANSCRIPTION_WORKERS` maior que `TRANSCRIPTION_MAX_PER_USER` (por exemplo 2 e 1).
 - **Junção (critérios 9 a 13):** turnos fake de diarização e trechos fake de transcrição, em tabelas pequenas: trecho dentro de um turno, entre turnos, fora de qualquer turno.
 - **Tratamento (critérios 5 e 6):** suíte com ferramenta real de áudio e fixtures curtas, sem modelos de IA.
 - **Modelos reais (critérios 21 a 24):** suíte separada e opcional, fora do `pytest` padrão, com áudio curto em pt-BR de duas vozes. Critério 22 roda com rede do container bloqueada. Critério 24 roda manualmente em máquina com NVIDIA.
-- **Frontend (critérios 25 a 27):** framework não decidido. Questão para o planner.
+- **Frontend (critérios 25 a 27 e 31):** Vitest + React Testing Library + MSW. Resolvido: ADR-0015. Critério 31 é teste de componente com Transcrição de 2 h de fixture (01-prd, NFR-07).
 
 ## Questões em aberto
 
-1. Cache dos modelos do Whisper fica no mesmo volume do Pyannote. Q17 fala só do Pyannote; critério transversal 14 (offline com modelos em cache) exige os dois.
-2. Critério 26 junta, no frontend, os segmentos deste módulo com o vínculo de `GET /meetings/{id}/participants`. Se o planner preferir rota de Transcrição já com nomes, ela fica em `participants`, para não criar dependência deste módulo em `participants`.
-3. Para o planner:
-   - quais tratamentos de áudio (conversão de formato e taxa de amostragem, normalização, redução de ruído);
-   - onde e em que formato guardar o áudio tratado;
-   - biblioteca do Whisper (por exemplo `openai-whisper` ou `faster-whisper`) e tamanho do modelo;
-   - versão e modelo do Pyannote;
-   - regra de junção entre turnos e trechos (por exemplo maior sobreposição) e granularidade dos segmentos;
-   - worker, concorrência entre Reuniões e valor do limite por Usuário;
-   - Reuniões em `pending` após reinício (fila durável ou novo aviso);
-   - metas de tempo de processamento em CPU e GPU.
+1. Cache dos modelos do Whisper e do Pyannote no mesmo volume (`snook-models`, em `/models`), como o critério transversal 14 exige. Resolvido: ADR-0014.
+2. Critério 26 junta, no frontend, os segmentos deste módulo com o vínculo de `GET /meetings/{id}/participants`. Resolvido: `05-api.md` (junção no frontend; sem rota de Transcrição com nomes).
+3. Respondidas pelo planner:
+   - tratamentos de áudio: mono 16 kHz, passa-alta 80 Hz, `loudnorm`, sem redução de ruído agressiva. Resolvido: ADR-0014.
+   - áudio tratado em `/audios/<meeting_id>/treated.flac` (FLAC mono 16 kHz). Resolvido: ADR-0014.
+   - biblioteca do Whisper: faster-whisper, modelo padrão `large-v3-turbo`. Resolvido: ADR-0014.
+   - Pyannote: `pyannote.audio` 3.x com `pyannote/speaker-diarization-3.1`. Resolvido: ADR-0014.
+   - junção: maior sobreposição de tempo; sem sobreposição, turno mais próximo; trechos seguidos do mesmo speaker com pausa até 1,0 s viram um segmento. Resolvido: ADR-0014.
+   - worker e concorrência: pipeline em processo, `TRANSCRIPTION_MAX_PER_USER` 1 e `TRANSCRIPTION_WORKERS` 2. Resolvido: ADR-0007 e ADR-0010.
+   - Reuniões em `pending` após reinício: reenfileiradas no startup, em ordem de criação. Resolvido: ADR-0007.
+   - metas de tempo de processamento: sem meta na v1; spike da Task 1 mede. Resolvido: `02-architecture.md`, "Questões em aberto".
 4. Código HTTP 409 e endpoint são sugestões, não decisões.

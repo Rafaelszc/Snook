@@ -42,7 +42,7 @@
 - Campos por provedor:
   - OpenAI, Anthropic, DeepSeek: chave, modelo, janela de contexto.
   - Ollama: URL, modelo, janela de contexto, sem chave.
-- Padrões sugeridos de modelo e janela por provedor (valores do planner).
+- Padrões sugeridos de modelo e janela por provedor (valores no ADR-0013).
 - "Testar conexão" sem salvar; validação da conexão ao salvar; limite de tentativas (Q60).
 - Regras da URL do Ollama (Q60, Q63).
 - Chave cifrada com a chave-mestra do `.env`; exibição só por máscara (Q64).
@@ -95,7 +95,7 @@ Endpoints sugeridos (planner confirma): `GET /llm-configs`, `PUT /llm-configs/{p
 Interface interna (nomes do planner):
 
 - **Provedor ativo**: dado o Usuário, devolve provedor, modelo e janela de contexto, ou erro "sem provedor ativo".
-- **Estimar tokens**: dado o Usuário e um texto, devolve contagem estimada de tokens para o modelo ativo. Método: planner.
+- **Estimar tokens**: dado o Usuário e um texto, devolve contagem estimada de tokens para o modelo ativo. Método: heurística aditiva por linha (ADR-0011).
 - **Gerar**: dado o Usuário, o System Prompt e o conteúdo, chama o provedor ativo e devolve o texto da resposta. Aceita pedir saída em JSON quando o provedor suporta. Chamadas ao Ollama também não seguem redirecionamento.
 - **Erros tipados**, no mínimo: sem provedor ativo; chave ou credencial recusada; provedor inacessível (rede, URL, redirecionamento ou timeout); modelo inexistente; limite de contexto excedido; limite de uso (rate limit) do provedor.
 - Chave decifrada existe só dentro do módulo, no momento da chamada. Nenhuma função da interface devolve a chave.
@@ -168,26 +168,26 @@ Interface interna (nomes do planner):
 38. A URL do Ollama aceita qualquer host, inclusive `localhost`, `host.docker.internal` e endereços de rede privada, desde que o esquema seja `http` ou `https`. Outro esquema (por exemplo `file:` ou `ftp:`) é recusado com HTTP 422 no teste e no salvar.
 39. O teste de conexão, o salvar e o "Gerar" do Ollama não seguem redirecionamento. Uma resposta de redirecionamento vira falha com o motivo "provedor inacessível", e nada é gravado.
 40. URL do Ollama com credenciais embutidas (`http://usuario:senha@host`) é recusada com HTTP 422 no teste e no salvar, para que a URL exibida nunca carregue segredo (Q63).
-41. Depois de N chamadas a "Testar conexão" ou a salvar (que também testa) dentro de uma janela de tempo, as seguintes recebem HTTP 429 até a janela passar, e nenhuma chamada ao provedor é feita. N e a janela vêm de configuração (valores com o planner).
+41. Depois de N chamadas a "Testar conexão" ou a salvar (que também testa) dentro de uma janela de tempo, as seguintes recebem HTTP 429 até a janela passar, e nenhuma chamada ao provedor é feita. N e a janela vêm de configuração (valores padrão no ADR-0010).
 
 ## Estratégia de testes (seam confirmado na Q32)
 
 - **Seam:** API HTTP via `TestClient` no Pytest, SQLite temporário, chave-mestra de teste. Adapters trocados por fake configurável (sucesso, credencial recusada, inacessível, modelo inexistente, redirecionamento). Cobre critérios 1 a 28, 31 e 38 a 41.
-- **Adapters (critérios 29, 30 e 32):** cada adapter roda contra respostas HTTP gravadas, sem rede e sem chave real. Ferramenta de gravação: planner. Critério 39 também roda no adapter real do Ollama, com resposta gravada de redirecionamento.
+- **Adapters (critérios 29, 30 e 32):** cada adapter roda contra respostas HTTP gravadas, sem rede e sem chave real. Ferramenta: `respx`, com respostas em `tests/fixtures/llm/<provider>/*.json` (ADR-0012). Critério 39 também roda no adapter real do Ollama, com resposta gravada de redirecionamento.
 - **Segredos (critérios 12 e 27):** teste lê SQLite direto e captura logs (`caplog`), buscando o texto da chave de teste.
-- **Frontend (critérios 33 a 37):** framework não decidido. Questão para o planner.
+- **Frontend (critérios 33 a 37):** Vitest + React Testing Library + MSW. Resolvido: ADR-0015.
 
 ## Questões em aberto
 
-1. Para o planner (02-architecture e 03-security):
-   - algoritmo de cifra e nome da variável da chave-mestra;
-   - destino das chaves salvas se a chave-mestra mudar ou se perder;
-   - método de estimativa de tokens por provedor;
-   - padrões de modelo e de janela de contexto por provedor;
-   - como o teste de conexão valida cada provedor (por exemplo listagem de modelos ou chamada mínima);
-   - timeout das chamadas;
-   - valores do limite de "Testar conexão" e chave da contagem;
-   - ferramenta de gravação de respostas HTTP;
-   - nível ASVS (Q60).
+1. Respondidas pelo planner:
+   - cifra AES-256-GCM; variável `SNOOK_MASTER_KEY`. Resolvido: ADR-0009.
+   - chave-mestra trocada ou perdida: rotação por `python -m snook.cli rotate-master-key`; sem rotação, configuração fica ilegível e o Usuário redigita a chave. Resolvido: ADR-0009.
+   - estimativa de tokens: heurística aditiva por linha, `chars_per_token` 3.0. Resolvido: ADR-0011.
+   - padrões de modelo e de janela por provedor. Resolvido: ADR-0013.
+   - teste de conexão sem gerar texto (consulta do modelo em cada provedor). Resolvido: ADR-0012.
+   - timeouts: leitura `LLM_READ_TIMEOUT` padrão 300 s; teste de conexão 20 s. Resolvido: ADR-0012.
+   - limite de "Testar conexão": 10 chamadas por Usuário em 10 min. Resolvido: ADR-0010.
+   - gravação de respostas HTTP: `respx`. Resolvido: ADR-0012.
+   - nível ASVS: 5.0, L2. Resolvido: `03-security.md`.
 2. Códigos HTTP 404, 409, 422 e 429 e endpoints são sugestões, não decisões. Planner pode ajustar, desde que o critério continue verificável.
-3. Rede do Ollama: URL precisa ser alcançável de dentro do container (por exemplo `host.docker.internal`, não `localhost`). Fica para o planner e o README.
+3. Rede do Ollama: URL precisa ser alcançável de dentro do container (por exemplo `host.docker.internal`, não `localhost`). Resolvido: ADR-0013 (URL padrão sugerida `http://host.docker.internal:11434`). README explica.

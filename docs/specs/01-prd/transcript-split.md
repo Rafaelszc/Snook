@@ -1,7 +1,7 @@
 # 01-prd/transcript-split - PRD do módulo `transcript-split`
 
-> Status: completo. Decisões fechadas: Q34, Q43, Q44, Q45, Q46, Q48, Q50, Q51, Q52, Q54, Q56, Q59, Q65, Q66, Q67, Q68.
-> Visão e capability map: `docs/specs/00-overview.md`. Requisitos transversais: `docs/specs/01-prd.md`.
+> Status: completo. Decisões fechadas: Q34, Q43, Q44, Q45, Q46, Q48, Q50, Q51, Q52, Q54, Q56, Q59, Q65, Q66, Q67, Q68, Q70 (ADR-0019).
+> Visão e capability map: `docs/specs/00-overview.md`. Requisitos transversais: `docs/specs/01-prd.md`. Rotas sem o prefixo `/api` (ver `01-prd.md`, "Convenção de rotas").
 > Depende de: `participants` (nomes), `llm-providers` (provedor ativo, janela de contexto, estimativa de tokens), `diarized-transcription` (segmentos), `meetings` (status e marcas) e `auth` (rotas). Dependentes: `backlog-generation` e `backlog-review`.
 
 ## Problem Statement
@@ -44,11 +44,12 @@
 - Estimativa de tokens pelo modelo ativo; comparação com o orçamento da Parte.
 - Parte única quando a Transcrição cabe.
 - Status `needs_split`, cortes sugeridos, tela de divisão, validação dos cortes.
+- Checagem "passou a caber" ao abrir a tela de divisão, por `POST /meetings/{id}/split/refresh` (Q66, Q70, ADR-0019).
 - "Cancelar divisão" quando há backlog gravado (Q59 a, Q68).
 - Gravação das Partes, sempre substituindo as anteriores; aviso "Partes prontas" para `backlog-generation`.
 - Transições de status do contrato.
 
-Endpoints sugeridos (planner confirma): `GET /meetings/{id}/split`, `PUT /meetings/{id}/split`, `POST /meetings/{id}/split/cancel`.
+Endpoints sugeridos (planner confirma): `GET /meetings/{id}/split` (só leitura), `POST /meetings/{id}/split/refresh` (checagem "passou a caber" ao abrir a tela, ADR-0019), `PUT /meetings/{id}/split`, `POST /meetings/{id}/split/cancel`.
 
 Campos sugeridos da Parte: `id`, `meeting_id`, `index` (ordem, a partir de 1), `first_segment_id`, `last_segment_id`, `start_seconds`, `end_seconds`, `estimated_tokens`. Reunião guarda também a origem do `needs_split` (`split_reason`: `too_long` ou `adjust`), só para exibição (Q68).
 
@@ -62,6 +63,7 @@ Campos sugeridos da Parte: `id`, `meeting_id`, `index` (ordem, a partir de 1), `
 - Resumir a Transcrição.
 - Mostrar Partes no backlog ou na exportação (Q48).
 - Renomear Participantes. Fica em `participants` e `backlog-review` (Q55).
+- Mudar estado em `GET` (ADR-0019).
 
 ## Restrições
 
@@ -80,10 +82,12 @@ Campos sugeridos da Parte: `id`, `meeting_id`, `index` (ordem, a partir de 1), `
 | Saídas de `needs_split`: `failed` na confirmação sem provedor ativo ou com segmento maior que o orçamento; Parte única quando a Transcrição passa a caber. | Q59 |
 | "Reajustar cortes" com a Transcrição cabendo inteira segue com Parte única, sem tela. | Q65 |
 | "Passou a caber, segue sozinha" roda ao abrir a tela de divisão e ao confirmar. | Q66 |
+| Ao abrir a tela, a regra roda em `POST /meetings/{id}/split/refresh`, chamado pelo frontend. `GET /meetings/{id}/split` só lê. | Q70 (ADR-0019) |
 | Tela de divisão sem provedor ativo mostra só a mensagem que aponta para a tela de configurações. | Q67 |
 | "Cancelar divisão" vale sempre que a Reunião tem backlog gravado (`needs_split` → `done`, sem mudar nada); `split_reason` só para exibição. | Q68 |
 | Nenhuma chamada à LLM recebe um texto de Parte cuja estimativa passe do orçamento. | 01-prd, RT-10 |
 | Cada Usuário vê e altera só as próprias Reuniões. | rodada 2, Q19 |
+| Lista de segmentos da tela de divisão virtualizada; INP até 200 ms com Transcrição de 2 h. | Q70 (ADR-0023); 01-prd, NFR-04 e NFR-07 |
 
 ## Contrato com outros módulos
 
@@ -98,7 +102,7 @@ Interface interna (nomes do planner):
   5. demais casos: Reunião vai para `needs_split`; grava `split_reason` `adjust` no modo `reajustar`, `too_long` no modo `normal`.
 - `backlog-review` chama "Preparar geração" para regenerar: modo `normal` para "mesmos cortes"; modo `reajustar` para "reajustar cortes antes" (Q50).
 - **Texto da Parte**: dado intervalo de segmentos, monta o texto enviado à LLM. Uma linha por segmento: instante absoluto de início, nome atual do Participante, texto. Formato sugerido: `[hh:mm:ss] Nome: texto` (planner pode ajustar). Mesma função serve à estimativa e ao envio: tamanho medido = tamanho enviado. Nome lido a cada montagem; renomeação (Q55) vale na próxima geração.
-- **Orçamento da Parte**: dado provedor, modelo e janela, devolve janela menos reserva. Reserva cobre System Prompt, lista de Participantes, nomes de Epics a partir da segunda Parte (Q46) e resposta da LLM. Cálculo da reserva: planner. `backlog-generation` usa para reestimar cada Parte antes do envio.
+- **Orçamento da Parte**: dado provedor, modelo e janela, devolve janela menos reserva. Reserva cobre System Prompt, lista de Participantes, nomes de Epics a partir da segunda Parte (Q46) e resposta da LLM. Cálculo da reserva: ADR-0011. `backlog-generation` usa para reestimar cada Parte antes do envio.
 - **Partes prontas**: aviso emitido uma única vez por preparação concluída, com o `id`. `backlog-generation` consome.
 - **Partes**: dado `id` da Reunião, devolve Partes em ordem, com intervalo e texto.
 - **Gravação das Partes**:
@@ -143,7 +147,7 @@ Nos testes, "cabe" significa estimativa de tokens do texto da Parte menor ou igu
 8. Cada corte sugerido fica no fim de um segmento. As Partes resultantes são contíguas, não se sobrepõem, cobrem todos os segmentos e cabem no orçamento.
 9. Os cortes sugeridos seguem a regra gulosa: cada Parte recebe o maior número de segmentos seguidos que ainda cabe. Assim, o número de Partes é o menor possível com cortes no fim de segmento.
 10. Para cada Parte sugerida, a resposta traz intervalo de tempo, estimativa de tokens e se cabe.
-11. `GET /meetings/{id}/split` fora de `needs_split` responde HTTP 409. A exceção é uma Reunião em `done` já dividida: nesse caso, devolve os cortes atuais, só para leitura.
+11. `GET /meetings/{id}/split` fora de `needs_split` responde HTTP 409. A exceção é uma Reunião em `done` já dividida: nesse caso, devolve os cortes atuais, só para leitura. `POST /meetings/{id}/split/refresh` fora de `needs_split` responde HTTP 409, e nada muda.
 
 ### Confirmação da divisão
 
@@ -172,7 +176,7 @@ Nos testes, "cabe" significa estimativa de tokens do texto da Parte menor ou igu
 
 ### Isolamento e autenticação
 
-28. `GET`, `PUT` e `cancel` em `/meetings/{id}/split` com o `id` de uma Reunião de outro Usuário respondem HTTP 404, e nada muda.
+28. `GET`, `PUT`, `refresh` e `cancel` em `/meetings/{id}/split` com o `id` de uma Reunião de outro Usuário respondem HTTP 404, e nada muda.
 29. Requisição sem autenticação às rotas deste módulo recebe HTTP 401.
 
 ### Frontend
@@ -196,13 +200,21 @@ Nos testes, "cabe" significa estimativa de tokens do texto da Parte menor ou igu
 40. `POST /meetings/{id}/split/cancel` numa Reunião fora de `needs_split`, ou sem backlog gravado, responde HTTP 409, e nada muda.
 41. `PUT /meetings/{id}/split` sem provedor ativo leva a Reunião a `failed` com etapa `generation` e mensagem que aponta para a tela de configurações. Nada é gravado, e nenhum aviso é emitido.
 42. `PUT /meetings/{id}/split` em que um segmento sozinho passa do orçamento do provedor ativo atual leva a Reunião a `failed` com etapa `generation` e a mensagem do critério 6. Nada é gravado, e nenhum aviso é emitido.
-43. Ao abrir a tela de divisão (`GET /meetings/{id}/split`) ou ao confirmar (`PUT`), se a Transcrição inteira passou a caber no orçamento do provedor ativo atual, o módulo grava uma Parte única, leva a Reunião a `generating` e emite "Partes prontas" uma única vez. O `GET` responde com o novo status e sem cortes; o `PUT` ignora os cortes enviados (Q66).
-44. `GET /meetings/{id}/split` sem provedor ativo responde com a mensagem que aponta para a tela de configurações, sem orçamento e sem cortes sugeridos (Q67).
+43. A regra "passou a caber" roda em `POST /meetings/{id}/split/refresh`, que o frontend chama ao abrir a tela de divisão, e em `PUT /meetings/{id}/split`, ao confirmar (Q66, Q70, ADR-0019):
+    - Numa Reunião em `needs_split` cuja Transcrição inteira passou a caber no orçamento do provedor ativo atual, os dois gravam uma Parte única, levam a Reunião a `generating` e emitem "Partes prontas" uma única vez.
+    - Nesse caso, o `POST .../refresh` responde com o mesmo corpo do `GET`, com o novo status e sem cortes. O `PUT` ignora os cortes enviados.
+    - Se a Transcrição ainda não cabe inteira, o `POST .../refresh` não grava nada, não muda o status, não emite aviso e responde como o `GET`.
+    - `GET /meetings/{id}/split` só lê: não grava Parte, não muda o status e não emite aviso, mesmo quando a Transcrição passou a caber.
+44. `GET /meetings/{id}/split` e `POST /meetings/{id}/split/refresh` sem provedor ativo respondem com a mensagem que aponta para a tela de configurações, sem orçamento e sem cortes sugeridos. Nada muda, e a Reunião continua em `needs_split` (Q67).
 45. A tela de divisão mostra o botão "Cancelar divisão" só quando a resposta do `GET` indica que a Reunião tem backlog gravado. Depois de cancelar, o frontend volta à revisão do backlog.
 
 ### Avisos fora de hora
 
 46. Um aviso "Participantes confirmados" ou "Nova tentativa" (etapa `generation`) recebido com a Reunião fora de `transcribed` é ignorado: nenhuma checagem roda, nenhuma Parte é gravada, nenhum aviso é emitido e o status não muda.
+
+### Frontend: abertura da tela (Q70, ADR-0019)
+
+47. Ao abrir a tela de divisão de uma Reunião em `needs_split`, o frontend chama `POST /meetings/{id}/split/refresh` antes de mostrar os cortes. Se a resposta traz status `generating`, o frontend leva o usuário ao detalhe da Reunião, como no critério 36, sem mostrar a tela de cortes.
 
 ## Estratégia de testes (seam confirmado na Q32)
 
@@ -211,15 +223,16 @@ Nos testes, "cabe" significa estimativa de tokens do texto da Parte menor ou igu
   - "Estimar tokens", determinístico, por exemplo um token por caractere;
   - consumidores dos avisos.
 
-  Cobre critérios 1 a 29, 37 a 44 e 46, um teste por critério.
+  Cobre critérios 1 a 29, 37 a 44 e 46, um teste por critério. O critério 43 inclui um teste que chama o `GET` com a Transcrição cabendo e confere que o banco não mudou.
 - **Avisos e regeneração:** avisos de entrada e "Preparar geração" disparados no próprio teste.
-- **Frontend (critérios 30 a 36 e 45):** framework não decidido. Questão para o planner.
+- **Frontend (critérios 30 a 36, 45 e 47):** Vitest + React Testing Library + MSW. Resolvido: ADR-0015.
+- **Performance (01-prd, NFR-04 e NFR-07):** INP e virtualização da lista de segmentos medidos com Transcrição de 2 h de fixture.
 
 ## Questões em aberto
 
-1. Para o planner:
-   - cálculo da reserva do orçamento (System Prompt, Participantes, Epics anteriores, resposta) e onde o System Prompt mora, sem ciclo com `backlog-generation`;
-   - método de estimativa de tokens (em `llm-providers`);
-   - desempenho da estimativa em transcrições de 2 h ao mover cortes (cálculo no servidor por Parte, ou estimativa por segmento somada no cliente);
-   - `GET` do critério 43 muda estado; planner pode trocar por checagem disparada pelo frontend ao abrir a tela, desde que o comportamento visto pelo usuário seja o mesmo.
+1. Respondidas pelo planner:
+   - reserva do orçamento: System Prompt, Participantes, 1.000 tokens para nomes de Epics, resposta e margem de 5%. Resolvido: ADR-0011.
+   - onde o System Prompt mora, sem ciclo com `backlog-generation`: módulo `shared/prompts`. Resolvido: ADR-0020.
+   - estimativa de tokens: heurística aditiva por linha, em `llm-providers`. Resolvido: ADR-0011.
+   - desempenho ao mover cortes: `GET /meetings/{id}/split` devolve a estimativa por segmento, e o cliente soma; o `PUT` revalida no servidor. Resolvido: ADR-0011 e `02-architecture.md`, "Divisão".
 2. Códigos HTTP 404, 409 e 422 e endpoints são sugestões, não decisões.

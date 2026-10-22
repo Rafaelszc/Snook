@@ -164,15 +164,14 @@ Tela e endpoint de "Renomear participante": PRD de `backlog-review`.
 - **Seam:** API HTTP via `TestClient` no Pytest, SQLite temporário, Reuniões montadas no setup já em `transcribed`, com segmentos fake. Fakes: áudio tratado (trecho sintético de duração conhecida), "Provedor ativo" (com e sem provedor), consumidor do aviso "Participantes confirmados". Cobre critérios 1 a 16, 23 e 24, um teste por critério.
 - **Renomear (critérios 17 a 22):** testados aqui pela interface interna; endpoint é de `backlog-review`. Critério 21 roda uma vez por status. PRD de `backlog-review` cobre o mesmo pela API, junto com a troca do solicitante nas US.
 - **Amostras (critérios 2 a 4):** teste confere duração do áudio devolvido e intervalo pedido a "Áudio tratado".
-- **Frontend (critérios 25 a 31):** framework não decidido. Questão para o planner.
+- **Frontend (critérios 25 a 31):** Vitest + React Testing Library + MSW. Resolvido: ADR-0015.
 
 ## Questões em aberto
 
-1. **Transcrição com nomes.** `diarized-transcription` (critério 26) mostra nomes dos Participantes. Este módulo expõe o vínculo em `GET /meetings/{id}/participants`; frontend junta com os segmentos. Se o planner preferir rota de Transcrição já com nomes, ela fica aqui. Nomes lidos na hora: renomeação aparece sem passo extra.
-2. Para o planner:
-   - formato e codificação da amostra (por exemplo wav ou mp3);
-   - tamanho máximo do nome;
-   - cache das amostras;
-   - como "Renomear Participante" entra na transação de `backlog-review`;
-   - transação entre módulos da confirmação dos nomes com "Registrar Participantes confirmados" de `meetings` (mesma conexão SQLite, unidade de trabalho compartilhada ou outro mecanismo).
+1. **Transcrição com nomes.** Resolvido: `05-api.md`. Frontend junta os segmentos de `GET /meetings/{id}/transcript` com `GET /meetings/{id}/participants`. Nomes lidos na hora: renomeação aparece sem passo extra.
+2. Respondidas pelo planner:
+   - formato da amostra: `audio/wav`, gerado sob demanda, sem cache. Resolvido: ADR-0014.
+   - tamanho máximo do nome: 100 caracteres. Resolvido: `05-api.md`.
+   - "Renomear Participante" na transação de `backlog-review`: `rename(..., before_absorb)` na mesma unidade de trabalho. Resolvido: ADR-0006 e `02-architecture.md`, "Interfaces internas".
+   - transação da confirmação com "Registrar Participantes confirmados": unidade de trabalho compartilhada, um commit. Resolvido: ADR-0006.
 3. Códigos HTTP 404, 409 e 422 e endpoints são sugestões, não decisões.

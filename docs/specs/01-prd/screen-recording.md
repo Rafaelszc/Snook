@@ -1,7 +1,7 @@
 # 01-prd/screen-recording - PRD do módulo `screen-recording`
 
-> Status: completo. Decisões fechadas: Q1, Q26, Q36 (substitui a Q24), Q42, Q53, Q56, Q61.
-> Visão e capability map: `docs/specs/00-overview.md`. Requisitos transversais: `docs/specs/01-prd.md`.
+> Status: completo. Decisões fechadas: Q1, Q26, Q36 (substitui a Q24), Q42, Q53, Q56, Q61, Q70 (ADR-0016, ADR-0018, LGPD), Q71, Q72.
+> Visão e capability map: `docs/specs/00-overview.md`. Requisitos transversais: `docs/specs/01-prd.md`. Rotas sem o prefixo `/api` (ver `01-prd.md`, "Convenção de rotas").
 > Depende de: `meetings` (criação de Reunião). Dependentes: nenhum.
 
 ## Problem Statement
@@ -13,11 +13,13 @@
 ## Solution
 
 - Botão "Gravar reunião" na mesma área do upload.
+- Antes de gravar, app lembra o Usuário de obter o consentimento dos participantes (LGPD).
 - App pede compartilhamento de tela (ou aba) com áudio e acesso ao microfone. Grava os dois misturados numa trilha só.
 - Vídeo não é gravado.
 - Falta uma fonte: app avisa; usuário grava só com a que existe ou cancela. Nenhuma fonte: gravação recusada.
 - Gravação para sozinha em 1h59m50s, abaixo do limite de 2 h.
 - Ao parar: usuário confere título, pré-preenchido com o nome gerado do arquivo. App envia o áudio como nova Reunião, mesmo caminho do upload.
+- Gravação só funciona em contexto seguro (`http://localhost` ou HTTPS). Na rede, o app precisa do perfil `lan`.
 
 ## User Stories
 
@@ -33,10 +35,14 @@
 10. Como usuário, quero tentar enviar de novo quando a rede falhar, sem gravar de novo, para não perder a reunião.
 11. Como usuário, quero saber quando meu navegador não tem suporte oficial à gravação, para usar Chrome ou Edge, ou enviar um arquivo.
 12. Como usuário, quero que a gravação pare sozinha pouco antes do limite de 2 h, para que o servidor não recuse o arquivo.
+13. Como usuário, quero ser lembrado de obter o consentimento dos participantes antes de gravar, para cumprir a LGPD.
+14. Como usuário que abre o app pela rede sem HTTPS, quero saber por que a gravação não está disponível e o que fazer, para não achar que o app está quebrado.
 
 ## Escopo
 
 - Botão "Gravar reunião" ao lado do upload.
+- Aviso de consentimento dos participantes (LGPD) antes de iniciar a gravação (Q70, Q72).
+- Checagem de contexto seguro antes de oferecer a gravação (Q70, ADR-0016).
 - Captura do som da tela ou aba (`getDisplayMedia` com áudio) e do microfone (`getUserMedia`).
 - Checagem das fontes antes de começar: aviso e escolha quando falta uma; recusa quando faltam as duas.
 - Mistura das fontes numa trilha só, no navegador.
@@ -55,6 +61,8 @@
 - Transcrição durante a gravação (não-objetivo "tempo real").
 - Gravar sem o app aberto, ou fora do navegador.
 - Validação de formato, tamanho e duração no servidor. É de `meetings`.
+- Configurar HTTPS. Fica com o Operador, pelo perfil `lan` (`08-deployment.md`, ADR-0016).
+- Guardar prova do consentimento dos participantes (`03-security.md`, "Privacidade (LGPD)").
 
 ## Restrições
 
@@ -68,10 +76,13 @@
 | Uma trilha só, misturada no navegador. | rodada 4, Q42 |
 | Falta uma das fontes: aviso e escolha entre gravar só com a disponível ou cancelar. | rodada 4, Q42 |
 | Sem nenhuma fonte de áudio: gravação recusada com mensagem. | rodada 4, Q42 |
-| Campo opcional de número de participantes. | rodada 2, Q26; Q56 |
+| Campo opcional de número de participantes, de 1 a 20. | rodada 2, Q26; Q56; Q70 (`05-api.md`) |
 | Campo `title` opcional também na gravação, pré-preenchido com o nome do arquivo. | Q53 |
 | Comportamentos de parada, saída da página, reenvio e aviso de navegador (critérios 10 a 12, 16, 19 e 23). | Q56 |
-| A Reunião é criada pela mesma regra do upload (formatos, 2 h, 500 MB); o servidor lê a duração do webm do `MediaRecorder`. | `meetings.md`, contrato "Criar Reunião"; Q61 |
+| A Reunião é criada pela mesma regra do upload (formatos, 2 h, 500 MiB); o servidor lê a duração do webm do `MediaRecorder`. | `meetings.md`, contrato "Criar Reunião"; Q61; Q70 (ADR-0018) |
+| `getDisplayMedia` e `getUserMedia` exigem contexto seguro (`https://` ou `http://localhost`). Na rede, o app usa HTTPS pelo perfil `lan`. | Q70 (ADR-0016) |
+| Aviso de consentimento dos participantes (LGPD) antes de iniciar a gravação, com o texto literal da Q72. | Q70 (`03-security.md`, LGPD); Q72 |
+| Codec `audio/webm;codecs=opus` a 64 kbps; mistura pela Web Audio API; pedido da tela antes do microfone. | ADR-0015 |
 | React + TypeScript + shadcn/ui no frontend. | briefing |
 
 ## Contrato com outros módulos
@@ -79,6 +90,7 @@
 - Módulo não tem backend próprio. Envia o arquivo pelo endpoint de criação de Reunião de `meetings` (`POST /meetings`, sugerido): `file` em webm só de áudio, `title` e `expected_speakers` opcional.
 - Reunião da gravação é igual a Reunião de upload: mesmo status inicial (`pending`), mesmo aviso "Reunião criada", mesmo pipeline, mesmo "Tentar novamente".
 - Recusas do servidor (formato, tamanho, duração, arquivo sem áudio, título) seguem regras e mensagens de `meetings`.
+- Aviso de consentimento usa o mesmo componente e a mesma constante de texto da tela de upload (`meetings`, critério 52).
 
 ## Critérios de aceite
 
@@ -119,20 +131,31 @@
 
 ### Tamanho e servidor
 
-24. A taxa de bits da gravação mantém uma gravação de 1h59m50s abaixo de 500 MB.
+24. A taxa de bits da gravação mantém uma gravação de 1h59m50s abaixo de 524.288.000 bytes (500 MiB, ADR-0018).
 25. `POST /meetings` aceita um arquivo webm só de áudio no formato produzido pela gravação, sem duração no cabeçalho (fixture gerada a partir do próprio gravador), e grava a duração real (`meetings`, critério 47).
+
+### Aviso de consentimento (Q70, Q71, Q72, LGPD)
+
+26. A área de gravação mostra o aviso de consentimento dos participantes junto do botão "Gravar reunião", visível antes de a gravação começar. O aviso exibe o texto literal fixado em `meetings`, critério 52 (Q72), vindo da mesma constante única do frontend. O teste desta tela compara o texto exibido com essa constante. O aviso é só texto: não pede confirmação nem bloqueia a gravação (Q71).
+
+### Contexto seguro (Q70, ADR-0016)
+
+27. Com o app aberto fora de contexto seguro (`window.isSecureContext` falso, por exemplo em `http://192.168.0.10:8080`), o botão "Gravar reunião" fica desabilitado. A mensagem diz que a gravação exige HTTPS ou `localhost`, que o Operador pode ativar o perfil `lan`, e que o envio de arquivo continua disponível. Essa mensagem tem prioridade sobre a do critério 22.
+28. Em `http://localhost` e em `https://` (perfil `lan`, com a CA local confiada no cliente), a checagem do critério 27 não bloqueia a gravação.
 
 ## Estratégia de testes (seam da Q32 no backend; seam de frontend abaixo)
 
-- **Seam principal (frontend):** lógica da gravação atrás de interfaces para `getDisplayMedia`, `getUserMedia` e `MediaRecorder`. Fakes simulam cada combinação de fontes (as duas, só tela, só microfone, nenhuma), fim do compartilhamento pelo navegador e parada em 1h59m50s com relógio falso. Cobre critérios 1 a 8, 10 a 20, 22 e 23. Framework de teste do frontend: planner.
+- **Seam principal (frontend):** lógica da gravação atrás de interfaces para `getDisplayMedia`, `getUserMedia`, `MediaRecorder` e `isSecureContext` (`DisplayCapture`, `MicCapture`, `Recorder`, `Clock`, ADR-0015). Fakes simulam cada combinação de fontes (as duas, só tela, só microfone, nenhuma), fim do compartilhamento pelo navegador, parada em 1h59m50s com relógio falso e contexto inseguro. Cobre critérios 1 a 8, 10 a 20, 22, 23, 26, 27 e 28 (este com fake). Framework: Vitest + React Testing Library + MSW. Resolvido: ADR-0015.
 - **Backend (critério 25):** API HTTP via `TestClient` no Pytest (seam da Q32), com fixture webm só de áudio, sem duração no cabeçalho.
 - **Arquivo real (critérios 3, 9, 21 e 24):** teste manual em checklist, em Chrome e Edge, no Windows e no Linux (Fedora). Cada execução confere com `ffprobe`: uma só trilha de áudio, nenhuma de vídeo, tamanho dentro da projeção para 1h59m50s.
+- **Perfil `lan` real (critério 28):** checagem manual junto do critério transversal 22 de `01-prd.md`.
 
 ## Questões em aberto
 
-1. "Tentar novamente" após `failed` (Q54) vale para Reunião da gravação sem nada específico deste módulo. O "Tentar de novo" do critério 19 é outra coisa: reenvio do arquivo quando o upload falha, antes de a Reunião existir.
-2. Riscos a verificar na implementação:
+1. Q71 fechada em 2026-10-22: aviso é só texto visível, sem confirmação obrigatória. Q72 fechada em 2026-10-22: texto literal do aviso (`meetings`, critério 52).
+2. "Tentar novamente" após `failed` (Q54) vale para Reunião da gravação sem nada específico deste módulo. O "Tentar de novo" do critério 19 é outra coisa: reenvio do arquivo quando o upload falha, antes de a Reunião existir.
+3. Riscos a verificar na implementação:
    - **Áudio do sistema no Linux.** Até onde se sabe, Chrome e Edge captam áudio do sistema inteiro só no Windows e no ChromeOS. No Linux e no macOS, em geral só áudio de aba. Usuário usa Fedora. Critério 21 exige só áudio de aba; áudio do sistema inteiro no Linux fica a verificar.
    - **Eco.** Sem fone, microfone capta também os alto-falantes. Duplica vozes na trilha misturada e pode atrapalhar a diarização. UI pode recomendar fone; não decidido.
    - **Perda da gravação.** Gravação fica na memória do navegador até o envio. Fechar a aba antes do envio perde a reunião, apesar da confirmação do critério 12. Baixar cópia local: não decidido.
-3. Para o planner: taxa de bits e codec (por exemplo Opus); como misturar as fontes (por exemplo Web Audio API); ordem dos pedidos de permissão; framework de teste do frontend.
+4. Respondidas pelo planner: codec `audio/webm;codecs=opus` a 64 kbps (cerca de 58 MB em 1h59m50s); mistura pela Web Audio API; tela pedida antes do microfone; framework de teste do frontend. Resolvido: ADR-0015.
