@@ -16,21 +16,21 @@ Detalhes em `AGENTS.md` e `docs/specs/`.
 
 ## Agentes Recomendados
 
-Snook usa agentes especializados para manter a qualidade. Use via `/skill-name` no Claude Code.
+Snook usa agentes especializados para manter a qualidade. Chame pelo nome no Claude Code (`@spec-writer` etc.). `/code-review`, `/simplify` e `/web-design-guidelines` são skills.
 
 ### Pipeline de specs (Especificação)
 
 Rode **nesta ordem** se mudando requisitos ou arquitetura:
 
-| Agente | Comando | Uso |
+| Agente | Chamada | Uso |
 |---|---|---|
-| **spec-writer** | `/spec-writer` | Escreve `00-overview.md` e `01-prd.md` a partir de um briefing fechado. Spec inicial ou mudança de escopo. |
-| **spec-reviewer** | `/spec-reviewer` | Revisa specs contra código e ADRs. Use antes do planner. |
-| **planner** | `/planner` | Transforma spec aprovado em `tasks/plan.md` e ADRs. Apenas com spec validado. |
-| **spec-reviewer** (2ª) | `/spec-reviewer` | Revisa plano e ADRs novos contra specs. Use depois do planner. |
-| **task-breaker** | `/task-breaker` | Quebra plano em tarefas no `tasks/todo.md`. Apenas com plano aprovado. |
+| **spec-writer** | `@spec-writer` | Escreve `00-overview.md` e `01-prd.md` a partir de um briefing fechado. Spec inicial ou mudança de escopo. |
+| **spec-reviewer** | `@spec-reviewer` | Revisa specs contra código e ADRs. Use antes do planner. |
+| **planner** | `@planner` | Transforma spec aprovado em `tasks/plan.md` e ADRs. Apenas com spec validado. |
+| **spec-reviewer** (2ª) | `@spec-reviewer` | Revisa plano e ADRs novos contra specs. Use depois do planner. |
+| **task-breaker** | `@task-breaker` | Quebra plano em tarefas no `tasks/todo.md`. Apenas com plano aprovado. |
 
-**Fluxo exemplo:** mudança de requisito → `/spec-writer` → `/spec-reviewer` → `/planner` → `/spec-reviewer` → `/task-breaker`.
+**Fluxo exemplo:** mudança de requisito → `@spec-writer` → `@spec-reviewer` → `@planner` → `@spec-reviewer` → `@task-breaker`.
 
 ### Apoio na implementação
 
@@ -41,7 +41,7 @@ Rode **nesta ordem** se mudando requisitos ou arquitetura:
 | `/web-design-guidelines` | Revisão de telas e UI em checkpoint. |
 | `frontend-*` skills | Usar conforme `tasks/plan.md`, "Skills de frontend por tarefa". |
 
-Não siga `/spec-writer` → `/planner` sem aprovação do usuário. Plano precisa validação humana.
+Não siga `@spec-writer` → `@planner` sem aprovação do usuário. Plano precisa validação humana.
 
 ## GitFlow
 
@@ -82,13 +82,13 @@ Boas práticas:
 Exemplo:
 
 ```
-Add auth module API routes
+add(auth): signup and login routes
 
 Implement signup and login endpoints with bcrypt password hashing
-(cost 12, max 72 bytes). Session management by httpx adapter.
+(cost 12, max 72 bytes). Session stored server-side.
 Addresses Task 9: auth module foundation.
 
-Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
 ```
 
 **Template mínimo:**
@@ -98,7 +98,7 @@ Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
 
 <explicação opcional: por quê esta mudança, contexto, dependências>
 <linha em branco antes do footer>
-Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
 ```
 
 **Tipos comuns**: `add` (feature), `fix` (bug), `refactor` (sem mudança de comportamento), `test` (testes), `docs` (documentação), `chore` (build, infra, deps).
@@ -150,7 +150,7 @@ Merge só via `Squash and merge` (um commit por PR).
 ### Prerequisites
 
 - Python 3.12, uv
-- Node.js 22+, npm
+- Node.js na versão do `frontend/.nvmrc`, npm
 - Docker Compose
 - ffmpeg
 
@@ -183,7 +183,7 @@ npm run build
 
 ```bash
 docker compose up --build
-# Acessa em http://localhost (nginx) ou http://<LAN_IP>:5000 (perfil lan)
+# Acessa em http://localhost:8080 (nginx) ou https://<SNOOK_LAN_HOST> (perfil lan, Caddy)
 ```
 
 ## Estrutura de código
@@ -191,7 +191,7 @@ docker compose up --build
 ```
 backend/src/snook/
 ├── main.py, cli.py
-├── core/                  # relógio, erro, event bus, UoW
+├── core/                  # settings, db, UoW, eventos, erros, relógio (clock.py), logs, arquivos
 ├── shared/
 │   └── prompts/          # system prompts, schemas
 └── modules/<modulo>/
@@ -201,7 +201,7 @@ backend/src/snook/
     └── repository.py      # acesso a dados (privado)
 
 frontend/src/
-├── app.tsx               # raiz
+├── app/                  # rotas, layout, guarda de autenticação
 ├── styles/               # Tailwind, variáveis CSS
 ├── lib/                  # utilitários, hooks
 ├── components/           # atoms e moléculas
@@ -214,7 +214,7 @@ Grafo de importação em `docs/specs/02-architecture.md`. Nenhum módulo importa
 
 ### Validação de entrada
 
-- [ ] Toda rota valida entrada (Pydantic no backend, zod/valibot no frontend).
+- [ ] Toda rota valida entrada (Pydantic no backend; no frontend, validação própria sem lib nova fora dos ADRs).
 - [ ] GET nunca muda estado.
 - [ ] Reunião: check se usuário é dono (404 se não).
 
@@ -244,7 +244,7 @@ Grafo de importação em `docs/specs/02-architecture.md`. Nenhum módulo importa
 ### Logs
 
 - [ ] Sem senha, token, chave, `HF_TOKEN` ou Transcrição.
-- [ ] JSON, incluindo `timestamp`, `level`, `event`, `context`.
+- [ ] JSON, uma linha por evento, com `ts`, `level`, `logger`, `event`, `request_id` (`07-observability.md`).
 
 ### Segurança de rede
 
@@ -265,13 +265,13 @@ Grafo de importação em `docs/specs/02-architecture.md`. Nenhum módulo importa
 
 - [ ] Sem `.env`, chaves ou segredos no git.
 - [ ] Sem banco, áudio ou volumes em commit.
-- [ ] `CAP_CHROOT_ALLOWED` (volumes do Caddy) em `.gitignore`.
+- [ ] Volume `caddy-data` e `snook-lan-ca.crt` fora do git (`.gitignore`).
 
 Listagem completa: `docs/specs/03-security.md`.
 
 ## Tipos
 
-Backend: `/mypy` strict em todo módulo novo.
+Backend: `mypy --strict` em todo módulo novo.
 
 ```bash
 cd backend && uv run mypy src --strict --check-untyped-defs
@@ -283,7 +283,7 @@ Frontend: TypeScript `strict: true`.
 
 ### Backend
 
-Um teste por critério de aceite. Padrão: `tests/<modulo>/test_<rota_ou_servico>_<cenário>.py`.
+Um teste por critério de aceite. Padrão: `backend/tests/<modulo>/test_api_*.py`.
 
 ```python
 def test_auth_signup_creates_user(db_session, client):
@@ -298,7 +298,7 @@ def test_auth_signup_invalid_email(client):
 
 ### Frontend
 
-Vitest + React Testing Library. Padrão: `src/**/__tests__/<componente>.test.tsx`.
+Vitest + React Testing Library. Padrão: `src/**/*.test.tsx`.
 
 ```typescript
 it("renders login form", () => {
@@ -321,9 +321,7 @@ cd frontend && npm test -- --run
 
 ## Documentação
 
-Specs em `docs/specs/` com voz caveman (breve, sem floreio). Sem comentários desnecessários no código; se explica, é código ruim.
-
-Exemplo: `const userEmail = email.toLowerCase()` precisa comentário só se lowercase é não óbvio pelo contexto (regra LGPD, por exemplo). Caso contrário, nome já explica.
+Specs em `docs/specs/` com voz caveman (breve, sem floreio). Comentário no código só quando informa algo que o nome não diz (regra LGPD, por exemplo). Não remover comentário existente sem pedido.
 
 ## Perguntas?
 
