@@ -353,10 +353,10 @@
 
 ### Checkpoint: Frontend base
 
-- [ ] `cd frontend && npm test -- --run` e `npm run build` passam
-- [ ] Checagem de UI
-- [ ] `impeccable-design-polish` sobre os tokens e a página de amostra dos componentes
-- [ ] `/security-review` sobre o diff
+- [x] `cd frontend && npm test -- --run` e `npm run build` passam
+- [x] Checagem de UI
+- [x] `impeccable-design-polish` sobre os tokens e a página de amostra dos componentes
+- [x] `/security-review` sobre o diff
 
 ### Task 6.1: Dockerfiles do backend (CPU e GPU)
 
