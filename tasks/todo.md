@@ -79,14 +79,14 @@
 **Description:** Cria o projeto `backend/` com `uv`, ruff, mypy `--strict`, pytest e `import-linter` (contratos de `core`, `shared`, `cli`/`main`), mais `Settings` e o relógio injetável.
 
 **Acceptance criteria:**
-- [ ] O backend não sobe sem `SNOOK_MASTER_KEY` válida e a mensagem de erro não mostra o valor (SEC-08).
-- [ ] `Settings` traz os padrões de `08-deployment.md`, "Variáveis de ambiente", e `BCRYPT_ROUNDS` vem de configuração.
-- [ ] `core/clock.py` expõe um relógio que o teste troca por um falso.
+- [x] O backend não sobe sem `SNOOK_MASTER_KEY` válida e a mensagem de erro não mostra o valor (SEC-08).
+- [x] `Settings` traz os padrões de `08-deployment.md`, "Variáveis de ambiente", e `BCRYPT_ROUNDS` vem de configuração.
+- [x] `core/clock.py` expõe um relógio que o teste troca por um falso.
 
 **Verification:**
-- [ ] Testes: `cd backend && uv run pytest tests/core/test_settings.py -q` (startup sem chave, com chave inválida, padrões, relógio falso).
-- [ ] Gate backend, com `lint-imports` provando que `shared` não importa `modules`.
-- [ ] `cd backend && uv sync --frozen` funciona depois do `uv.lock` gerado.
+- [x] Testes: `cd backend && uv run pytest tests/core/test_settings.py -q` (startup sem chave, com chave inválida, padrões, relógio falso).
+- [x] Gate backend, com `lint-imports` provando que `shared` não importa `modules`.
+- [x] `cd backend && uv sync --frozen` funciona depois do `uv.lock` gerado.
 
 **Dependencies:** None
 
