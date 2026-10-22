@@ -1,0 +1,42 @@
+/* ADR-0022: só transform e opacity, 120 a 240 ms (tokens em tokens.css). */
+
+.motion-fade {
+  transition: opacity var(--motion-base) var(--motion-ease);
+}
+
+.motion-rise {
+  transition:
+    opacity var(--motion-base) var(--motion-ease),
+    transform var(--motion-base) var(--motion-ease);
+}
+
+.motion-press {
+  transition: transform var(--motion-fast) var(--motion-ease);
+}
+
+@keyframes motion-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.motion-enter {
+  animation: motion-enter var(--motion-slow) var(--motion-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-fade,
+  .motion-rise,
+  .motion-press {
+    transition: none;
+  }
+
+  .motion-enter {
+    animation: none;
+  }
+}

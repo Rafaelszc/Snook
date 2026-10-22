@@ -264,13 +264,13 @@
 **Description:** `tokens.css` (cores neutras com uma cor de destaque, tema claro e escuro, escala 12 a 40 px, raio, sombra), fonte variável local em `public/fonts/`, `motion.css` (120 a 240 ms, só `transform` e `opacity`).
 
 **Acceptance criteria:**
-- [ ] Os tokens vêm de CSS variables e o Tailwind os lê; a fonte é local, sem requisição externa (CSP `default-src 'self'`, SEC-13).
-- [ ] Texto normal em tema claro e escuro tem contraste mínimo de 4,5:1, conferido por teste que calcula a razão dos tokens (ADR-0022).
-- [ ] Nenhuma transição de `motion.css` anima outra propriedade além de `transform` e `opacity`, e `prefers-reduced-motion: reduce` as desliga (teste que lê o CSS).
+- [x] Os tokens vêm de CSS variables e o Tailwind os lê; a fonte é local, sem requisição externa (CSP `default-src 'self'`, SEC-13).
+- [x] Texto normal em tema claro e escuro tem contraste mínimo de 4,5:1, conferido por teste que calcula a razão dos tokens (ADR-0022).
+- [x] Nenhuma transição de `motion.css` anima outra propriedade além de `transform` e `opacity`, e `prefers-reduced-motion: reduce` as desliga (teste que lê o CSS).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/styles`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/styles`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 4.1
 
@@ -287,13 +287,13 @@
 **Description:** Componente único `GlassPanel` e `glass.css`. É o único lugar com `backdrop-filter`.
 
 **Acceptance criteria:**
-- [ ] Sem suporte (`CSS.supports("backdrop-filter","blur(1px)")` falso), com `prefers-reduced-transparency: reduce` ou `forced-colors: active`, o painel usa fundo opaco (`02-architecture.md`, "Verificação").
-- [ ] Texto sobre o painel mantém 4,5:1 contra o pior fundo, em tema claro e escuro.
-- [ ] Teste que varre `src/**/*.css` e `*.tsx` falha se `backdrop-filter` aparece fora de `glass.css` (regra do ADR-0022).
+- [x] Sem suporte (`CSS.supports("backdrop-filter","blur(1px)")` falso), com `prefers-reduced-transparency: reduce` ou `forced-colors: active`, o painel usa fundo opaco (`02-architecture.md`, "Verificação").
+- [x] Texto sobre o painel mantém 4,5:1 contra o pior fundo, em tema claro e escuro.
+- [x] Teste que varre `src/**/*.css` e `*.tsx` falha se `backdrop-filter` aparece fora de `glass.css` (regra do ADR-0022).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 5.1
 
@@ -310,13 +310,13 @@
 **Description:** `useReducedMotion`, `useCanHover` e `usePointerSpotlight` em `lib/ui/`.
 
 **Acceptance criteria:**
-- [ ] `usePointerSpotlight` registra `pointermove` só com `(hover: hover) and (pointer: fine)` e sem movimento reduzido (`02-architecture.md`, "Restrições obrigatórias").
-- [ ] Com `pointer: coarse` ou movimento reduzido, nenhum listener de `pointermove` é registrado (teste com spy).
-- [ ] A atualização usa `requestAnimationFrame` e CSS variables, sem re-render React (teste conta renders).
+- [x] `usePointerSpotlight` registra `pointermove` só com `(hover: hover) and (pointer: fine)` e sem movimento reduzido (`02-architecture.md`, "Restrições obrigatórias").
+- [x] Com `pointer: coarse` ou movimento reduzido, nenhum listener de `pointermove` é registrado (teste com spy).
+- [x] A atualização usa `requestAnimationFrame` e CSS variables, sem re-render React (teste conta renders).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/lib/ui`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/lib/ui`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 5.1
 
@@ -333,13 +333,13 @@
 **Description:** `StatusBadge` para os 7 status (com `aria-live` onde muda) e uma página de amostra (rota de desenvolvimento) com tokens, `GlassPanel` e badge.
 
 **Acceptance criteria:**
-- [ ] `StatusBadge` mostra texto pt-BR para `pending`, `processing`, `transcribed`, `needs_split`, `generating`, `done` e `failed`, sem depender só de cor (WCAG 2.2 AA).
-- [ ] Mudança de status anuncia em região `aria-live`.
-- [ ] A página de amostra passa `vitest-axe` sem violação.
+- [x] `StatusBadge` mostra texto pt-BR para `pending`, `processing`, `transcribed`, `needs_split`, `generating`, `done` e `failed`, sem depender só de cor (WCAG 2.2 AA).
+- [x] Mudança de status anuncia em região `aria-live`.
+- [x] A página de amostra passa `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 5.1, 5.2
 
