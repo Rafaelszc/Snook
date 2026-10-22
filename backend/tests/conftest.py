@@ -1,6 +1,7 @@
 import base64
 import os
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 from fastapi import FastAPI
@@ -46,8 +47,12 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
 
 
 @pytest.fixture
-def settings(monkeypatch: pytest.MonkeyPatch) -> Settings:
+def settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Settings:
     monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "data" / "snook.db"))
+    monkeypatch.setenv("AUDIO_ROOT", str(tmp_path / "audios"))
+    monkeypatch.setenv("MODELS_ROOT", str(tmp_path / "models"))
+    (tmp_path / "data").mkdir()
     return load_settings(env_file=None)
 
 
