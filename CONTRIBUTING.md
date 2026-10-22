@@ -69,19 +69,39 @@ git push -u origin feature/descricao-breve
 
 ### Commits
 
-Imperativo, primeira linha ≤50 char, sem floreio. Exemplo:
+Boas práticas:
+
+- **Escopo pequeno**: um commit = uma mudança lógica. Não misture refactoring com feature.
+- **Primeira linha**: imperativo, ≤50 char, sem ponto, reflete a mudança principal.
+- **Body** (opcional mas recomendado): deixe linha em branco, depois explique o **por quê** (não o **quê**, já está no diff).
+- **Sempre imperativo**: "Add X", não "Added X" ou "Adds X".
+- **Sem floreio**: sem emojis, sem artigos desnecessários.
+- **Tarefa rastreável**: commit reflete spec ou tarefa do `tasks/todo.md`. Sem "fix typo in comment" ou "ajusta ordem de imports".
+- **Mensagem em inglês**: nomes de código, funções, módulos. Contexto em português se necessário.
+
+Exemplo:
 
 ```
 Add auth module API routes
 
-- Implement POST /auth/signup and POST /auth/login
-- Add bcrypt password hashing with cost 12
-- Implement session management with httpx adapter
+Implement signup and login endpoints with bcrypt password hashing
+(cost 12, max 72 bytes). Session management by httpx adapter.
+Addresses Task 9: auth module foundation.
 
 Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
 ```
 
-**Sempre**: messagem de commit reflete o spec ou a tarefa que implementa. Sem "fix typo in comment" ou "ajusta ordem de imports".
+**Template mínimo:**
+
+```
+<type>(<escopo>): <descrição curta em imperativo, ≤50 char>
+
+<explicação opcional: por quê esta mudança, contexto, dependências>
+<linha em branco antes do footer>
+Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
+```
+
+**Tipos comuns**: `add` (feature), `fix` (bug), `refactor` (sem mudança de comportamento), `test` (testes), `docs` (documentação), `chore` (build, infra, deps).
 
 ### Pull Request
 
