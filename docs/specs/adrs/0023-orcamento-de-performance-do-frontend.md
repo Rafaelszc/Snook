@@ -2,7 +2,7 @@
 
 - Status: Aceita
 - Data: 2026-10-22 (proposta e aceite)
-- Fonte: decisão do usuário em 2026-10-22, Q17 da rodada de decisões do planner: orçamento de performance aprovado, junto com a dependência `@tanstack/react-virtual`. Recomendação aceita sem mudança.
+- Fonte: decisão do usuário em 2026-10-22, Q17 da rodada de decisões do planner: orçamento de performance aprovado, junto com a dependência `@tanstack/react-virtual`. Recomendação aceita sem mudança. Rota do LCP (NFR-03) fixada pela Q73 (2026-10-22); fixture do NFR-04 na tela de revisão fixada no `01-prd.md`.
 
 ## Contexto
 
@@ -27,12 +27,14 @@
 
 Opção 1. NFRs de frontend abaixo, com o ID usado no `01-prd.md`. Inclusão no `01-prd.md` aprovada pelo usuário em 2026-10-22, entre as mudanças no spec.
 
+Fonte única das metas e da forma de medir: `01-prd.md`, NFR-01 a NFR-08. A tabela abaixo resume aquele texto. Em divergência, vale o `01-prd.md`.
+
 | NFR | Métrica | Meta | Como medir |
 |---|---|---|---|
 | NFR-01 | JS inicial (rota de login) | até 200 KB gzip | relatório do `vite build` no CI |
 | NFR-02 | JS total da app | até 500 KB gzip | idem |
-| NFR-03 | LCP em `localhost`, perfil de CPU 4x mais lenta no DevTools | até 2,5 s | Lighthouse manual no checkpoint |
-| NFR-04 | INP nas telas de divisão e revisão | até 200 ms | DevTools Performance, Transcrição de 2 h de fixture |
+| NFR-03 | LCP em `localhost`, perfil de CPU 4x mais lenta no DevTools; rota medida: tela de login, a mesma do NFR-01 (Q73) | até 2,5 s | Lighthouse manual no checkpoint |
+| NFR-04 | INP nas telas de divisão e de revisão do backlog | até 200 ms | DevTools Performance. Tela de divisão: Transcrição de 2 h de fixture. Tela de revisão: backlog de fixture com 30 Epics e 200 US |
 | NFR-05 | CLS | até 0,1 | Lighthouse |
 | NFR-06 | Elementos com `backdrop-filter` visíveis | no máximo 3 | revisão de código e de tela |
 | NFR-07 | Listas da Transcrição e da divisão | virtualizadas | teste de componente com Transcrição de 2 h de fixture |

@@ -1,6 +1,6 @@
 # 03 - Segurança: Snook
 
-> Status: planner, 2026-10-22. ADRs de segurança (0008, 0009, 0010, 0016, 0019, 0021) e demais citados aceitos pelo usuário em 2026-10-22. Correções da revisão do spec-reviewer aplicadas em 2026-10-22 (perfil `lan` e proxies confiáveis, `delete-user`, aviso de consentimento). Base: `00-overview.md`, `01-prd.md`, PRDs de módulo, `02-architecture.md`.
+> Status: planner, 2026-10-22. ADRs de segurança (0008, 0009, 0010, 0016, 0019, 0021) e demais citados aceitos pelo usuário em 2026-10-22. SEC-27 (proxies confiáveis) aceito pelo usuário em 2026-10-22. Correções da revisão do spec-reviewer aplicadas em 2026-10-22 (perfil `lan` e proxies confiáveis, `delete-user`, aviso de consentimento). Base: `00-overview.md`, `01-prd.md`, PRDs de módulo, `02-architecture.md`.
 > Referências: OWASP Top 10:2025, OWASP ASVS 5.0, LGPD (Lei 13.709/2018).
 
 ## Escopo e ativos

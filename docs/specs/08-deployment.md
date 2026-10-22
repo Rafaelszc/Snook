@@ -1,6 +1,6 @@
 # 08 - Implantação: Snook
 
-> Status: planner, 2026-10-22. Correções da revisão do spec-reviewer aplicadas em 2026-10-22 (seção "Perfil lan", CLI de escrita, variante GPU).
+> Status: planner, 2026-10-22. Correções da revisão do spec-reviewer aplicadas em 2026-10-22 (seção "Perfil lan", CLI de escrita, variante GPU). Segunda revisão aplicada em 2026-10-22: testes e verificação manual do perfil `lan` repartidos entre os checkpoints Fundação, `auth` e `screen-recording` de `tasks/plan.md`; conferência do `docker compose stop` na Task 6.
 > Justificativa do arquivo: RT-12 e critérios transversais 1, 2, 8, 14, 21 e 22; perfis CPU e GPU (Q5); segredos no `.env` (Q17, Q33); volumes (Q40, Q41); HTTPS na rede (Q70, ADR-0016).
 
 ## Ambientes
@@ -142,10 +142,14 @@ Regra: só proxy confiável define esquema e IP do cliente.
 - **Efeitos verificados:**
   - `SESSION_COOKIE_SECURE=auto` liga `Secure` quando o esquema é `https` (perfil `lan`) e em `localhost` (ADR-0008, SEC-03).
   - Limite de login por IP (ADR-0010) conta o IP do cliente da rede, não o IP do Caddy nem do nginx.
-- **Testes (Task 6b e Task 7):**
-  - requisição pelo Caddy: cookie com `Secure`; limitador vê o IP do cliente;
-  - requisição direta ao nginx com `X-Forwarded-For: 1.2.3.4` e `X-Forwarded-Proto: https` forjados: limitador vê o IP real; esquema `http`;
-  - requisição direta ao backend de IP fora de `TRUSTED_PROXY_IPS`: cabeçalhos ignorados.
+- **Testes do resolvedor de proxy (Task 7; checkpoint Fundação):** direto na função do resolvedor ou por rota de teste que devolve IP e esquema resolvidos. A rota de teste é registrada só na suíte do Pytest, nunca na app de produção.
+  - conexão de IP em `TRUSTED_PROXY_IPS` com `X-Forwarded-For: 1.2.3.4, <IP do cliente>`: IP resolvido é `<IP do cliente>`;
+  - `X-Forwarded-Proto: https` vale só vindo de IP em `TRUSTED_PROXY_IPS`;
+  - conexão de IP fora de `TRUSTED_PROXY_IPS`: cabeçalhos ignorados; valem IP e esquema da conexão.
+- **Testes de HTTPS (Task 6b; checkpoint Fundação):** `https://<SNOOK_LAN_HOST>` responde e traz HSTS (ver "Verificação manual").
+- **Testes de cookie e limitador (Tasks 10 e 11; checkpoint `auth`):** precisam de login e limitador prontos.
+  - login pelo Caddy: cookie com `Secure`; limitador vê o IP do cliente;
+  - requisição direta ao nginx com `X-Forwarded-For: 1.2.3.4` e `X-Forwarded-Proto: https` forjados: limitador vê o IP real; esquema `http`.
 
 ### Confiar na CA local
 
@@ -163,23 +167,23 @@ A CA fica no volume `caddy-data`. A chave privada da CA assina certificado para 
 5. Conferir: `https://<SNOOK_LAN_HOST>` abre sem alerta; o botão "Gravar reunião" fica habilitado (`screen-recording` critério 28).
 6. Ao desativar o perfil `lan` ou trocar de servidor, remover a CA dos clientes.
 
-### Verificação manual (checkpoint Fundação)
+### Verificação manual
 
-- `curl --cacert snook-lan-ca.crt -sI https://<SNOOK_LAN_HOST>/` mostra `Strict-Transport-Security`.
-- Login pela rede devolve `Set-Cookie` com `Secure`.
-- Critério transversal 22: gravação de tela funciona num cliente da rede que confia na CA.
+- Checkpoint Fundação (Task 6b): `curl --cacert snook-lan-ca.crt -sI https://<SNOOK_LAN_HOST>/` responde por HTTPS e mostra `Strict-Transport-Security`.
+- Checkpoint `auth` (Tasks 10 e 11): login pela rede devolve `Set-Cookie` com `Secure`; falhas de login pela rede contam o IP do cliente.
+- Checkpoint `screen-recording` (Tasks 28 e 29): critério transversal 22, gravação de tela funciona num cliente da rede que confia na CA; checklist manual em Chrome e Edge no Windows e no Fedora.
 
 ## CLI de escrita (`delete-user`, `rotate-master-key`)
 
 Comandos que escrevem no banco rodam com o backend parado. A trava `/data/snook.lock` garante isso (ADR-0006).
 
-1. `docker compose stop backend backend-gpu` (para o serviço do perfil ativo; o outro é ignorado).
+1. `docker compose stop backend backend-gpu` (para o serviço do perfil ativo; o outro é ignorado). A Task 6 confere que o comando funciona com um dos serviços fora do perfil ativo. Se não funcionar, este passo vira um comando por perfil: `docker compose stop backend` (CPU) e `docker compose stop backend-gpu` (GPU).
 2. Perfil CPU: `docker compose run --rm backend python -m snook.cli delete-user <username>`.
    Perfil GPU: `docker compose run --rm backend-gpu python -m snook.cli delete-user <username>`.
 3. `docker compose up -d`.
 
 - Backend no ar: o comando acha a trava ocupada, para com erro e não escreve nada.
-- `delete-user` pede que o Operador digite o nome de usuário de novo, ou aceita `--yes`.
+- `delete-user` pede que o Operador digite o nome de usuário de novo, ou aceita `--yes`. Confirmação diferente do argumento: o comando sai sem apagar nada (SEC-24; teste no checkpoint `delete-user`).
 - Dado apagado pode seguir no último `snook.db.bak-*` até a próxima migração (`03-security.md`, "Backups").
 
 ## CI/CD ([ADR-0017](adrs/0017-ferramentas-e-ci.md))
@@ -208,7 +212,7 @@ Comandos que escrevem no banco rodam com o backend parado. A trava `/data/snook.
 
 1. `git checkout <tag anterior>`.
 2. Se a versão nova rodou migração: parar o backend, restaurar o backup.
-   - `docker compose stop backend backend-gpu`
+   - `docker compose stop backend backend-gpu` (mesma conferência da Task 6 descrita em "CLI de escrita"; se falhar, use o comando do perfil ativo)
    - `docker compose run --rm --entrypoint sh backend -c "cp /data/snook.db.bak-<rev> /data/snook.db"` (no perfil GPU, troque `backend` por `backend-gpu`)
 3. `docker compose up -d --build`.
 

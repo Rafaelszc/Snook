@@ -37,7 +37,7 @@ Opção 1, com valores em configuração (`.env`).
 | Gerações simultâneas no servidor | global | 2 | `GENERATION_WORKERS` |
 
 - Login correto zera só a contagem do identificador.
-- IP do cliente: lido de `X-Forwarded-For` só quando a requisição vem do proxy do frontend (`TRUSTED_PROXY_IPS`). Fora disso, IP da conexão.
+- IP do cliente: lido de `X-Forwarded-For` só quando a conexão vem de IP em `TRUSTED_PROXY_IPS` (nginx e, no perfil `lan`, Caddy). Leitura da direita para a esquerda: o primeiro IP fora de `TRUSTED_PROXY_IPS` é o do cliente. Fora disso, IP da conexão. Regra completa em SEC-27 (`03-security.md`) e em `08-deployment.md`, "Perfil lan".
 - HTTP 429 traz `Retry-After`.
 - Critério 30 de `diarized-transcription` só vale com `TRANSCRIPTION_WORKERS` maior que `TRANSCRIPTION_MAX_PER_USER`. Com valores que não cumprem isso, o backend sobe e grava aviso no log. A nota sobre essa relação no PRD foi aprovada pelo usuário em 2026-10-22, entre as mudanças no spec.
 
