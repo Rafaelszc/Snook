@@ -123,13 +123,13 @@
 **Description:** Engine SQLite (WAL, FK ligadas, `busy_timeout`), `UnitOfWork` com `publish_after_commit` e Alembic configurado (ADR-0006).
 
 **Acceptance criteria:**
-- [ ] Toda conexão sai com `foreign_keys=ON`, `journal_mode=WAL` e `busy_timeout` (`04-data-model.md`, "Convenções").
-- [ ] Um commit por transação; aviso registrado em `publish_after_commit` só sai depois do commit, e nunca em rollback (`03-security.md`, "Always").
-- [ ] `alembic upgrade head` roda num banco temporário vazio.
+- [x] Toda conexão sai com `foreign_keys=ON`, `journal_mode=WAL` e `busy_timeout` (`04-data-model.md`, "Convenções").
+- [x] Um commit por transação; aviso registrado em `publish_after_commit` só sai depois do commit, e nunca em rollback (`03-security.md`, "Always").
+- [x] `alembic upgrade head` roda num banco temporário vazio.
 
 **Verification:**
-- [ ] Testes: `cd backend && uv run pytest tests/core/test_db_uow.py -q`.
-- [ ] Gate backend.
+- [x] Testes: `cd backend && uv run pytest tests/core/test_db_uow.py -q`.
+- [x] Gate backend.
 
 **Dependencies:** Task 3.1
 
