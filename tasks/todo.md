@@ -264,13 +264,13 @@
 **Description:** `tokens.css` (cores neutras com uma cor de destaque, tema claro e escuro, escala 12 a 40 px, raio, sombra), fonte variável local em `public/fonts/`, `motion.css` (120 a 240 ms, só `transform` e `opacity`).
 
 **Acceptance criteria:**
-- [ ] Os tokens vêm de CSS variables e o Tailwind os lê; a fonte é local, sem requisição externa (CSP `default-src 'self'`, SEC-13).
-- [ ] Texto normal em tema claro e escuro tem contraste mínimo de 4,5:1, conferido por teste que calcula a razão dos tokens (ADR-0022).
-- [ ] Nenhuma transição de `motion.css` anima outra propriedade além de `transform` e `opacity`, e `prefers-reduced-motion: reduce` as desliga (teste que lê o CSS).
+- [x] Os tokens vêm de CSS variables e o Tailwind os lê; a fonte é local, sem requisição externa (CSP `default-src 'self'`, SEC-13).
+- [x] Texto normal em tema claro e escuro tem contraste mínimo de 4,5:1, conferido por teste que calcula a razão dos tokens (ADR-0022).
+- [x] Nenhuma transição de `motion.css` anima outra propriedade além de `transform` e `opacity`, e `prefers-reduced-motion: reduce` as desliga (teste que lê o CSS).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/styles`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/styles`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 4.1
 

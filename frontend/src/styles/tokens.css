@@ -1,0 +1,131 @@
+/* ADR-0022: tokens do design system. Fonte local (CSP default-src 'self', SEC-13). */
+
+@font-face {
+  font-family: "Geist Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("/fonts/geist-latin-ext-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Geist Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("/fonts/geist-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* Cores: neutras e uma de destaque (--highlight). Pares testados em tokens.test.ts. */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --highlight: oklch(0.48 0.2 264);
+  --highlight-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.53 0.22 27);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.6 0 0);
+  --ring: oklch(0.48 0.2 264);
+
+  /* Estados: sempre acompanhados de texto ou ícone, nunca só cor. */
+  --status-pending: oklch(0.5 0 0);
+  --status-processing: oklch(0.48 0.2 264);
+  --status-done: oklch(0.45 0.12 150);
+  --status-failed: oklch(0.53 0.22 27);
+
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.48 0.2 264);
+
+  /* Tipografia: escala 12, 14, 16, 20, 24, 32, 40 px. */
+  --font-family-sans: "Geist Variable", system-ui, sans-serif;
+  --font-family-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --fs-12: 0.75rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-20: 1.25rem;
+  --fs-24: 1.5rem;
+  --fs-32: 2rem;
+  --fs-40: 2.5rem;
+  --lh-body: 1.5;
+  --lh-heading: 1.2;
+
+  /* Raio, sombra. Espaçamento usa a escala de 4 px do Tailwind. */
+  --radius: 0.625rem;
+  --elevation-1: 0 1px 2px oklch(0 0 0 / 6%);
+  --elevation-2: 0 8px 24px oklch(0 0 0 / 10%);
+
+  /* Movimento: 120 a 240 ms, só transform e opacity (motion.css). */
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 240ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.75 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --highlight: oklch(0.78 0.13 264);
+  --highlight-foreground: oklch(0.145 0 0);
+  --destructive: oklch(0.72 0.19 22);
+  --border: oklch(0.35 0 0);
+  --input: oklch(0.6 0 0);
+  --ring: oklch(0.78 0.13 264);
+
+  --status-pending: oklch(0.75 0 0);
+  --status-processing: oklch(0.78 0.13 264);
+  --status-done: oklch(0.78 0.15 150);
+  --status-failed: oklch(0.72 0.19 22);
+
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.78 0.13 264);
+  --sidebar-primary-foreground: oklch(0.145 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.35 0 0);
+  --sidebar-ring: oklch(0.78 0.13 264);
+
+  --elevation-1: 0 1px 2px oklch(0 0 0 / 40%);
+  --elevation-2: 0 8px 24px oklch(0 0 0 / 50%);
+}
