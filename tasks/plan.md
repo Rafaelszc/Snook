@@ -198,7 +198,7 @@ Checagem de UI em todo checkpoint com tela (abaixo chamada "checagem de UI"):
 
 ### Checkpoint: `meetings`
 
-- [ ] Critérios 1 a 52 de `01-prd/meetings.md` cobertos (34 manual)
+- [ ] Critérios 1 a 46 e 49 a 52 de `01-prd/meetings.md` cobertos (34 manual); 47 e 48 ficam no checkpoint `screen-recording`
 - [ ] Critério 52: `ConsentNotice` mostra o texto exato da constante junto do botão de envio
 - [ ] Checagem de UI; `impeccable-design-polish` nas telas de upload, lista e detalhe
 - [ ] `/security-review` sobre o diff
@@ -212,7 +212,7 @@ Checagem de UI em todo checkpoint com tela (abaixo chamada "checagem de UI"):
 
 ### Checkpoint: Pipeline de transcrição com fakes
 
-- [ ] Critérios 1 a 20 e 28 a 30 de `01-prd/diarized-transcription.md` passam
+- [ ] Critérios 1 a 17 e 28 a 30 de `01-prd/diarized-transcription.md` passam (18 a 20 no checkpoint `diarized-transcription`, depois da rota `GET /transcript`)
 - [ ] Exclusão durante processamento não recria dados
 - [ ] `/security-review` sobre o diff
 
@@ -221,6 +221,7 @@ Checagem de UI em todo checkpoint com tela (abaixo chamada "checagem de UI"):
 
 ### Checkpoint: `diarized-transcription`
 
+- [ ] Critérios 18 a 20 de `01-prd/diarized-transcription.md` passam pela rota `GET /transcript`
 - [ ] Critérios 21 a 24 na suíte `models_real`, rodada à mão; critério 22 com rede do container bloqueada; critério 24 manual com GPU NVIDIA
 - [ ] Critérios 25 a 27 e 31 cobertos por Vitest
 - [ ] SEC-22 verificado: download de modelo exige repositório e revisão fixos
