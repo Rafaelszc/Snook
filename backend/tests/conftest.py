@@ -3,6 +3,11 @@ import os
 from collections.abc import Iterator
 
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+from snook.core.settings import Settings, load_settings
+from snook.main import create_app
 
 VALID_MASTER_KEY = base64.urlsafe_b64encode(bytes(range(32))).decode()
 
@@ -38,3 +43,20 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         if name.startswith(_ENV_PREFIXES) or name in _ENV_NAMES:
             monkeypatch.delenv(name)
     yield
+
+
+@pytest.fixture
+def settings(monkeypatch: pytest.MonkeyPatch) -> Settings:
+    monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
+    return load_settings(env_file=None)
+
+
+@pytest.fixture
+def app(settings: Settings) -> FastAPI:
+    return create_app(settings)
+
+
+@pytest.fixture
+def client(app: FastAPI) -> Iterator[TestClient]:
+    with TestClient(app) as test_client:
+        yield test_client

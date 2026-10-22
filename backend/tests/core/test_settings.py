@@ -54,12 +54,6 @@ def test_master_key_is_not_leaked_by_repr(monkeypatch: pytest.MonkeyPatch) -> No
     assert settings.snook_master_key.get_secret_value() == VALID_MASTER_KEY
 
 
-@pytest.fixture
-def settings(monkeypatch: pytest.MonkeyPatch) -> Settings:
-    monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
-    return load_settings(env_file=None)
-
-
 def test_defaults_follow_deployment_spec(settings: Settings) -> None:
     assert settings.snook_master_key_previous is None
     assert settings.hf_token is None
