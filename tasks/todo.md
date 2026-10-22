@@ -145,13 +145,13 @@
 **Description:** `EventBus` em memória com tipos de aviso com `run_id`, e `core/runlock.py` com `fcntl.flock` (ADR-0006, ADR-0007).
 
 **Acceptance criteria:**
-- [ ] Todo aviso leva `meeting_id` e `run_id`; o barramento entrega ao consumidor registrado, e o consumidor pode ignorar `run_id` que não bate.
-- [ ] Um segundo processo que tenta pegar a trava falha com erro claro (`03-security.md`, "Always": pegar a trava antes de escrever).
-- [ ] A trava é liberada quando o processo morre.
+- [x] Todo aviso leva `meeting_id` e `run_id`; o barramento entrega ao consumidor registrado, e o consumidor pode ignorar `run_id` que não bate.
+- [x] Um segundo processo que tenta pegar a trava falha com erro claro (`03-security.md`, "Always": pegar a trava antes de escrever).
+- [x] A trava é liberada quando o processo morre.
 
 **Verification:**
-- [ ] Testes: `cd backend && uv run pytest tests/core/test_events.py tests/core/test_runlock.py -q` (o de trava usa um subprocesso real e mata o dono).
-- [ ] Gate backend.
+- [x] Testes: `cd backend && uv run pytest tests/core/test_events.py tests/core/test_runlock.py -q` (o de trava usa um subprocesso real e mata o dono).
+- [x] Gate backend.
 
 **Dependencies:** Task 3.1
 
