@@ -102,13 +102,13 @@
 **Description:** `AppError`, corpo de erro padrão, handler genérico de 500, `create_app()` e `GET /api/health`, mais `conftest.py` com app de teste.
 
 **Acceptance criteria:**
-- [ ] `GET /api/health` responde 200 `{"status":"ok"}` sem sessão (`01-prd.md` RT-03; transversal 10).
-- [ ] `AppError(code, message, http_status)` vira `{"error": {"code", "message", "fields"}}` (`05-api.md`, "Erros").
-- [ ] Exceção não tratada responde 500 `{"error":{"code":"internal_error","message":"erro interno"}}` sem stack trace (SEC-19).
+- [x] `GET /api/health` responde 200 `{"status":"ok"}` sem sessão (`01-prd.md` RT-03; transversal 10).
+- [x] `AppError(code, message, http_status)` vira `{"error": {"code", "message", "fields"}}` (`05-api.md`, "Erros").
+- [x] Exceção não tratada responde 500 `{"error":{"code":"internal_error","message":"erro interno"}}` sem stack trace (SEC-19).
 
 **Verification:**
-- [ ] Testes: `cd backend && uv run pytest tests/core/test_errors_health.py -q`.
-- [ ] Gate backend.
+- [x] Testes: `cd backend && uv run pytest tests/core/test_errors_health.py -q`.
+- [x] Gate backend.
 
 **Dependencies:** Task 3.1
 

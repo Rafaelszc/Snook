@@ -4,8 +4,11 @@ version = "0.1.0"
 description = "Snook: transcrição local de reuniões e geração de backlog."
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "fastapi>=0.160.0",
+    "httpx>=0.28.1",
     "pydantic>=2.9",
     "pydantic-settings>=2.6",
+    "uvicorn>=0.32",
 ]
 
 [dependency-groups]
