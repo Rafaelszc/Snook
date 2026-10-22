@@ -241,13 +241,13 @@
 **Description:** React Router, TanStack Query, layout base e `lib/api/` (cliente `fetch` com `credentials: "same-origin"`, tipos, erro tipado a partir do contrato de `05-api.md`).
 
 **Acceptance criteria:**
-- [ ] O cliente converte `{"error":{"code","message","fields"}}` em erro tipado que a tela lê.
-- [ ] O cliente nunca guarda token em `localStorage` nem em `sessionStorage` (`03-security.md`, "Never"; teste com spy no `Storage`).
-- [ ] Rotas placeholder navegam e o `ConsentNotice` ainda não existe (vem na Task 22.1).
+- [x] O cliente converte `{"error":{"code","message","fields"}}` em erro tipado que a tela lê.
+- [x] O cliente nunca guarda token em `localStorage` nem em `sessionStorage` (`03-security.md`, "Never"; teste com spy no `Storage`).
+- [x] Rotas placeholder navegam e o `ConsentNotice` ainda não existe (vem na Task 22.1).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/lib`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/lib`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 4.2
 

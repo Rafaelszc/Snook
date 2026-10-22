@@ -16,9 +16,7 @@ function Health() {
 }
 
 it("renderiza, mocka rota com MSW e passa vitest-axe", async () => {
-  server.use(
-    http.get("/api/health", () => HttpResponse.json({ status: "ok" }))
-  )
+  server.use(http.get("/api/health", () => HttpResponse.json({ status: "ok" })))
   const { container } = renderWithProviders(<Health />)
   expect(await screen.findByText("status: ok")).toBeInTheDocument()
   expect(await axe(container)).toHaveNoViolations()
