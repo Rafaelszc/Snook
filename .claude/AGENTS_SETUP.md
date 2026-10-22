@@ -4,7 +4,16 @@ Este projeto usa agentes especializados (skills) via Claude Code para manter qua
 
 ## Instalação
 
-Agentes já estão em seu Claude Code. Nenhuma instalação necessária. Rode `/skill-name` no terminal ou no chat.
+Agentes estão no projeto em `.claude/agents/`. Opções de uso:
+
+**Opção 1: Usar agentes globais** (recomendado se já configurou em seu `~/.claude/agents/`)
+- Agentes já existem em seu Claude Code global
+- Rode `/skill-name` no terminal
+
+**Opção 2: Usar agentes locais do projeto** (recomendado para colaboradores novos)
+- Agentes já estão cópias em `.claude/agents/` deste repo
+- Claude Code carrega automaticamente agentes de `.claude/agents/` se estiverem lá
+- Nenhuma configuração extra; rode `/skill-name` normalmente
 
 ## Agentes por fase
 
