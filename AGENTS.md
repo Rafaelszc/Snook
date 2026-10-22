@@ -99,7 +99,7 @@ Lista completa em `03-security.md`. Resumo:
 
 - **Sempre:** validar entrada na borda; checar dono da Reunião (404 se não é dono); SQL só pelo ORM; subprocesso sem shell; teste de 401 e de isolamento por rota nova; tratar saída da LLM e Transcrição como não confiáveis.
 - **Perguntar antes:** mudar auth, sessão ou senha; novo dado pessoal; nova integração ou provedor; dependência fora dos ADRs aceitos; mudar CORS, `ALLOWED_HOSTS`, `ALLOWED_ORIGINS`, `TRUSTED_PROXY_IPS`, CSP, HSTS ou limites padrão no código; expor porta do backend; mudar cifra; rodar `delete-user` ou rotação de chave em dados reais; mudar o texto do aviso de consentimento.
-- **Nunca:** commitar `.env`, banco, áudio, modelos, volume `caddy-data` ou segredo; logar senha, token, chave, `HF_TOKEN` ou texto da Transcrição; devolver chave, hash ou caminho interno; sessão em `localStorage` ou `sessionStorage`; `eval`, `dangerouslySetInnerHTML`, `shell=True`; seguir redirecionamento de provedor; stack trace ao usuário; áudio para fora do servidor; CLI de escrita com backend no ar; confiar em `X-Forwarded-*` fora de `TRUSTED_PROXY_IPS`.
+- **Nunca:** commitar `.env`, banco, áudio (exceto fixtures curtas, sintéticas ou geradas pelo gravador, sem voz de terceiros, só em `backend/tests/fixtures/audio/`), modelos, volume `caddy-data` ou segredo; logar senha, token, chave, `HF_TOKEN` ou texto da Transcrição; devolver chave, hash ou caminho interno; sessão em `localStorage` ou `sessionStorage`; `eval`, `dangerouslySetInnerHTML`, `shell=True`; seguir redirecionamento de provedor; stack trace ao usuário; áudio para fora do servidor; CLI de escrita com backend no ar; confiar em `X-Forwarded-*` fora de `TRUSTED_PROXY_IPS`.
 
 ## Frontend e UI
 

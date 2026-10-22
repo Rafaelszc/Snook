@@ -192,7 +192,7 @@ Exceções conscientes de L2 (riscos aceitos, ver seção própria): sem MFA, se
 
 ### Never
 
-- Commitar `.env`, banco, áudio, modelos, volume `caddy-data` ou qualquer segredo.
+- Commitar `.env`, banco, áudio (exceto fixtures curtas, sintéticas ou geradas pelo gravador, sem voz de terceiros, só em `backend/tests/fixtures/audio/`), modelos, volume `caddy-data` ou qualquer segredo.
 - Logar senha, token de sessão, chave de LLM, `HF_TOKEN`, chave-mestra ou texto da Transcrição.
 - Devolver chave de LLM inteira, hash de senha ou caminho interno de arquivo pela API.
 - Guardar token de sessão em `localStorage` ou `sessionStorage`.
