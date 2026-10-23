@@ -43,6 +43,7 @@ def normalize_base_url(url: str) -> str:
     try:
         parts = urlsplit(url.strip())
         hostname = parts.hostname
+        _ = parts.port  # porta fora de 0..65535 levanta ValueError aqui, não no httpx
     except ValueError:
         raise InvalidBaseUrl("invalid_url") from None
     if parts.scheme.lower() not in _SCHEMES:

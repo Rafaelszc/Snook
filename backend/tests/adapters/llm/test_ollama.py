@@ -77,7 +77,7 @@ def test_rejects_embedded_credentials(url: str) -> None:
     assert "OutraChave99" not in exc.value.message
 
 
-@pytest.mark.parametrize("url", ["http://", "http://:11434", "https:///api"])
+@pytest.mark.parametrize("url", ["http://", "http://:11434", "https:///api", "http://host:99999"])
 def test_rejects_empty_host(url: str) -> None:
     with pytest.raises(InvalidBaseUrl) as exc:
         normalize_base_url(url)

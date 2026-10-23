@@ -924,7 +924,7 @@
 
 - [x] Critérios 29, 30, 38 a 40 de `01-prd/llm-providers.md` passam (38 e 40 no nível do adapter; a resposta 422 por API fecha na Task 15.2)
 - [x] SEC-07, SEC-17 verificados
-- [ ] `/security-review` sobre o diff
+- [x] `/security-review` sobre o diff
 
 ### Task 15.1: `GET /llm-configs`
 
