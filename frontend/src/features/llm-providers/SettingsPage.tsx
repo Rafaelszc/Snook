@@ -52,7 +52,11 @@ function Summary({ config }: { config: LlmConfig }) {
       {rows.map(({ term, value }) => (
         <div key={term} className="contents">
           <dt className="text-muted-foreground">{term}</dt>
-          <dd translate="no" className="truncate font-mono tabular-nums">
+          <dd
+            translate="no"
+            title={value}
+            className="truncate font-mono tabular-nums"
+          >
             {value}
           </dd>
         </div>
@@ -105,6 +109,9 @@ export function SettingsPage() {
         </p>
       ) : isPending ? (
         <div aria-busy="true" className="grid gap-4 lg:grid-cols-2">
+          <span role="status" className="sr-only">
+            {MESSAGES.loading}
+          </span>
           {Array.from({ length: 4 }, (_, i) => (
             <div key={i} className="h-72 rounded-xl bg-muted" />
           ))}

@@ -25,7 +25,7 @@ export function RemoveDialog({
         </Button>
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
-        <AlertDialog.Overlay className="motion-fade fixed inset-0 z-50 bg-black/40" />
+        <AlertDialog.Overlay className="motion-fade-in fixed inset-0 z-50 bg-black/40" />
         <AlertDialog.Content asChild>
           <GlassPanel className="motion-enter fixed top-1/2 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-xl p-6">
             <AlertDialog.Title className="text-base font-semibold">

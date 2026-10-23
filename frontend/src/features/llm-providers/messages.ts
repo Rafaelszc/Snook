@@ -21,6 +21,7 @@ export const MESSAGES = {
   description:
     "Provedores de LLM que geram o backlog. O provedor ativo processa suas reuniões.",
   loadError: "Não foi possível carregar as configurações.",
+  loading: "Carregando configurações…",
   apiKey: "Chave de API",
   url: "URL",
   model: "Modelo",

@@ -1143,8 +1143,8 @@
 
 - [ ] Critérios 1 a 41 de `01-prd/llm-providers.md` cobertos
 - [ ] SEC-06, SEC-26 verificados
-- [ ] Checagem de UI; `impeccable-design-polish` na tela de configurações
-- [ ] `/security-review` sobre o diff
+- [x] Checagem de UI; `impeccable-design-polish` na tela de configurações
+- [x] `/security-review` sobre o diff
 - [ ] Revisão humana antes de seguir
 
 ---
