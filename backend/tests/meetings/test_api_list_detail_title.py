@@ -12,11 +12,17 @@ from tests.auth.helpers import Users, rows
 from tests.meetings.helpers import URL, FakeProbe, set_fields, upload
 
 UNKNOWN_ID = "3f2b8c1e-5d4a-4b6c-9e7f-0a1b2c3d4e5f"
-SUMMARY_FIELDS = {"id", "title", "created_at", "duration_seconds", "status"}
+SUMMARY_FIELDS = {
+    "id",
+    "title",
+    "created_at",
+    "duration_seconds",
+    "status",
+    "participants_confirmed",
+}
 DETAIL_FIELDS = SUMMARY_FIELDS | {
     "original_filename",
     "expected_speakers",
-    "participants_confirmed",
     "has_backlog",
     "failed_stage",
     "error_message",
@@ -51,6 +57,7 @@ def test_list_is_newest_first_with_summary_fields(
         "created_at": "2026-10-23T12:01:00Z",
         "duration_seconds": 60.0,
         "status": "pending",
+        "participants_confirmed": False,
     }
 
 
@@ -90,6 +97,8 @@ def test_detail_has_listing_fields_and_flags(
     body = ana.get(f"{URL}/{meeting_id}").json()
     assert body["participants_confirmed"] is True
     assert body["has_backlog"] is True
+    [item] = ana.get(URL).json()
+    assert item["participants_confirmed"] is True
 
 
 def test_detail_in_failed_has_stage_and_message(

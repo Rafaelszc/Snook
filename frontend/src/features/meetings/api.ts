@@ -7,12 +7,12 @@ export interface MeetingSummary {
   created_at: string
   duration_seconds: number
   status: Status
+  participants_confirmed: boolean
 }
 
 export interface MeetingDetail extends MeetingSummary {
   original_filename: string
   expected_speakers: number | null
-  participants_confirmed: boolean
   has_backlog: boolean
   failed_stage: "transcription" | "generation" | null
   error_message: string | null
@@ -29,13 +29,9 @@ const ACTIVE: ReadonlySet<Status> = new Set([
   "generating",
 ])
 
-export function isActive(meeting: {
-  status: Status
-  participants_confirmed?: boolean
-}): boolean {
+export function isActive(meeting: MeetingSummary): boolean {
   return (
     ACTIVE.has(meeting.status) ||
-    (meeting.status === "transcribed" &&
-      meeting.participants_confirmed === true)
+    (meeting.status === "transcribed" && meeting.participants_confirmed)
   )
 }

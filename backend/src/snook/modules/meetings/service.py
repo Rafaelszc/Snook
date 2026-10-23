@@ -326,6 +326,7 @@ def _summary(meeting: Meeting) -> MeetingSummary:
         created_at=meeting.created_at,
         duration_seconds=meeting.duration_seconds,
         status=meeting.status,
+        participants_confirmed=_flags(meeting).participants_confirmed,
     )
 
 
@@ -336,7 +337,6 @@ def _detail(meeting: Meeting) -> MeetingDetail:
         **_summary(meeting).model_dump(),
         original_filename=meeting.original_filename,
         expected_speakers=meeting.expected_speakers,
-        participants_confirmed=flags.participants_confirmed,
         has_backlog=flags.has_backlog,
         failed_stage=meeting.failed_stage if failed else None,
         error_message=meeting.error_message if failed else None,

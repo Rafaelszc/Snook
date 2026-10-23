@@ -8,6 +8,7 @@ export const SUMMARY: MeetingSummary = {
   created_at: "2026-10-23T12:00:00Z",
   duration_seconds: 3725,
   status: "pending",
+  participants_confirmed: false,
 }
 
 export function detail(overrides: Partial<MeetingDetail> = {}): MeetingDetail {
@@ -15,7 +16,6 @@ export function detail(overrides: Partial<MeetingDetail> = {}): MeetingDetail {
     ...SUMMARY,
     original_filename: "planejamento.mp3",
     expected_speakers: 3,
-    participants_confirmed: false,
     has_backlog: false,
     failed_stage: null,
     error_message: null,
