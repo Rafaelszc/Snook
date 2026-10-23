@@ -1,15 +1,44 @@
-from dataclasses import dataclass
+import logging
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 from datetime import datetime
 
 from snook.core.clock import to_iso
+from snook.core.errors import AppError
+from snook.core.logging import register_secret
+from snook.core.ratelimit import SlidingWindowLimiter
+from snook.core.settings import Settings
 from snook.core.uow import UnitOfWork
-from snook.modules.llm_providers import repository
-from snook.modules.llm_providers.crypto import KeyCipher, MasterKeyMismatch, SealedKey
+from snook.modules.llm_providers import messages, repository
+from snook.modules.llm_providers.adapters.anthropic import AnthropicAdapter
+from snook.modules.llm_providers.adapters.base import (
+    CredentialRejected,
+    LLMAdapter,
+    LLMError,
+    ProviderTarget,
+)
+from snook.modules.llm_providers.adapters.ollama import (
+    InvalidBaseUrl,
+    OllamaAdapter,
+    normalize_base_url,
+)
+from snook.modules.llm_providers.adapters.openai_compat import OpenAICompatAdapter
+from snook.modules.llm_providers.crypto import (
+    KeyCipher,
+    MasterKeyMismatch,
+    SealedKey,
+    decode_master_key,
+)
+from snook.modules.llm_providers.defaults import DEFAULTS
 from snook.modules.llm_providers.models import (
     KEY_STATUS_OK,
     KEY_STATUS_UNREADABLE,
+    PROVIDERS,
     LlmConfig,
 )
+from snook.modules.llm_providers.schemas import ConfigDraft, ConfigOut
+
+logger = logging.getLogger("snook.llm_providers")
 
 MASK_MIN_LENGTH = 12
 
@@ -49,7 +78,7 @@ def save_config(
     api_key: str | None,
     base_url: str | None,
     now: datetime,
-) -> None:
+) -> LlmConfig:
     """Cria ou atualiza a configuração. `api_key=None` mantém a chave gravada."""
     config = repository.get_config(uow.session, user_id, provider)
     if config is None:
@@ -67,6 +96,7 @@ def save_config(
     if api_key is not None:
         _store_key(config, cipher, api_key)
     repository.add_config(uow.session, config)
+    return config
 
 
 def read_api_key(uow: UnitOfWork, cipher: KeyCipher, *, user_id: str, provider: str) -> str | None:
@@ -111,3 +141,225 @@ def rotate_master_key(uow: UnitOfWork, cipher: KeyCipher, *, now: datetime) -> R
         config.updated_at = to_iso(now)
         rotated += 1
     return RotationResult(rotated=rotated, unreadable=unreadable)
+
+
+# --- Configurações do Usuário (`/api/llm-configs`) ---
+
+KEY_PROVIDERS = ("openai", "anthropic", "deepseek")
+
+_REASONS = {
+    "credential_rejected": "credential_rejected",
+    "provider_unreachable": "provider_unreachable",
+    "model_not_found": "model_not_found",
+    "provider_rate_limited": "rate_limited",
+    "context_limit_exceeded": "context_limit",
+}
+
+
+def build_cipher(settings: Settings) -> KeyCipher:
+    previous = settings.snook_master_key_previous
+    return KeyCipher(
+        decode_master_key(settings.snook_master_key.get_secret_value()),
+        previous=None if previous is None else decode_master_key(previous.get_secret_value()),
+    )
+
+
+def build_adapters(settings: Settings) -> dict[str, LLMAdapter]:
+    timeout = float(settings.llm_read_timeout)
+    return {
+        "openai": OpenAICompatAdapter("openai", read_timeout=timeout),
+        "anthropic": AnthropicAdapter(read_timeout=timeout),
+        "deepseek": OpenAICompatAdapter("deepseek", read_timeout=timeout),
+        "ollama": OllamaAdapter(read_timeout=timeout),
+    }
+
+
+def build_test_limiter(settings: Settings) -> SlidingWindowLimiter:
+    """Teste e salvar dividem o limite, por Usuário (ADR-0010)."""
+    return SlidingWindowLimiter(
+        max_events=settings.llm_test_max_calls, window_seconds=settings.llm_test_window_seconds
+    )
+
+
+def require_provider(provider: str) -> None:
+    if provider not in PROVIDERS:
+        raise AppError("provider_not_found", messages.PROVIDER_NOT_FOUND, 404)
+
+
+def reason_of(error: LLMError) -> str:
+    return _REASONS.get(error.kind, "provider_unreachable")
+
+
+def _field_error(field_name: str, message: str) -> AppError:
+    return AppError("validation_error", messages.INVALID_DATA, 422, fields={field_name: message})
+
+
+def _view(provider: str, config: LlmConfig | None) -> ConfigOut:
+    default = DEFAULTS[provider]
+    base = {
+        "provider": provider,
+        "default_model": default.model,
+        "default_context_window": default.context_window,
+    }
+    if config is None:
+        return ConfigOut(
+            **base,
+            state="not_configured",
+            model=None,
+            context_window=None,
+            key_mask=None,
+            base_url=None,
+            key_status=None,
+        )
+    return ConfigOut(
+        **base,
+        state="active" if config.is_active else "configured",
+        model=config.model,
+        context_window=config.context_window,
+        key_mask=config.key_mask,
+        base_url=config.base_url,
+        key_status=config.key_status,
+    )
+
+
+def list_configs(uow: UnitOfWork, *, user_id: str) -> list[ConfigOut]:
+    """Os quatro provedores, configurados ou não (`llm-providers` 1 a 4)."""
+    saved = {c.provider: c for c in repository.list_user_configs(uow.session, user_id)}
+    return [_view(provider, saved.get(provider)) for provider in PROVIDERS]
+
+
+@dataclass(frozen=True)
+class ConnectionAttempt:
+    """Valores do teste: corpo, senão o salvo, senão o padrão. `new_api_key`: chave a gravar."""
+
+    provider: str
+    target: ProviderTarget
+    new_api_key: str | None = field(default=None, repr=False)
+    key_unreadable: bool = False
+
+
+def _resolve_base_url(draft: ConfigDraft, config: LlmConfig | None) -> str:
+    base_url = draft.base_url or (config.base_url if config else None)
+    if base_url is None:
+        raise _field_error("base_url", messages.BASE_URL_REQUIRED)
+    try:
+        return normalize_base_url(base_url)
+    except InvalidBaseUrl as exc:
+        raise AppError(exc.code, exc.message, 422, fields={"base_url": exc.message}) from None
+
+
+def resolve_attempt(
+    uow: UnitOfWork, cipher: KeyCipher, *, user_id: str, provider: str, draft: ConfigDraft
+) -> ConnectionAttempt:
+    """Monta o alvo do teste. Chave salva só decifra aqui, sem sair do módulo (SEC-07)."""
+    config = repository.get_config(uow.session, user_id, provider)
+    default = DEFAULTS[provider]
+    model = draft.model or (config.model if config else default.model)
+    window = draft.context_window or (config.context_window if config else default.context_window)
+    if provider == "ollama":
+        if draft.api_key is not None:
+            raise _field_error("api_key", messages.API_KEY_NOT_ALLOWED)
+        target = ProviderTarget(
+            model=model, base_url=_resolve_base_url(draft, config), context_window=window
+        )
+        return ConnectionAttempt(provider, target)
+    if draft.base_url is not None:
+        raise _field_error("base_url", messages.BASE_URL_NOT_ALLOWED)
+    if draft.api_key is not None:
+        target = ProviderTarget(model=model, api_key=draft.api_key, context_window=window)
+        return ConnectionAttempt(provider, target, new_api_key=draft.api_key)
+    if config is None or config.key_ciphertext is None:
+        raise _field_error("api_key", messages.API_KEY_REQUIRED)
+    # Ilegível fica `unreadable` no commit deste bloco; o teste falha depois (ADR-0009).
+    saved_key = read_api_key(uow, cipher, user_id=user_id, provider=provider)
+    if saved_key is not None:
+        register_secret(saved_key)
+    target = ProviderTarget(model=model, api_key=saved_key, context_window=window)
+    return ConnectionAttempt(provider, target, key_unreadable=saved_key is None)
+
+
+def check_connection(
+    attempt: ConnectionAttempt,
+    *,
+    adapters: Mapping[str, LLMAdapter],
+    limiter: SlidingWindowLimiter,
+    user_id: str,
+    now: datetime,
+) -> None:
+    """Chama o provedor fora de transação. Falha vira `LLMError`; acima do limite, 429."""
+    if attempt.key_unreadable:
+        raise CredentialRejected("unreadable_key")
+    retry_after = limiter.retry_after(user_id, now)
+    if retry_after:
+        logger.warning("security.rate_limited", extra={"limiter": "llm_test", "user_id": user_id})
+        raise AppError(
+            "rate_limited", messages.RATE_LIMITED, 429, headers={"Retry-After": str(retry_after)}
+        )
+    limiter.hit(user_id, now)
+    adapters[attempt.provider].test_connection(attempt.target)
+
+
+def save_attempt(
+    uow: UnitOfWork,
+    cipher: KeyCipher,
+    attempt: ConnectionAttempt,
+    *,
+    user_id: str,
+    now: datetime,
+) -> ConfigOut:
+    """Grava o que passou no teste. Primeira do Usuário fica ativa (`llm-providers` 16)."""
+    provider = attempt.provider
+    existing = repository.get_config(uow.session, user_id, provider)
+    if (
+        provider in KEY_PROVIDERS
+        and attempt.new_api_key is None
+        and (existing is None or existing.key_ciphertext is None)
+    ):
+        # Removida entre o teste e a gravação: sem chave para manter.
+        raise _field_error("api_key", messages.API_KEY_REQUIRED)
+    first = not repository.list_user_configs(uow.session, user_id)
+    target = attempt.target
+    config = save_config(
+        uow,
+        cipher,
+        user_id=user_id,
+        provider=provider,
+        model=target.model,
+        context_window=target.context_window or DEFAULTS[provider].context_window,
+        api_key=attempt.new_api_key,
+        base_url=target.base_url,
+        now=now,
+    )
+    if first:
+        config.is_active = True
+        uow.session.flush()
+    logger.info("llm_config.saved", extra={"user_id": user_id, "provider": provider})
+    return _view(provider, config)
+
+
+def activate_config(uow: UnitOfWork, *, user_id: str, provider: str, now: datetime) -> ConfigOut:
+    """Um ativo por Usuário (`llm-providers` 19 a 21)."""
+    config = repository.get_config(uow.session, user_id, provider)
+    if config is None:
+        raise AppError("provider_not_configured", messages.PROVIDER_NOT_CONFIGURED, 409)
+    current = repository.get_active_config(uow.session, user_id)
+    if current is not None and current is not config:
+        current.is_active = False
+        current.updated_at = to_iso(now)
+        # Antes de ativar o novo: o índice único parcial olha linha a linha.
+        uow.session.flush()
+    if not config.is_active:
+        config.is_active = True
+        config.updated_at = to_iso(now)
+        uow.session.flush()
+    logger.info("llm_config.activated", extra={"user_id": user_id, "provider": provider})
+    return _view(provider, config)
+
+
+def delete_config(uow: UnitOfWork, *, user_id: str, provider: str) -> None:
+    """Apaga a linha e a chave cifrada; sem ativar outro (`llm-providers` 23 a 25)."""
+    config = repository.get_config(uow.session, user_id, provider)
+    if config is None:
+        raise AppError("config_not_found", messages.CONFIG_NOT_FOUND, 404)
+    repository.delete_config(uow.session, config)
+    logger.info("llm_config.deleted", extra={"user_id": user_id, "provider": provider})

@@ -931,13 +931,13 @@
 **Description:** Listagem dos 4 provedores com estado, padrões do ADR-0013 (`defaults.py`), máscara da chave e URL do Ollama.
 
 **Acceptance criteria:**
-- [ ] Usuário sem configuração vê os 4 como `not_configured`, com modelo e janela padrão (`llm-providers` 1).
-- [ ] Provedor configurado mostra modelo, janela, ativo e só a máscara (`sk-...abcd`: até 3 primeiros e 4 últimos; chave com menos de 12 caracteres vira `...`) (`llm-providers` 2, 3); URL do Ollama aparece inteira (`llm-providers` 4).
-- [ ] Configuração de outro Usuário não aparece; sem sessão responde 401 (`llm-providers` 26, 28; SEC-26).
+- [x] Usuário sem configuração vê os 4 como `not_configured`, com modelo e janela padrão (`llm-providers` 1).
+- [x] Provedor configurado mostra modelo, janela, ativo e só a máscara (`sk-...abcd`: até 3 primeiros e 4 últimos; chave com menos de 12 caracteres vira `...`) (`llm-providers` 2, 3); URL do Ollama aparece inteira (`llm-providers` 4).
+- [x] Configuração de outro Usuário não aparece; sem sessão responde 401 (`llm-providers` 26, 28; SEC-26).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_api_list.py -q`.
-- [ ] Gate backend. SEC-07, SEC-26.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_api_list.py -q`.
+- [x] Gate backend. SEC-07, SEC-26.
 
 **Dependencies:** Tasks 12.2, 10.1
 
@@ -952,13 +952,13 @@
 **Description:** Teste de conexão sem gravar, com adapters trocáveis por fake nos testes.
 
 **Acceptance criteria:**
-- [ ] Chave e modelo válidos respondem `{ok:true}` e nada é gravado (`llm-providers` 5); credencial recusada, Ollama inacessível e modelo inexistente respondem `{ok:false,reason}` com `credential_rejected`, `provider_unreachable`, `model_not_found` (`llm-providers` 6, 7, 8).
-- [ ] A chave enviada não aparece em resposta nem em log (`llm-providers` 9, 27; SEC-07); com `api_key` vazio e config existente, usa a chave salva.
-- [ ] URL do Ollama com esquema estranho ou credencial recebe 422 (`llm-providers` 38, 40); `{provider}` desconhecido recebe 404; adapter de Ollama real recusa redirecionamento (`llm-providers` 39).
+- [x] Chave e modelo válidos respondem `{ok:true}` e nada é gravado (`llm-providers` 5); credencial recusada, Ollama inacessível e modelo inexistente respondem `{ok:false,reason}` com `credential_rejected`, `provider_unreachable`, `model_not_found` (`llm-providers` 6, 7, 8).
+- [x] A chave enviada não aparece em resposta nem em log (`llm-providers` 9, 27; SEC-07); com `api_key` vazio e config existente, usa a chave salva.
+- [x] URL do Ollama com esquema estranho ou credencial recebe 422 (`llm-providers` 38, 40); `{provider}` desconhecido recebe 404; adapter de Ollama real recusa redirecionamento (`llm-providers` 39).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_api_test_connection.py -q`.
-- [ ] Gate backend. SEC-07, SEC-09, SEC-17.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_api_test_connection.py -q`.
+- [x] Gate backend. SEC-07, SEC-09, SEC-17.
 
 **Dependencies:** Tasks 15.1, 13.2, 14.1, 14.2
 
@@ -973,13 +973,13 @@
 **Description:** Salvar refaz o teste no servidor; grava cifrado; primeira configuração fica ativa; edição mantém ou troca a chave.
 
 **Acceptance criteria:**
-- [ ] Conexão que falha responde 422 com o motivo e a configuração anterior não muda (`llm-providers` 10); conexão válida grava e devolve só a máscara (`llm-providers` 11, 12).
-- [ ] Primeira configuração de Ollama sem URL, ou de OpenAI, Anthropic ou DeepSeek sem chave, recebe 422 (`llm-providers` 13); modelo ausente usa o padrão (`llm-providers` 14); janela ausente usa o padrão, valor não inteiro positivo recebe 422 (`llm-providers` 15).
-- [ ] Primeira configuração fica ativa, a segunda não muda o ativo (`llm-providers` 16); edição sem nova chave mantém a atual e testa com ela (`llm-providers` 17); com nova chave, substitui depois do teste passar (`llm-providers` 18). O evento de salvar vai ao log sem a chave (SEC-20).
+- [x] Conexão que falha responde 422 com o motivo e a configuração anterior não muda (`llm-providers` 10); conexão válida grava e devolve só a máscara (`llm-providers` 11, 12).
+- [x] Primeira configuração de Ollama sem URL, ou de OpenAI, Anthropic ou DeepSeek sem chave, recebe 422 (`llm-providers` 13); modelo ausente usa o padrão (`llm-providers` 14); janela ausente usa o padrão, valor não inteiro positivo recebe 422 (`llm-providers` 15).
+- [x] Primeira configuração fica ativa, a segunda não muda o ativo (`llm-providers` 16); edição sem nova chave mantém a atual e testa com ela (`llm-providers` 17); com nova chave, substitui depois do teste passar (`llm-providers` 18). O evento de salvar vai ao log sem a chave (SEC-20).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_api_save.py -q`.
-- [ ] Gate backend. SEC-07, SEC-09, SEC-20, SEC-26.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_api_save.py -q`.
+- [x] Gate backend. SEC-07, SEC-09, SEC-20, SEC-26.
 
 **Dependencies:** Task 15.2
 
@@ -994,13 +994,13 @@
 **Description:** `POST /llm-configs/{provider}/activate` e `DELETE /llm-configs/{provider}`.
 
 **Acceptance criteria:**
-- [ ] Ativar um provedor configurado o torna ativo e desativa o anterior; no máximo um ativo por Usuário (`llm-providers` 19, 20); ativar não configurado recebe 409 `provider_not_configured` (`llm-providers` 21).
-- [ ] Remover apaga a configuração e a chave cifrada do SQLite (`llm-providers` 23); remover o ativo deixa sem ativo, sem ativar outro (`llm-providers` 24); remover não configurado recebe 404 (`llm-providers` 25).
-- [ ] A remoção vai ao log sem a chave (SEC-20); cada rota nega 404/401 conforme isolamento (`llm-providers` 26, 28).
+- [x] Ativar um provedor configurado o torna ativo e desativa o anterior; no máximo um ativo por Usuário (`llm-providers` 19, 20); ativar não configurado recebe 409 `provider_not_configured` (`llm-providers` 21).
+- [x] Remover apaga a configuração e a chave cifrada do SQLite (`llm-providers` 23); remover o ativo deixa sem ativo, sem ativar outro (`llm-providers` 24); remover não configurado recebe 404 (`llm-providers` 25).
+- [x] A remoção vai ao log sem a chave (SEC-20); cada rota nega 404/401 conforme isolamento (`llm-providers` 26, 28).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_api_activate_delete.py -q`.
-- [ ] Gate backend. SEC-20, SEC-26.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_api_activate_delete.py -q`.
+- [x] Gate backend. SEC-20, SEC-26.
 
 **Dependencies:** Task 15.3
 
@@ -1015,13 +1015,13 @@
 **Description:** 10 chamadas por Usuário em 10 min, compartilhadas entre teste e salvar (ADR-0010).
 
 **Acceptance criteria:**
-- [ ] Depois de N chamadas na janela, as seguintes recebem 429 `rate_limited` com `Retry-After` e nenhuma chamada ao provedor é feita (`llm-providers` 41; SEC-06).
-- [ ] N e a janela vêm de `LLM_TEST_MAX_CALLS` e `LLM_TEST_WINDOW_SECONDS`; o limite é por Usuário (outro Usuário não é afetado).
-- [ ] O 429 vai ao log sem a chave (SEC-20).
+- [x] Depois de N chamadas na janela, as seguintes recebem 429 `rate_limited` com `Retry-After` e nenhuma chamada ao provedor é feita (`llm-providers` 41; SEC-06).
+- [x] N e a janela vêm de `LLM_TEST_MAX_CALLS` e `LLM_TEST_WINDOW_SECONDS`; o limite é por Usuário (outro Usuário não é afetado).
+- [x] O 429 vai ao log sem a chave (SEC-20).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_api_ratelimit.py -q` (relógio falso).
-- [ ] Gate backend. SEC-06, SEC-20.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_api_ratelimit.py -q` (relógio falso).
+- [x] Gate backend. SEC-06, SEC-20.
 
 **Dependencies:** Tasks 15.3, 11.1
 

@@ -19,6 +19,8 @@ from snook.core.settings import Settings, load_settings
 from snook.core.uow import UnitOfWork
 from snook.modules.auth import api as auth_api
 from snook.modules.auth import service as auth_service
+from snook.modules.llm_providers import api as llm_api
+from snook.modules.llm_providers import service as llm_service
 
 logger = logging.getLogger("snook.main")
 
@@ -99,11 +101,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.clock = SystemClock()  # teste troca por FakeClock
     app.state.login_throttle = auth_service.LoginThrottle.from_settings(settings)
+    app.state.key_cipher = llm_service.build_cipher(settings)
+    app.state.llm_adapters = llm_service.build_adapters(settings)  # teste troca por fakes
+    app.state.llm_test_limiter = llm_service.build_test_limiter(settings)
     register_error_handlers(app, server_error_headers=SECURITY_HEADERS)
     install_http_security(app, settings)
     app.add_middleware(RequestLogMiddleware)  # por fora: loga também as rejeições
     app.include_router(health_router)
     app.include_router(auth_api.router)
+    app.include_router(llm_api.router)
     return app
 
 
