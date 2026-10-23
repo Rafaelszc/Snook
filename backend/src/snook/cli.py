@@ -1,0 +1,76 @@
+"""Comandos do Operador: `python -m snook.cli <comando>`.
+
+Comando que escreve no banco roda com o backend parado: pega a trava `/data/snook.lock`
+(ADR-0006, SEC-24).
+"""
+
+import argparse
+import logging
+import sys
+from collections.abc import Sequence
+
+from snook.core.clock import SystemClock
+from snook.core.db import backup_database, create_db_engine, create_session_factory
+from snook.core.logging import setup_logging
+from snook.core.runlock import RunLock, RunLockError
+from snook.core.settings import Settings, SettingsError, load_settings
+from snook.core.uow import UnitOfWork
+from snook.modules.llm_providers import service as llm_service
+from snook.modules.llm_providers.crypto import KeyCipher, decode_master_key
+
+logger = logging.getLogger("snook.cli")
+
+
+class CommandError(Exception):
+    """Falha esperada do comando; a mensagem vai para o Operador, sem segredo."""
+
+
+def _rotate_master_key(settings: Settings) -> None:
+    if settings.snook_master_key_previous is None:
+        raise CommandError("SNOOK_MASTER_KEY_PREVIOUS ausente: informe a chave-mestra anterior.")
+    cipher = KeyCipher(
+        decode_master_key(settings.snook_master_key.get_secret_value()),
+        previous=decode_master_key(settings.snook_master_key_previous.get_secret_value()),
+    )
+    db = settings.database_path
+    if not db.exists():
+        raise CommandError(f"banco {db} não existe: suba o backend uma vez antes.")
+    with RunLock(db.with_name("snook.lock")):
+        backup = db.with_name(f"{db.name}.bak-rotate")
+        backup_database(db, backup)
+        engine = create_db_engine(db)
+        try:
+            with UnitOfWork(create_session_factory(engine), lambda _event: None) as uow:
+                result = llm_service.rotate_master_key(uow, cipher, now=SystemClock().now())
+        finally:
+            engine.dispose()
+    logger.info(
+        "operator.master_key_rotated",
+        extra={"rotated": result.rotated, "unreadable": result.unreadable},
+    )
+    print(f"Chaves recifradas: {result.rotated}. Ilegíveis: {result.unreadable}.")
+    print(f"Backup anterior à rotação: {backup}. Apague-o depois de conferir.")
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="python -m snook.cli")
+    commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser(
+        "rotate-master-key",
+        help="recifra as chaves de LLM com SNOOK_MASTER_KEY; lê a anterior de "
+        "SNOOK_MASTER_KEY_PREVIOUS",
+    )
+    args = parser.parse_args(argv)
+    try:
+        settings = load_settings()
+        setup_logging(settings)
+        if args.command == "rotate-master-key":
+            _rotate_master_key(settings)
+    except (SettingsError, RunLockError, CommandError) as exc:
+        print(f"erro: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

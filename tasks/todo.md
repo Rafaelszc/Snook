@@ -779,13 +779,13 @@
 **Description:** `crypto.py`: AES-256-GCM com `SNOOK_MASTER_KEY` e AAD por Usuário e provedor (ADR-0009).
 
 **Acceptance criteria:**
-- [ ] Decifrar o valor cifrado com a chave-mestra devolve a chave original; o valor cifrado difere do original (`llm-providers` 12, transversal 6).
-- [ ] Valor cifrado copiado para outro Usuário ou outro provedor não decifra (AAD; SEC-07).
-- [ ] Chave-mestra errada falha com erro tipado, sem texto da chave na mensagem.
+- [x] Decifrar o valor cifrado com a chave-mestra devolve a chave original; o valor cifrado difere do original (`llm-providers` 12, transversal 6).
+- [x] Valor cifrado copiado para outro Usuário ou outro provedor não decifra (AAD; SEC-07).
+- [x] Chave-mestra errada falha com erro tipado, sem texto da chave na mensagem.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_crypto.py -q`.
-- [ ] Gate backend. SEC-07.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_crypto.py -q`.
+- [x] Gate backend. SEC-07.
 
 **Dependencies:** Task 3.1
 
@@ -799,13 +799,13 @@
 **Description:** Tabela `llm_configs` (migração `0002_llm_providers_configs`), repositório que grava a chave cifrada e estado `key_status` quando a chave-mestra mudou sem rotação.
 
 **Acceptance criteria:**
-- [ ] O valor da chave no SQLite difere da chave enviada e decifra com a chave-mestra (`llm-providers` 12, transversal 6).
-- [ ] Chave que não decifra (mestra trocada) marca `key_status` ilegível, sem erro 500 e sem vazar valor (ADR-0009).
-- [ ] `ON DELETE CASCADE` de `users` leva as configurações (`04-data-model.md`).
+- [x] O valor da chave no SQLite difere da chave enviada e decifra com a chave-mestra (`llm-providers` 12, transversal 6).
+- [x] Chave que não decifra (mestra trocada) marca `key_status` ilegível, sem erro 500 e sem vazar valor (ADR-0009).
+- [x] `ON DELETE CASCADE` de `users` leva as configurações (`04-data-model.md`).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_storage.py -q`; `uv run alembic upgrade head`.
-- [ ] Gate backend. SEC-07.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_storage.py -q`; `uv run alembic upgrade head`.
+- [x] Gate backend. SEC-07.
 
 **Dependencies:** Tasks 12.1, 9.1
 
@@ -820,13 +820,13 @@
 **Description:** Comando `python -m snook.cli rotate-master-key` com `SNOOK_MASTER_KEY_PREVIOUS`, trava e backup.
 
 **Acceptance criteria:**
-- [ ] Depois da rotação, toda chave decifra com a nova chave-mestra e o valor cifrado mudou (ADR-0009).
-- [ ] Com a trava `/data/snook.lock` ocupada, o comando para com erro e não escreve (SEC-24; ADR-0006).
-- [ ] Nenhuma chave nem chave-mestra aparece na saída nem no log (SEC-07, SEC-20).
+- [x] Depois da rotação, toda chave decifra com a nova chave-mestra e o valor cifrado mudou (ADR-0009).
+- [x] Com a trava `/data/snook.lock` ocupada, o comando para com erro e não escreve (SEC-24; ADR-0006).
+- [x] Nenhuma chave nem chave-mestra aparece na saída nem no log (SEC-07, SEC-20).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/cli/test_rotate_master_key.py -q`.
-- [ ] Gate backend. SEC-07, SEC-24. Não rodar em dado real sem aprovação ("Perguntar antes").
+- [x] `cd backend && uv run pytest tests/cli/test_rotate_master_key.py -q`.
+- [x] Gate backend. SEC-07, SEC-24. Não rodar em dado real sem aprovação ("Perguntar antes").
 
 **Dependencies:** Task 12.2
 

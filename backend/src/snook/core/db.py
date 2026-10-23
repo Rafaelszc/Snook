@@ -68,7 +68,7 @@ def _current_revision(database_path: Path) -> str:
     return str(row[0]) if row else "base"
 
 
-def _backup_database(database_path: Path, backup_path: Path) -> None:
+def backup_database(database_path: Path, backup_path: Path) -> None:
     backup_path.unlink(missing_ok=True)
     source = sqlite3.connect(database_path)
     target = sqlite3.connect(backup_path)
@@ -92,7 +92,7 @@ def migrate_with_backup(database_path: Path | str, script_location: Path = _ALEM
         current = _current_revision(database_path)
         if current != head:
             backup_path = database_path.with_name(f"{database_path.name}.bak-{current}")
-            _backup_database(database_path, backup_path)
+            backup_database(database_path, backup_path)
     try:
         upgrade_database(database_path, script_location)
     except Exception:

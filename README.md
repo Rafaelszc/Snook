@@ -26,6 +26,20 @@ GPU: `COMPOSE_PROFILES=gpu` no `.env`. Rede confiável com HTTPS: `docs/specs/08
 - Áudios: `./audios`, fora do git.
 - `.env` guarda segredos. Nunca commitar.
 
+## Chave-mestra (`SNOOK_MASTER_KEY`)
+
+Cifra as chaves de LLM dos Usuários (ADR-0009). Backup do banco sem ela não expõe chaves.
+
+Trocar a chave-mestra:
+
+1. No `.env`: chave atual vai para `SNOOK_MASTER_KEY_PREVIOUS`; nova em `SNOOK_MASTER_KEY`.
+2. `docker compose stop backend backend-gpu`.
+3. `docker compose run --rm backend python -m snook.cli rotate-master-key` (GPU: `backend-gpu`).
+4. Conferir a saída. Apagar `SNOOK_MASTER_KEY_PREVIOUS` do `.env` e o backup `snook.db.bak-rotate` do volume.
+5. `docker compose up -d`.
+
+Chave-mestra perdida ou trocada sem rotação: chaves ficam ilegíveis. Nada é apagado. Cada Usuário informa a chave de novo em Configurações.
+
 ## Desenvolvimento
 
 Comandos de teste e lint em `AGENTS.md`, "Comandos".
