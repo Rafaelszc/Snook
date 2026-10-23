@@ -52,6 +52,7 @@ def settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Settings:
     monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "data" / "snook.db"))
     monkeypatch.setenv("AUDIO_ROOT", str(tmp_path / "audios"))
     monkeypatch.setenv("MODELS_ROOT", str(tmp_path / "models"))
+    monkeypatch.setenv("BCRYPT_ROUNDS", "4")  # ADR-0021: custo baixo só nos testes
     (tmp_path / "data").mkdir()
     return load_settings(env_file=None)
 

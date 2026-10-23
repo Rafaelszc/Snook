@@ -6,6 +6,7 @@ from snook.core.db import Base, create_db_engine
 from snook.core.settings import load_settings
 
 # Cada tarefa que cria tabela importa aqui o `models` do módulo dono, para o autogenerate ver.
+from snook.modules.auth import models as _auth_models  # noqa: F401
 
 config = context.config
 target_metadata = Base.metadata

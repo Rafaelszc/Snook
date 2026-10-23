@@ -13,6 +13,9 @@ _REQUIRED_MESSAGE = "Campo obrigatório."
 _INVALID_MESSAGE = "Valor inválido."
 _EXTRA_MESSAGE = "Campo não permitido."
 
+# Tipo de `PydanticCustomError` cuja mensagem (pt-BR, de `messages.py`) vai direto ao `fields`.
+FIELD_MESSAGE_ERROR = "field_message"
+
 _HTTP_CODES = {
     404: ("not_found", "Recurso não encontrado."),
     405: ("method_not_allowed", "Método não permitido."),
@@ -56,7 +59,9 @@ def _field_name(loc: tuple[int | str, ...]) -> str:
     return ".".join(parts) or "body"
 
 
-def _field_message(error_type: str) -> str:
+def _field_message(error_type: str, message: str) -> str:
+    if error_type == FIELD_MESSAGE_ERROR:
+        return message
     if error_type == "missing":
         return _REQUIRED_MESSAGE
     if error_type == "extra_forbidden":
@@ -73,7 +78,7 @@ async def _handle_app_error(_request: Request, exc: Exception) -> JSONResponse:
 
 async def _handle_validation_error(_request: Request, exc: Exception) -> JSONResponse:
     errors = cast(RequestValidationError, exc).errors()
-    fields = {_field_name(err["loc"]): _field_message(err["type"]) for err in errors}
+    fields = {_field_name(err["loc"]): _field_message(err["type"], err["msg"]) for err in errors}
     return error_response("validation_error", "Dados inválidos.", 422, fields=fields)
 
 
