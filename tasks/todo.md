@@ -678,13 +678,13 @@
 **Description:** `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me` e a varredura de rotas para SEC-01.
 
 **Acceptance criteria:**
-- [ ] Login por email, por nome de usuário e por caixa diferente autentica (`auth` 12, 13, 14); senha errada ou conta inexistente responde 401 `invalid_credentials` com a mesma mensagem e tempo parecido (`auth` 15, 16; SEC-05).
-- [ ] Logout apaga a sessão no servidor e a mesma sessão recebe 401 depois (`auth` 17); `GET /auth/me` responde `id`, `email`, `username` (`auth` 18) e 401 sem sessão (`auth` 19); o cadastro seguido de `GET /auth/me` sem login funciona (`auth` 8).
-- [ ] Cadastro e login respondem sem sessão (`auth` 20); não existe rota de recuperação, troca de senha, perfil ou exclusão (`auth` 21); teste que percorre `app.routes` falha se rota fora da lista pública não exige sessão (SEC-01, transversal 10).
+- [x] Login por email, por nome de usuário e por caixa diferente autentica (`auth` 12, 13, 14); senha errada ou conta inexistente responde 401 `invalid_credentials` com a mesma mensagem e tempo parecido (`auth` 15, 16; SEC-05).
+- [x] Logout apaga a sessão no servidor e a mesma sessão recebe 401 depois (`auth` 17); `GET /auth/me` responde `id`, `email`, `username` (`auth` 18) e 401 sem sessão (`auth` 19); o cadastro seguido de `GET /auth/me` sem login funciona (`auth` 8).
+- [x] Cadastro e login respondem sem sessão (`auth` 20); não existe rota de recuperação, troca de senha, perfil ou exclusão (`auth` 21); teste que percorre `app.routes` falha se rota fora da lista pública não exige sessão (SEC-01, transversal 10).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/auth -q`.
-- [ ] Gate backend. SEC-01, SEC-03, SEC-05.
+- [x] `cd backend && uv run pytest tests/auth -q`.
+- [x] Gate backend. SEC-01, SEC-03, SEC-05.
 
 **Dependencies:** Task 9.3
 

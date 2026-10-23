@@ -1,3 +1,4 @@
+import functools
 import hashlib
 import secrets
 import uuid
@@ -12,6 +13,7 @@ from snook.core.text import normalize
 from snook.core.uow import UnitOfWork
 from snook.modules.auth import messages, repository
 from snook.modules.auth.models import User, UserSession
+from snook.modules.auth.schemas import PASSWORD_MAX_BYTES
 
 SESSION_TOKEN_BYTES = 32
 
@@ -66,6 +68,27 @@ def register_user(
     return _public(user)
 
 
+@functools.cache
+def _dummy_hash(rounds: int) -> bytes:
+    return bcrypt.hashpw(secrets.token_bytes(16), bcrypt.gensalt(rounds))
+
+
+def login(uow: UnitOfWork, *, identifier: str, password: str, rounds: int) -> AuthUser:
+    """Login por email ou nome de usuário, sem caixa (`auth` 12 a 16).
+
+    Toda falha responde a mesma mensagem e paga um bcrypt, inclusive conta inexistente
+    e senha acima de 72 bytes: tempo parecido (SEC-05).
+    """
+    user = repository.find_user_by_login(uow.session, normalize(identifier))
+    secret = password.encode()
+    fits = len(secret) <= PASSWORD_MAX_BYTES
+    hashed = user.password_hash.encode() if user and fits else _dummy_hash(rounds)
+    matches = bcrypt.checkpw(secret if fits else b"", hashed)
+    if user is None or not fits or not matches:
+        raise AppError("invalid_credentials", messages.INVALID_CREDENTIALS, 401)
+    return _public(user)
+
+
 def _token_hash(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
@@ -103,6 +126,11 @@ def authenticate_session(
         return None
     row.last_seen_at = to_iso(now)
     return _public(user)
+
+
+def delete_session(uow: UnitOfWork, token: str) -> None:
+    """Logout: apaga a sessão no servidor (SEC-03)."""
+    repository.delete_session(uow.session, _token_hash(token))
 
 
 def delete_expired_sessions(uow: UnitOfWork, *, now: datetime, idle_seconds: int) -> int:

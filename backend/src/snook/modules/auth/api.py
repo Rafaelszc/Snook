@@ -8,8 +8,8 @@ from snook.core.logging import register_secret
 from snook.core.settings import Settings
 from snook.core.uow import UnitOfWork
 from snook.modules.auth import service
-from snook.modules.auth.deps import SESSION_COOKIE
-from snook.modules.auth.schemas import RegisterRequest, UserOut
+from snook.modules.auth.deps import SESSION_COOKIE, CurrentUser
+from snook.modules.auth.schemas import LoginRequest, RegisterRequest, UserOut
 
 router = APIRouter(prefix="/api/auth")
 
@@ -61,4 +61,51 @@ def register(
         )
     register_secret(token)
     _set_session_cookie(response, request, settings, token)
+    return UserOut(id=user.id, email=user.email, username=user.username)
+
+
+@router.post("/login")
+def login(
+    body: LoginRequest,
+    request: Request,
+    response: Response,
+    uow: Annotated[UnitOfWork, Depends(get_uow)],
+    settings: Annotated[Settings, Depends(get_settings)],
+    clock: Annotated[Clock, Depends(get_clock)],
+) -> UserOut:
+    register_secret(body.password)
+    with uow:
+        user = service.login(
+            uow, identifier=body.identifier, password=body.password, rounds=settings.bcrypt_rounds
+        )
+        token = service.create_session(
+            uow, user.id, now=clock.now(), max_seconds=settings.session_max_seconds
+        )
+    register_secret(token)
+    _set_session_cookie(response, request, settings, token)
+    return UserOut(id=user.id, email=user.email, username=user.username)
+
+
+@router.post("/logout", status_code=204)
+def logout(
+    user: CurrentUser,
+    request: Request,
+    response: Response,
+    uow: Annotated[UnitOfWork, Depends(get_uow)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> None:
+    # `current_user` já garantiu o cookie com sessão válida.
+    with uow:
+        service.delete_session(uow, request.cookies[SESSION_COOKIE])
+    response.delete_cookie(
+        SESSION_COOKIE,
+        path="/",
+        httponly=True,
+        samesite="lax",
+        secure=_cookie_secure(request, settings),
+    )
+
+
+@router.get("/me")
+def me(user: CurrentUser) -> UserOut:
     return UserOut(id=user.id, email=user.email, username=user.username)
