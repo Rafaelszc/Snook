@@ -2,6 +2,7 @@ import logging
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 from snook.core.clock import to_iso
 from snook.core.errors import AppError
@@ -11,11 +12,27 @@ from snook.core.settings import Settings
 from snook.core.uow import UnitOfWork
 from snook.modules.llm_providers import messages, repository
 from snook.modules.llm_providers.adapters.anthropic import AnthropicAdapter
+
+# Erros do contrato saem por aqui: consumidores importam só `service` (SEC-26).
 from snook.modules.llm_providers.adapters.base import (
-    CredentialRejected,
+    ContextLimitExceeded as ContextLimitExceeded,
+)
+from snook.modules.llm_providers.adapters.base import (
+    CredentialRejected as CredentialRejected,
+)
+from snook.modules.llm_providers.adapters.base import (
+    GenerationRequest,
     LLMAdapter,
-    LLMError,
     ProviderTarget,
+)
+from snook.modules.llm_providers.adapters.base import LLMError as LLMError
+from snook.modules.llm_providers.adapters.base import ModelNotFound as ModelNotFound
+from snook.modules.llm_providers.adapters.base import NoActiveProvider as NoActiveProvider
+from snook.modules.llm_providers.adapters.base import (
+    ProviderRateLimited as ProviderRateLimited,
+)
+from snook.modules.llm_providers.adapters.base import (
+    ProviderUnreachable as ProviderUnreachable,
 )
 from snook.modules.llm_providers.adapters.ollama import (
     InvalidBaseUrl,
@@ -37,6 +54,7 @@ from snook.modules.llm_providers.models import (
     LlmConfig,
 )
 from snook.modules.llm_providers.schemas import ConfigDraft, ConfigOut
+from snook.modules.llm_providers.tokens import estimate_tokens as estimate_tokens
 
 logger = logging.getLogger("snook.llm_providers")
 
@@ -363,3 +381,78 @@ def delete_config(uow: UnitOfWork, *, user_id: str, provider: str) -> None:
         raise AppError("config_not_found", messages.CONFIG_NOT_FOUND, 404)
     repository.delete_config(uow.session, config)
     logger.info("llm_config.deleted", extra={"user_id": user_id, "provider": provider})
+
+
+# --- Interface para outros módulos (`02-architecture.md`, "Interfaces internas") ---
+
+
+@dataclass(frozen=True)
+class ActiveProvider:
+    """Provedor ativo lido uma vez por geração. Sem chave (SEC-07)."""
+
+    provider: str
+    model: str
+    context_window: int
+
+
+def get_active_provider(uow: UnitOfWork, *, user_id: str) -> ActiveProvider:
+    """Provedor, modelo e janela do Usuário; sem ativo, `NoActiveProvider` (`llm-providers` 22)."""
+    config = repository.get_active_config(uow.session, user_id)
+    if config is None:
+        raise NoActiveProvider("no_active_provider")
+    return ActiveProvider(
+        provider=config.provider, model=config.model, context_window=config.context_window
+    )
+
+
+def _generation_target(
+    uow: UnitOfWork, cipher: KeyCipher, *, user_id: str, snapshot: ActiveProvider
+) -> ProviderTarget | None:
+    """Alvo com a chave do dono. `None` sem a configuração do snapshot."""
+    config = repository.get_config(uow.session, user_id, snapshot.provider)
+    if config is None:
+        return None
+    api_key = None
+    if snapshot.provider in KEY_PROVIDERS:
+        api_key = read_api_key(uow, cipher, user_id=user_id, provider=snapshot.provider)
+    return ProviderTarget(
+        model=snapshot.model,
+        api_key=api_key,
+        base_url=config.base_url,
+        context_window=snapshot.context_window,
+    )
+
+
+def generate(
+    uow: UnitOfWork,
+    cipher: KeyCipher,
+    adapters: Mapping[str, LLMAdapter],
+    *,
+    user_id: str,
+    provider_snapshot: ActiveProvider,
+    system_prompt: str,
+    content: str,
+    json_schema: dict[str, Any],
+    max_output_tokens: int,
+) -> str:
+    """Texto da resposta do provedor do snapshot, com a configuração do dono (SEC-26).
+
+    Abre a própria transação, curta: a chamada (até `LLM_READ_TIMEOUT`) fica fora dela.
+    Erros sobem tipados, sem a chave (SEC-17).
+    """
+    with uow:
+        # Ilegível fica `unreadable` no commit deste bloco; o erro sobe depois (ADR-0009).
+        target = _generation_target(uow, cipher, user_id=user_id, snapshot=provider_snapshot)
+    if target is None:
+        raise NoActiveProvider("config_removed")
+    if provider_snapshot.provider in KEY_PROVIDERS:
+        if target.api_key is None:
+            raise CredentialRejected("unreadable_key")
+        register_secret(target.api_key)
+    request = GenerationRequest(
+        system_prompt=system_prompt,
+        content=content,
+        json_schema=json_schema,
+        max_output_tokens=max_output_tokens,
+    )
+    return adapters[provider_snapshot.provider].generate(target, request)

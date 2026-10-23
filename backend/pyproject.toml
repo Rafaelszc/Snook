@@ -75,3 +75,11 @@ name = "módulos não importam cli nem main"
 type = "forbidden"
 source_modules = ["snook.modules", "snook.shared", "snook.core"]
 forbidden_modules = ["snook.cli", "snook.main"]
+
+# Build order de `02-architecture.md`, "Fronteiras entre módulos": de cima importa de baixo.
+# Cada módulo novo entra aqui na tarefa que o cria.
+[[tool.importlinter.contracts]]
+name = "módulos seguem a build order"
+type = "layers"
+containers = ["snook.modules"]
+layers = ["llm_providers", "auth"]
