@@ -110,7 +110,7 @@ def test_fakes_succeed(tmp_path: Path) -> None:
     engines = fake_engines()
     target = tmp_path / "treated.flac"
 
-    engines.audio.treat(_source(tmp_path), target)
+    engines.audio.treat(_source(tmp_path), target, 10.0)
 
     assert target.exists()
     assert engines.diarizer.diarize(target, 3) == TURNS
@@ -131,7 +131,7 @@ def test_fakes_succeed(tmp_path: Path) -> None:
 def test_fakes_fail(tmp_path: Path, outcome: str, stage: str, message: str) -> None:
     engines = fake_engines(outcome)  # type: ignore[arg-type]
     calls = {
-        "audio": lambda: engines.audio.treat(_source(tmp_path), tmp_path / "t.flac"),
+        "audio": lambda: engines.audio.treat(_source(tmp_path), tmp_path / "t.flac", 10.0),
         "diarizer": lambda: engines.diarizer.diarize(tmp_path / "t.flac", None),
         "transcriber": lambda: engines.transcriber.transcribe(tmp_path / "t.flac", LANGUAGE),
     }
@@ -153,7 +153,7 @@ def test_held_fake_finishes_only_after_release(tmp_path: Path) -> None:
     engines = fake_engines(hold=True)
     source = _source(tmp_path)
     target = tmp_path / "treated.flac"
-    worker = threading.Thread(target=engines.audio.treat, args=(source, target))
+    worker = threading.Thread(target=engines.audio.treat, args=(source, target, 10.0))
     worker.start()
 
     assert engines.audio.wait_started(MEETING_ID)

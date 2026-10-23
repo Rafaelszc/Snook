@@ -59,9 +59,9 @@ def test_created_meeting_goes_processing_then_transcribed(
     seen: list[str] = []
     treat = engines.audio.treat
 
-    def spy(source: Path, target: Path) -> None:
+    def spy(source: Path, target: Path, duration_seconds: float) -> None:
         seen.append(state(settings.database_path, source.parent.name)[0])
-        treat(source, target)
+        treat(source, target, duration_seconds)
 
     engines.audio.treat = spy  # type: ignore[method-assign]
 
@@ -363,4 +363,5 @@ def test_job_runs_in_spawned_process(tmp_path: Path) -> None:
             future.result(timeout=60)
     finally:
         pool.shutdown()
-    assert caught.value.message == messages.ENGINES_UNAVAILABLE
+    # Original ausente: o ffmpeg real (ou sua falta) falha no tratamento.
+    assert caught.value.message == messages.AUDIO_FAILED

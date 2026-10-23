@@ -35,7 +35,7 @@ class EngineFailure(Exception):
 
 
 class AudioTreater(Protocol):
-    def treat(self, source: Path, target: Path) -> None: ...
+    def treat(self, source: Path, target: Path, duration_seconds: float) -> None: ...
 
 
 class Diarizer(Protocol):

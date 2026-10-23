@@ -1560,13 +1560,13 @@
 **Description:** `engines/audio.py`: mono 16 kHz, passa-alta 80 Hz, `loudnorm`, FLAC em `/audios/.tmp/<uuid>.flac`, por `subprocess.run([...], shell=False)` com timeout (ADR-0014).
 
 **Acceptance criteria:**
-- [ ] Uma fixture curta de cada formato (mp3, wav, m4a, ogg, webm, mp4) é tratada e chega a `transcribed` sem ação manual (`diarized-transcription` 5; transversal 13).
-- [ ] O comando usa só caminhos do servidor e tem timeout; timeout vira falha de tratamento (SEC-11, SEC-25).
-- [ ] Saída é FLAC mono 16 kHz, conferido por `ffprobe`.
+- [x] Uma fixture curta de cada formato (mp3, wav, m4a, ogg, webm, mp4) é tratada e chega a `transcribed` sem ação manual (`diarized-transcription` 5; transversal 13).
+- [x] O comando usa só caminhos do servidor e tem timeout; timeout vira falha de tratamento (SEC-11, SEC-25).
+- [x] Saída é FLAC mono 16 kHz, conferido por `ffprobe`.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_audio_engine.py -q` (ffmpeg real, sem modelos).
-- [ ] Gate backend. SEC-11, SEC-25.
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_audio_engine.py -q` (ffmpeg real, sem modelos).
+- [x] Gate backend. SEC-11, SEC-25.
 
 **Dependencies:** Task 23.2
 
@@ -1581,13 +1581,13 @@
 **Description:** `treated_audio_clip(meeting_id, start, end) -> bytes` e movimento do `treated.flac` para o diretório da Reunião depois do commit.
 
 **Acceptance criteria:**
-- [ ] Depois de `transcribed`, o áudio tratado existe em `/audios/<meeting_id>/treated.flac` e o trecho devolvido para um intervalo tem a duração do intervalo (`diarized-transcription` 6).
-- [ ] O movimento ocorre só depois do commit; se a Reunião foi excluída, o temporário é apagado e nada fica (`diarized-transcription` 17; `02-architecture.md`, "Exclusão").
-- [ ] "Nova tentativa" descarta o áudio tratado anterior antes de reprocessar (`diarized-transcription` 2).
+- [x] Depois de `transcribed`, o áudio tratado existe em `/audios/<meeting_id>/treated.flac` e o trecho devolvido para um intervalo tem a duração do intervalo (`diarized-transcription` 6).
+- [x] O movimento ocorre só depois do commit; se a Reunião foi excluída, o temporário é apagado e nada fica (`diarized-transcription` 17; `02-architecture.md`, "Exclusão").
+- [x] "Nova tentativa" descarta o áudio tratado anterior antes de reprocessar (`diarized-transcription` 2).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_treated_audio.py -q`.
-- [ ] Gate backend. SEC-15, SEC-24.
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_treated_audio.py -q`.
+- [x] Gate backend. SEC-15, SEC-24.
 
 **Dependencies:** Task 25.1
 
