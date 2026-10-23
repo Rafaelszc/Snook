@@ -841,13 +841,13 @@
 **Description:** `adapters/base.py`: interface do adapter, erros tipados (`NoActiveProvider`, `CredentialRejected`, `ProviderUnreachable`, `ModelNotFound`, `ContextLimitExceeded`, `ProviderRateLimited`) e cliente `httpx` com `follow_redirects=False`, timeout de conexão 10 s, corpo cortado em 5 MB (ADR-0012).
 
 **Acceptance criteria:**
-- [ ] Resposta de redirecionamento vira `ProviderUnreachable`, sem seguir (`llm-providers` 39; SEC-17).
-- [ ] Corpo de 6 MB é cortado em 5 MB e vira erro tipado; timeout de leitura vira `ProviderUnreachable` (SEC-17, `respx`).
-- [ ] O erro devolvido traz tipo e motivo, nunca corpo cru nem headers nem a chave (`llm-providers` 27; SEC-17).
+- [x] Resposta de redirecionamento vira `ProviderUnreachable`, sem seguir (`llm-providers` 39; SEC-17).
+- [x] Corpo de 6 MB é cortado em 5 MB e vira erro tipado; timeout de leitura vira `ProviderUnreachable` (SEC-17, `respx`).
+- [x] O erro devolvido traz tipo e motivo, nunca corpo cru nem headers nem a chave (`llm-providers` 27; SEC-17).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/adapters/llm/test_base.py -q`.
-- [ ] Gate backend. SEC-17.
+- [x] `cd backend && uv run pytest tests/adapters/llm/test_base.py -q`.
+- [x] Gate backend. SEC-17.
 
 **Dependencies:** Task 3.1
 
@@ -862,13 +862,13 @@
 **Description:** `adapters/openai_compat.py` atende OpenAI e DeepSeek com URL fixa, saída JSON, teste de conexão por consulta do modelo e fixtures gravadas em `tests/fixtures/llm/<provider>/`.
 
 **Acceptance criteria:**
-- [ ] "Gerar" devolve o texto da resposta gravada para OpenAI e para DeepSeek (`llm-providers` 29).
-- [ ] Respostas gravadas de credencial recusada, modelo inexistente, limite de contexto, rate limit e falha de rede viram os erros tipados certos (`llm-providers` 30).
-- [ ] A chave aparece só no header de autorização e nunca em erro, log ou fixture (`llm-providers` 9, 27; SEC-07).
+- [x] "Gerar" devolve o texto da resposta gravada para OpenAI e para DeepSeek (`llm-providers` 29).
+- [x] Respostas gravadas de credencial recusada, modelo inexistente, limite de contexto, rate limit e falha de rede viram os erros tipados certos (`llm-providers` 30).
+- [x] A chave aparece só no header de autorização e nunca em erro, log ou fixture (`llm-providers` 9, 27; SEC-07).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/adapters/llm/test_openai_compat.py -q` (`respx`, sem rede).
-- [ ] Gate backend. SEC-07, SEC-17.
+- [x] `cd backend && uv run pytest tests/adapters/llm/test_openai_compat.py -q` (`respx`, sem rede).
+- [x] Gate backend. SEC-07, SEC-17.
 
 **Dependencies:** Task 13.1
 

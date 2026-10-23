@@ -1,0 +1,12 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "id": "gpt-5-mini",
+    "object": "model",
+    "created": 1754425777,
+    "owned_by": "system"
+  }
+}

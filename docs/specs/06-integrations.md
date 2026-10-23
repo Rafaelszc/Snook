@@ -41,7 +41,8 @@
 | HTTP 400 com código de contexto (`context_length_exceeded` na OpenAI e DeepSeek; texto "prompt is too long" na Anthropic; erro de contexto do Ollama) | `ContextLimitExceeded` | "A parte passou do limite de contexto do modelo." |
 | HTTP 429 | `ProviderRateLimited` | "Limite de uso do provedor atingido. Tente mais tarde." |
 | HTTP 3xx | `ProviderUnreachable` | "Provedor inacessível (redirecionamento recusado)." |
-| Timeout, DNS, conexão recusada, TLS, 5xx, corpo acima de 5 MB | `ProviderUnreachable` | "Provedor inacessível." |
+| Timeout, DNS, conexão recusada, TLS, 5xx, corpo acima de 5 MB, corpo de sucesso fora do formato | `ProviderUnreachable` | "Provedor inacessível." |
+| Outro 4xx (ex.: 402 sem saldo na DeepSeek) | `ProviderUnreachable`, motivo `http_<status>` | "Provedor inacessível." |
 | Sem provedor ativo | `NoActiveProvider` | "Nenhum provedor ativo. Configure em Configurações." |
 | Chave ilegível (`key_status = unreadable`) | `CredentialRejected` | "Chave ilegível. Informe a chave de novo em Configurações." |
 
