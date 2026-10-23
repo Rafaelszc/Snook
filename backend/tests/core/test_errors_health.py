@@ -40,7 +40,12 @@ def _app_with_probe_routes(settings: Settings) -> FastAPI:
 
 @pytest.fixture
 def probe(settings: Settings) -> TestClient:
-    return TestClient(_app_with_probe_routes(settings), raise_server_exceptions=False)
+    return TestClient(
+        _app_with_probe_routes(settings),
+        base_url="http://localhost",
+        headers={"Origin": "http://localhost:8080"},
+        raise_server_exceptions=False,
+    )
 
 
 def test_health_is_ok_without_session(client: TestClient) -> None:
