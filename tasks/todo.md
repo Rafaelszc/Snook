@@ -1330,13 +1330,13 @@
 **Description:** `POST /api/meetings/{id}/retry`: `failed/transcription` vai para `pending`; `failed/generation` vai para `transcribed`; limpa falha, troca `run_id`, emite `RetryRequested`.
 
 **Acceptance criteria:**
-- [ ] Etapa `transcription`: vai a `pending`, limpa `failed_stage` e `error_message`, emite `RetryRequested(transcription)` uma vez (`meetings` 24).
-- [ ] Etapa `generation`: vai a `transcribed`, limpa a falha, mantém Transcrição e Participantes, emite `RetryRequested(generation)` uma vez (`meetings` 25).
-- [ ] Fora de `failed` responde 409 `not_failed` sem mudar nada (`meetings` 26); o arquivo original não muda e nenhum novo envio é pedido (`meetings` 27); `id` de outro Usuário responde 404 (`meetings` 31); o retry vai ao log (SEC-20).
+- [x] Etapa `transcription`: vai a `pending`, limpa `failed_stage` e `error_message`, emite `RetryRequested(transcription)` uma vez (`meetings` 24).
+- [x] Etapa `generation`: vai a `transcribed`, limpa a falha, mantém Transcrição e Participantes, emite `RetryRequested(generation)` uma vez (`meetings` 25).
+- [x] Fora de `failed` responde 409 `not_failed` sem mudar nada (`meetings` 26); o arquivo original não muda e nenhum novo envio é pedido (`meetings` 27); `id` de outro Usuário responde 404 (`meetings` 31); o retry vai ao log (SEC-20).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_api_retry.py -q`.
-- [ ] Gate backend. SEC-02, SEC-20.
+- [x] `cd backend && uv run pytest tests/meetings/test_api_retry.py -q`.
+- [x] Gate backend. SEC-02, SEC-20.
 
 **Dependencies:** Tasks 20.1, 20.2
 
@@ -1351,13 +1351,13 @@
 **Description:** `startup.py` roda na subida, antes de aceitar requisições: marca interrompidas (Q58, Q69) e reenfileira `pending` em ordem de criação.
 
 **Acceptance criteria:**
-- [ ] `processing` vai a `failed` etapa `transcription`, `generating` a `failed` etapa `generation`, ambas com "processamento interrompido" (`meetings` 44); `transcribed` com Participantes confirmados vai a `failed` etapa `generation` com a mesma mensagem (`meetings` 49).
-- [ ] A marcação termina antes de aceitar requisições e não emite aviso (`meetings` 45); `transcribed` sem confirmação, `pending`, `needs_split`, `done` e `failed` não mudam (`meetings` 50).
-- [ ] Depois da marcação, o retry funciona como nos critérios 24 e 25 (`meetings` 46); `pending` é reenfileirado em ordem de criação (ADR-0007).
+- [x] `processing` vai a `failed` etapa `transcription`, `generating` a `failed` etapa `generation`, ambas com "processamento interrompido" (`meetings` 44); `transcribed` com Participantes confirmados vai a `failed` etapa `generation` com a mesma mensagem (`meetings` 49).
+- [x] A marcação termina antes de aceitar requisições e não emite aviso (`meetings` 45); `transcribed` sem confirmação, `pending`, `needs_split`, `done` e `failed` não mudam (`meetings` 50).
+- [x] Depois da marcação, o retry funciona como nos critérios 24 e 25 (`meetings` 46); `pending` é reenfileirado em ordem de criação (ADR-0007).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_startup.py -q` (grava no SQLite e sobe a app de novo com `TestClient`).
-- [ ] Gate backend. SEC-19.
+- [x] `cd backend && uv run pytest tests/meetings/test_startup.py -q` (grava no SQLite e sobe a app de novo com `TestClient`).
+- [x] Gate backend. SEC-19.
 
 **Dependencies:** Tasks 21.1, 3.5
 
