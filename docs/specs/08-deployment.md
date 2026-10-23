@@ -21,7 +21,7 @@ Sem ambiente na internet (Q60).
 | `backend` | `backend/Dockerfile` (Python 3.12 slim, ffmpeg, torch CPU) | `cpu` | nenhuma publicada; 8000 na rede interna | `snook-db:/data`, `./audios:/audios`, `snook-models:/models` |
 | `backend-gpu` | `backend/Dockerfile.gpu` (base CUDA, torch CUDA) | `gpu` | idem; alias de rede `backend` | idem; `deploy.resources.reservations.devices` NVIDIA |
 | `frontend` | `frontend/Dockerfile` (build Node, runtime nginx) | sempre | `${SNOOK_BIND:-127.0.0.1}:${SNOOK_PORT:-8080}:8080` | nenhum |
-| `caddy` | `caddy` (digest fixo) | `lan` | `443:443` | `caddy-data:/data`, `deploy/Caddyfile` só leitura |
+| `caddy` | `deploy/caddy.Dockerfile` (`caddy` por digest, UID 1000) | `lan` | `443:443` | `caddy-data:/data`, `deploy/Caddyfile` só leitura |
 
 - Perfil padrão: `.env.example` traz `COMPOSE_PROFILES=cpu`. Assim, `docker compose up` sobe CPU sem flag (critério transversal 1). GPU: trocar para `COMPOSE_PROFILES=gpu`.
 - `backend` e `backend-gpu` nunca sobem juntos. Ambos usam alias de rede `backend`, e o nginx aponta para `backend:8000`.

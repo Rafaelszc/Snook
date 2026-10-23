@@ -75,6 +75,28 @@ services:
     logging: *logging
     restart: unless-stopped
 
+  # HTTPS na rede (ADR-0016). Sem SNOOK_LAN_HOST, o site fica sem endereço e o Caddy não sobe.
+  caddy:
+    build:
+      context: deploy
+      dockerfile: caddy.Dockerfile
+    profiles: [lan]
+    environment:
+      SNOOK_LAN_HOST: ${SNOOK_LAN_HOST:-}
+    ports:
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro,z
+      # CA local: segredo, fora do git (SEC-08).
+      - caddy-data:/data
+    depends_on:
+      - frontend
+    networks:
+      snook-net:
+        ipv4_address: 172.28.0.11
+    logging: *logging
+    restart: unless-stopped
+
 networks:
   snook-net:
     ipam:
@@ -84,3 +106,4 @@ networks:
 volumes:
   snook-db:
   snook-models:
+  caddy-data:
