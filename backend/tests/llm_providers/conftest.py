@@ -14,7 +14,7 @@ from snook.core.db import create_db_engine, create_session_factory, upgrade_data
 from snook.core.settings import Settings
 from snook.core.uow import UnitOfWork
 from snook.modules.llm_providers.adapters.base import GenerationRequest, LLMError, ProviderTarget
-from tests.auth.helpers import registration, rows
+from tests.auth.helpers import Users, rows
 
 # Nomes liberados no .gitleaks.toml.
 API_KEY = "sk-TesteChave-0123456789abcdef"
@@ -55,27 +55,6 @@ def fakes(app: FastAPI) -> dict[str, FakeAdapter]:
 @pytest.fixture
 def db(settings: Settings) -> Path:
     return settings.database_path
-
-
-class Users:
-    """Cadastra Usuários e troca o cookie do cliente entre eles."""
-
-    def __init__(self, client: TestClient) -> None:
-        self._client = client
-        self._tokens: dict[str, str] = {}
-
-    def add(self, name: str) -> None:
-        self._client.cookies.clear()
-        body = registration(email=f"{name}@x.com", username=name)
-        response = self._client.post("/api/auth/register", json=body)
-        assert response.status_code == 201
-        self._tokens[name] = response.cookies["snook_session"]
-        # Cookie `Secure` em localhost não volta por http no TestClient: grava sem a flag.
-        self.use(name)
-
-    def use(self, name: str) -> None:
-        self._client.cookies.clear()
-        self._client.cookies.set("snook_session", self._tokens[name])
 
 
 @pytest.fixture

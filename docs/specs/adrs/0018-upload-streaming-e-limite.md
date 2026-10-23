@@ -34,7 +34,8 @@
 - Limite: opção 1 (500 MiB). Variável `UPLOAD_MAX_BYTES=524288000`. Mensagem diz "500 MB".
 - Recepção: opção 1.
   - nginx: `client_max_body_size 510m` só em `POST /api/meetings`; 1m nas demais rotas.
-  - Middleware: `Content-Length` acima do limite responde HTTP 413 antes de ler o corpo.
+  - Recepção (`meetings/storage.py`): `Content-Length` acima do limite mais 1 MiB de envelope multipart responde HTTP 413 antes de ler o corpo. O `BodyLimitMiddleware` de 1 MiB não vale nessa rota.
+  - Parser: `python-multipart`, só o parser de streaming sobre `request.stream()`; arquivo vai direto ao temporário. Dependência aprovada pelo usuário em 2026-10-23.
   - Cópia em blocos; passou do limite, apaga o temporário e responde HTTP 413.
   - Validação (`ffprobe`) roda no temporário. Só depois do commit da Reunião, o arquivo vai para `/audios/<meeting_id>/original.<ext>` (`os.replace` no mesmo volume).
   - Qualquer recusa apaga o temporário. Startup apaga sobras de `/audios/.tmp/`.

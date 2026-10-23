@@ -1156,13 +1156,13 @@
 **Description:** `media_probe.py` (`ffprobe` por `subprocess.run([...], shell=False)`, timeout, caminho do servidor) e `core/files.py` (`/audios/.tmp`, `/audios/<meeting_id>/`, regex de UUID, `realpath` sob `/audios`). Fixtures de áudio curtas por formato.
 
 **Acceptance criteria:**
-- [ ] `probe` devolve duração e presença de trilha de áudio para mp3, wav, m4a, ogg, webm e mp4 de fixture (`meetings` 1, 10).
-- [ ] `ffprobe` nunca recebe nome enviado pelo usuário: teste com `"; rm -rf / ;.mp3"` e `-i x.mp3` roda o comando só com caminho gerado (SEC-11).
-- [ ] Alvo fora de `/audios`, link simbólico para fora, `..`, raiz e `.tmp` são recusados com log (SEC-15).
+- [x] `probe` devolve duração e presença de trilha de áudio para mp3, wav, m4a, ogg, webm e mp4 de fixture (`meetings` 1, 10).
+- [x] `ffprobe` nunca recebe nome enviado pelo usuário: teste com `"; rm -rf / ;.mp3"` e `-i x.mp3` roda o comando só com caminho gerado (SEC-11).
+- [x] Alvo fora de `/audios`, link simbólico para fora, `..`, raiz e `.tmp` são recusados com log (SEC-15).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_media_probe.py tests/core/test_files.py -q`.
-- [ ] Gate backend. SEC-11, SEC-15.
+- [x] `cd backend && uv run pytest tests/meetings/test_media_probe.py tests/core/test_files.py -q`.
+- [x] Gate backend. SEC-11, SEC-15.
 
 **Dependencies:** Task 3.5
 
@@ -1177,13 +1177,13 @@
 **Description:** Tabela `meetings` (migração `0003_meetings`), repositório e schemas de saída sem caminho interno.
 
 **Acceptance criteria:**
-- [ ] Campos de `04-data-model.md` (`status`, `failed_stage`, `error_message`, `participants_confirmed_at`, `backlog_saved_at`, `run_id`, `created_at`, `updated_at`), FK para `users` com `ON DELETE CASCADE`.
-- [ ] Nenhum schema de saída contém o caminho do arquivo (`meetings` 21; `03-security.md`, "Never").
-- [ ] `alembic upgrade head` roda sobre o banco da Task 12.2.
+- [x] Campos de `04-data-model.md` (`status`, `failed_stage`, `error_message`, `participants_confirmed_at`, `backlog_saved_at`, `run_id`, `created_at`, `updated_at`), FK para `users` com `ON DELETE CASCADE`.
+- [x] Nenhum schema de saída contém o caminho do arquivo (`meetings` 21; `03-security.md`, "Never").
+- [x] `alembic upgrade head` roda sobre o banco da Task 12.2.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_storage_model.py -q`; `uv run alembic upgrade head`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/meetings/test_storage_model.py -q`; `uv run alembic upgrade head`.
+- [x] Gate backend.
 
 **Dependencies:** Tasks 9.1, 18.1
 
@@ -1198,13 +1198,13 @@
 **Description:** `POST /api/meetings` multipart com recepção em streaming para `/audios/.tmp/<uuid>`, `ffprobe`, gravação da Reunião `pending` com `run_id`, commit, movimento do arquivo para `/audios/<meeting_id>/original.<ext>` e aviso `MeetingCreated` pós-commit (ADR-0018).
 
 **Acceptance criteria:**
-- [ ] Cada formato válido responde 201 com `id`, `title`, `original_filename`, `duration_seconds`, `created_at` e `status` `pending`; o arquivo existe em `/audios` com o conteúdo enviado e a Reunião aponta para ele (`meetings` 1, 2).
-- [ ] Título informado é gravado sem espaços nas pontas; sem título, ou só espaços, usa o nome original; `expected_speakers` de 1 a 20 é gravado, ausente fica vazio (`meetings` 3, 4, 5).
-- [ ] `MeetingCreated` sai uma vez por upload válido; com consumidor que nunca termina, a resposta ainda é 201 (`meetings` 6, 7); extensão em maiúsculas vale como minúscula (`meetings` 15).
+- [x] Cada formato válido responde 201 com `id`, `title`, `original_filename`, `duration_seconds`, `created_at` e `status` `pending`; o arquivo existe em `/audios` com o conteúdo enviado e a Reunião aponta para ele (`meetings` 1, 2).
+- [x] Título informado é gravado sem espaços nas pontas; sem título, ou só espaços, usa o nome original; `expected_speakers` de 1 a 20 é gravado, ausente fica vazio (`meetings` 3, 4, 5).
+- [x] `MeetingCreated` sai uma vez por upload válido; com consumidor que nunca termina, a resposta ainda é 201 (`meetings` 6, 7); extensão em maiúsculas vale como minúscula (`meetings` 15).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_api_upload_valid.py -q`.
-- [ ] Gate backend. SEC-11, SEC-15, SEC-16.
+- [x] `cd backend && uv run pytest tests/meetings/test_api_upload_valid.py -q`.
+- [x] Gate backend. SEC-11, SEC-15, SEC-16.
 
 **Dependencies:** Tasks 18.2, 10.1
 
@@ -1219,13 +1219,13 @@
 **Description:** Recusas do upload com 413/422, temporário apagado em toda recusa (SEC-16).
 
 **Acceptance criteria:**
-- [ ] Extensão fora da lista (422, formatos listados), arquivo sem trilha de áudio (422 "arquivo sem áudio"), mais de 2 h (422), arquivo vazio (422) (`meetings` 9, 10, 11, 13); arquivo de exatamente 2 h é aceito (`meetings` 8).
-- [ ] Mais de 524.288.000 bytes recebe 413 e a mensagem diz "500 MB"; exatamente 524.288.000 não é recusado (`meetings` 12; testado com `UPLOAD_MAX_BYTES` reduzido, no valor exato e um byte acima).
-- [ ] `expected_speakers` 0, -1, 21 e `2.5` recebem 422 (`meetings` 14); em toda recusa não fica Reunião, arquivo em `/audios`, `.tmp` nem aviso.
+- [x] Extensão fora da lista (422, formatos listados), arquivo sem trilha de áudio (422 "arquivo sem áudio"), mais de 2 h (422), arquivo vazio (422) (`meetings` 9, 10, 11, 13); arquivo de exatamente 2 h é aceito (`meetings` 8).
+- [x] Mais de 524.288.000 bytes recebe 413 e a mensagem diz "500 MB"; exatamente 524.288.000 não é recusado (`meetings` 12; testado com `UPLOAD_MAX_BYTES` reduzido, no valor exato e um byte acima).
+- [x] `expected_speakers` 0, -1, 21 e `2.5` recebem 422 (`meetings` 14); em toda recusa não fica Reunião, arquivo em `/audios`, `.tmp` nem aviso.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_api_upload_refused.py -q`.
-- [ ] Gate backend. SEC-09, SEC-16, SEC-25.
+- [x] `cd backend && uv run pytest tests/meetings/test_api_upload_refused.py -q`.
+- [x] Gate backend. SEC-09, SEC-16, SEC-25.
 
 **Dependencies:** Task 18.3
 

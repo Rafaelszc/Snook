@@ -38,7 +38,7 @@
 - Whisper: opção 1. Variáveis `WHISPER_MODEL` (padrão `large-v3-turbo`), `WHISPER_COMPUTE_TYPE` (padrão `int8`; `float16` no perfil GPU). Idioma fixo `pt`. VAD do faster-whisper ligado.
 - Pyannote: `pyannote.audio` 3.x com `pyannote/speaker-diarization-3.1`. Variável `PYANNOTE_PIPELINE`. `expected_speakers` vira `num_speakers`. Versão exata fixada no lockfile da tarefa.
 - Tratamento: opção 1.
-- Leitura de duração e trilhas: `ffprobe`. Se `format.duration` falta (webm do `MediaRecorder`), lê o último pacote de áudio (`pts_time + duration_time`). Arquivo sem trilha de áudio legível vira "arquivo sem áudio".
+- Leitura de duração e trilhas: `ffprobe`. Se `format.duration` falta (webm do `MediaRecorder`), lê o último pacote de áudio (`pts_time + duration_time`). Arquivo sem trilha de áudio legível vira "arquivo sem áudio". `ffprobe` roda com `-protocol_whitelist file` e `-format_whitelist` só dos demuxers dos formatos aceitos: playlist ou script concat disfarçado não abre outro arquivo.
 - Armazenamento: `/audios/<meeting_id>/original.<ext>` e `/audios/<meeting_id>/treated.flac` (FLAC mono 16 kHz, cerca de 100 MB para 2 h). `meeting_id` é UUID gerado pelo servidor. Nome enviado pelo usuário nunca entra no caminho.
 - Amostra: ffmpeg corta o trecho de `treated.flac` e devolve `audio/wav`, gerado sob demanda, sem cache.
 - Junção diarização e transcrição: cada trecho do Whisper recebe o speaker com maior sobreposição de tempo. Sem sobreposição: speaker do turno mais próximo. Trechos seguidos do mesmo speaker com pausa até 1,0 s são unidos num segmento.

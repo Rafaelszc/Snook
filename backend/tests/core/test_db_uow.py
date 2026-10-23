@@ -133,3 +133,43 @@ def test_alembic_upgrade_head_runs_on_empty_database(tmp_path: Path) -> None:
     db_path = tmp_path / "fresh.db"
     upgrade_database(db_path)
     assert db_path.exists()
+
+
+def test_after_commit_runs_in_order_with_events(engine: Engine) -> None:
+    recorder = _Recorder(engine)
+    with UnitOfWork(create_session_factory(engine), recorder) as uow:
+        uow.session.add(_Parent(id=1))
+        uow.after_commit(lambda: recorder.events.append("moved"))
+        uow.publish_after_commit("created")
+        assert recorder.events == []
+    assert recorder.events == ["moved", "created"]
+
+
+def test_failed_after_commit_stops_later_events(
+    engine: Engine, caplog: pytest.LogCaptureFixture
+) -> None:
+    recorder = _Recorder(engine)
+
+    def broken() -> None:
+        raise OSError("disco cheio")
+
+    with (
+        caplog.at_level(logging.ERROR),
+        UnitOfWork(create_session_factory(engine), recorder) as uow,
+    ):
+        uow.session.add(_Parent(id=1))
+        uow.after_commit(broken)
+        uow.publish_after_commit("created")
+    assert recorder.events == []
+    assert "after-commit action failed" in caplog.text
+
+
+def test_rollback_skips_after_commit(engine: Engine) -> None:
+    ran: list[str] = []
+    with (
+        pytest.raises(RuntimeError),
+        UnitOfWork(create_session_factory(engine), lambda _e: None) as uow,
+    ):
+        uow.after_commit(lambda: ran.append("moved"))
+        raise RuntimeError("falha")
+    assert ran == []
