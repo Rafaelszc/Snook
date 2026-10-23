@@ -590,14 +590,14 @@
 **Description:** Tabelas `users` e `sessions` (migração `0001_auth_users_sessions`), repositório e funções de hash/verificação bcrypt (ADR-0021), com `email_norm` e `username_norm` únicos.
 
 **Acceptance criteria:**
-- [ ] A coluna de senha guarda hash bcrypt e `bcrypt.checkpw` com a senha original é verdadeiro (`auth` 9).
-- [ ] A unicidade de email e de nome de usuário ignora caixa: `Ana@x.com` e `ana@x.com` colidem; `Ana` e `ana` colidem (`auth` 6).
-- [ ] O texto da senha não aparece no SQLite (`auth` 10, parte do armazenamento; SEC-05).
+- [x] A coluna de senha guarda hash bcrypt e `bcrypt.checkpw` com a senha original é verdadeiro (`auth` 9).
+- [x] A unicidade de email e de nome de usuário ignora caixa: `Ana@x.com` e `ana@x.com` colidem; `Ana` e `ana` colidem (`auth` 6).
+- [x] O texto da senha não aparece no SQLite (`auth` 10, parte do armazenamento; SEC-05).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/auth/test_user_storage.py -q` (`BCRYPT_ROUNDS=4` nos testes).
-- [ ] `cd backend && uv run alembic upgrade head` num banco novo.
-- [ ] Gate backend. SEC-05.
+- [x] `cd backend && uv run pytest tests/auth/test_user_storage.py -q` (`BCRYPT_ROUNDS=4` nos testes).
+- [x] `cd backend && uv run alembic upgrade head` num banco novo.
+- [x] Gate backend. SEC-05.
 
 **Dependencies:** Task 3.5
 
@@ -613,13 +613,13 @@
 **Description:** `POST /api/auth/register` com validação por schema, mensagens pt-BR e erros 409/422.
 
 **Acceptance criteria:**
-- [ ] Cadastro válido responde 201 com `id`, `email` e `username`, sem senha nem hash (`auth` 1, 11).
-- [ ] Recusas sem criar Usuário: senha de 7 caracteres ou menos (422, `auth` 2); email já usado (409 `email_taken`, `auth` 3); nome já usado (409 `username_taken`, `auth` 4); email inválido (422, `auth` 5); nome de usuário fora de 3 a 30 ou com caractere inválido (422, `auth` 7); caixa diferente colide (409, `auth` 6).
-- [ ] Senha de 72 bytes é aceita; 73 bytes ASCII e senha acentuada acima de 72 bytes com menos de 72 caracteres são recusadas com 422 e "senha com no máximo 72 bytes" (`auth` 28, SEC-05). A senha não aparece em log (`auth` 10, SEC-20).
+- [x] Cadastro válido responde 201 com `id`, `email` e `username`, sem senha nem hash (`auth` 1, 11).
+- [x] Recusas sem criar Usuário: senha de 7 caracteres ou menos (422, `auth` 2); email já usado (409 `email_taken`, `auth` 3); nome já usado (409 `username_taken`, `auth` 4); email inválido (422, `auth` 5); nome de usuário fora de 3 a 30 ou com caractere inválido (422, `auth` 7); caixa diferente colide (409, `auth` 6).
+- [x] Senha de 72 bytes é aceita; 73 bytes ASCII e senha acentuada acima de 72 bytes com menos de 72 caracteres são recusadas com 422 e "senha com no máximo 72 bytes" (`auth` 28, SEC-05). A senha não aparece em log (`auth` 10, SEC-20).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/auth/test_api_register.py -q`.
-- [ ] Gate backend. SEC-05, SEC-09, SEC-20.
+- [x] `cd backend && uv run pytest tests/auth/test_api_register.py -q`.
+- [x] Gate backend. SEC-05, SEC-09, SEC-20.
 
 **Dependencies:** Task 9.1
 
@@ -634,13 +634,13 @@
 **Description:** Sessão com token opaco de 32 bytes (só SHA-256 no banco), cookie `snook_session`, dependência `current_user`, expiração por inatividade e máxima, limpeza horária. O cadastro cria sessão (ADR-0008).
 
 **Acceptance criteria:**
-- [ ] O cookie tem `HttpOnly`, `SameSite=Lax`, `Path=/` e `Secure` quando o esquema resolvido é `https` ou o host é `localhost`; o banco guarda só o hash do token (SEC-03).
-- [ ] Com relógio falso, a sessão expira com 24 h de inatividade e 7 dias no total; token novo a cada cadastro e login (SEC-03).
-- [ ] Cadastro responde com `Set-Cookie`, e a sessão criada existe na tabela `sessions` (base de `auth` 8; o `GET /auth/me` do critério 8 fecha na Task 10.1).
+- [x] O cookie tem `HttpOnly`, `SameSite=Lax`, `Path=/` e `Secure` quando o esquema resolvido é `https` ou o host é `localhost`; o banco guarda só o hash do token (SEC-03).
+- [x] Com relógio falso, a sessão expira com 24 h de inatividade e 7 dias no total; token novo a cada cadastro e login (SEC-03).
+- [x] Cadastro responde com `Set-Cookie`, e a sessão criada existe na tabela `sessions` (base de `auth` 8; o `GET /auth/me` do critério 8 fecha na Task 10.1).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/auth/test_sessions.py -q` (inclui `X-Forwarded-Proto: https` vindo de IP confiável: cookie com `Secure`).
-- [ ] Gate backend. SEC-03, SEC-27.
+- [x] `cd backend && uv run pytest tests/auth/test_sessions.py -q` (inclui `X-Forwarded-Proto: https` vindo de IP confiável: cookie com `Secure`).
+- [x] Gate backend. SEC-03, SEC-27.
 
 **Dependencies:** Tasks 9.2, 7.3
 
@@ -655,13 +655,13 @@
 **Description:** Tela de cadastro com card de vidro e mouse-tracking, erros da API, e ida à área autenticada após o cadastro.
 
 **Acceptance criteria:**
-- [ ] A tela inicial oferece cadastro e login (`auth` 22).
-- [ ] Cadastro bem-sucedido leva direto à área autenticada (`auth` 23).
-- [ ] Erros do cadastro aparecem na tela com a mensagem da API (`auth` 25); `vitest-axe` sem violação.
+- [x] A tela inicial oferece cadastro e login (`auth` 22).
+- [x] Cadastro bem-sucedido leva direto à área autenticada (`auth` 23).
+- [x] Erros do cadastro aparecem na tela com a mensagem da API (`auth` 25); `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/auth`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/auth`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 9.3, 5.2, 5.3
 
