@@ -46,6 +46,7 @@
 | `meeting.status_changed` | INFO | `meeting_id`, `run_id`, `from`, `to`, `failed_stage` |
 | `meeting.interrupted_marked` | WARNING | quantidade por status |
 | `operator.user_deleted` | INFO | `user_id`, `meetings_count` (SEC-20; sem email nem nome de usuário) |
+| `operator.master_key_rotated` | INFO | `rotated`, `unreadable` (contagens; sem chave nem chave-mestra, SEC-07) |
 | `pipeline.event_ignored` | INFO | evento, `meeting_id`, motivo (`status_mismatch`, `run_id_mismatch`) |
 | `transcription.finished` | INFO | `meeting_id`, `duration_ms`, `audio_seconds`, `segments`, `speakers`, `device` |
 | `generation.finished` | INFO | `meeting_id`, `parts`, `epics`, `user_stories`, `duration_ms` |
