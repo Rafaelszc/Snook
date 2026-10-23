@@ -8,7 +8,7 @@ from snook.modules.diarized_transcription import repository
 from snook.modules.diarized_transcription.dispatcher import (
     TranscriptionDispatcher as TranscriptionDispatcher,
 )
-from snook.modules.diarized_transcription.merge import Segment
+from snook.modules.diarized_transcription.merge import Segment, Speaker, speakers
 from snook.modules.diarized_transcription.pipeline import default_engines
 
 
@@ -34,3 +34,8 @@ def list_segments(uow: UnitOfWork, meeting_id: str) -> list[Segment]:
         Segment(s.speaker_label, s.start_seconds, s.end_seconds, s.text)
         for s in repository.list_segments(uow.session, meeting_id)
     ]
+
+
+def list_speakers(uow: UnitOfWork, meeting_id: str) -> list[Speaker]:
+    """Interface "Speakers": rótulos dos segmentos, com tempo total e maior segmento."""
+    return speakers(list_segments(uow, meeting_id))

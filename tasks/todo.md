@@ -1539,13 +1539,13 @@
 **Description:** `merge.py`: maior sobreposição de tempo, turno mais próximo quando não há sobreposição, fusão de trechos seguidos do mesmo speaker com pausa até 1,0 s (ADR-0014); interfaces "Segmentos" e "Speakers".
 
 **Acceptance criteria:**
-- [ ] Trecho dentro de um turno recebe o speaker dele; trecho fora de qualquer turno recebe o do turno mais próximo; nenhum segmento fica sem speaker (`diarized-transcription` 9, 10).
-- [ ] Cada segmento cumpre `0 <= start < end <= duração` e `text` não vazio; saem em ordem crescente de `start_seconds` (`diarized-transcription` 11, 12).
-- [ ] "Speakers" devolve exatamente os rótulos dos segmentos, com tempo total de fala e maior segmento (`diarized-transcription` 13).
+- [x] Trecho dentro de um turno recebe o speaker dele; trecho fora de qualquer turno recebe o do turno mais próximo; nenhum segmento fica sem speaker (`diarized-transcription` 9, 10).
+- [x] Cada segmento cumpre `0 <= start < end <= duração` e `text` não vazio; saem em ordem crescente de `start_seconds` (`diarized-transcription` 11, 12).
+- [x] "Speakers" devolve exatamente os rótulos dos segmentos, com tempo total de fala e maior segmento (`diarized-transcription` 13).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_merge.py -q` (tabelas pequenas: dentro, entre, fora de turno).
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_merge.py -q` (tabelas pequenas: dentro, entre, fora de turno).
+- [x] Gate backend.
 
 **Dependencies:** Task 23.2
 
