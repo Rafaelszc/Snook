@@ -1,0 +1,9 @@
+# Contexto = raiz do repo (precisa de deploy/nginx.conf). Só frontend/ e deploy/nginx.conf entram.
+*
+!frontend
+!deploy/nginx.conf
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+**/*.log

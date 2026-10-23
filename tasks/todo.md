@@ -353,23 +353,23 @@
 
 ### Checkpoint: Frontend base
 
-- [ ] `cd frontend && npm test -- --run` e `npm run build` passam
-- [ ] Checagem de UI
-- [ ] `impeccable-design-polish` sobre os tokens e a página de amostra dos componentes
-- [ ] `/security-review` sobre o diff
+- [x] `cd frontend && npm test -- --run` e `npm run build` passam
+- [x] Checagem de UI
+- [x] `impeccable-design-polish` sobre os tokens e a página de amostra dos componentes
+- [x] `/security-review` sobre o diff
 
 ### Task 6.1: Dockerfiles do backend (CPU e GPU)
 
 **Description:** `backend/Dockerfile` (Python 3.12 slim, ffmpeg, torch CPU) e `backend/Dockerfile.gpu` (base CUDA), usuário UID 1000, imagens fixadas por digest.
 
 **Acceptance criteria:**
-- [ ] As duas imagens constroem e rodam como UID 1000 (SEC-23).
-- [ ] Imagem base fixada por digest; `uv sync --frozen` no build (SEC-21).
-- [ ] Nenhum segredo nem `.env` entra na imagem (`.dockerignore`; SEC-08).
+- [x] As duas imagens constroem e rodam como UID 1000 (SEC-23).
+- [x] Imagem base fixada por digest; `uv sync --frozen` no build (SEC-21).
+- [x] Nenhum segredo nem `.env` entra na imagem (`.dockerignore`; SEC-08).
 
 **Verification:**
-- [ ] `docker build -f backend/Dockerfile backend` termina; `docker run --rm <img> id -u` imprime `1000`.
-- [ ] `docker build -f backend/Dockerfile.gpu backend` termina (execução em GPU fica para a Task 26.4).
+- [x] `docker build -f backend/Dockerfile backend` termina; `docker run --rm <img> id -u` imprime `1000`.
+- [x] `docker build -f backend/Dockerfile.gpu backend` termina (execução em GPU fica para a Task 26.4).
 
 **Dependencies:** Task 3.5
 
@@ -383,18 +383,18 @@
 **Description:** `frontend/Dockerfile` (build Node, runtime nginx) e `deploy/nginx.conf` com proxy de `/api` para `backend:8000`, limite de corpo e headers.
 
 **Acceptance criteria:**
-- [ ] `location /api/` repassa ao `backend:8000` com `Host`; a SPA volta `index.html` nas rotas do cliente.
-- [ ] Corpo limitado em 1 MiB nas rotas JSON e em 524.288.000 bytes só no `POST /api/meetings` (SEC-25, ADR-0018).
-- [ ] O container roda como UID 1000 (SEC-23).
+- [x] `location /api/` repassa ao `backend:8000` com `Host`; a SPA volta `index.html` nas rotas do cliente.
+- [x] Corpo limitado em 1 MiB nas rotas JSON e em 510m (500 MiB mais folga de multipart, ADR-0018) só no `POST /api/meetings` (SEC-25).
+- [x] O container roda como UID 1000 (SEC-23).
 
 **Verification:**
-- [ ] `docker build -f frontend/Dockerfile frontend` termina.
-- [ ] `docker run --rm <img> nginx -t -c /etc/nginx/nginx.conf` passa.
+- [x] `docker build -f frontend/Dockerfile .` termina (contexto = raiz, porque a imagem copia `deploy/nginx.conf`).
+- [x] `docker run --rm <img> nginx -t -c /etc/nginx/nginx.conf` passa.
 
 **Dependencies:** Tasks 4.3, 6.1
 
 **Files likely touched:**
-- `frontend/Dockerfile`, `frontend/.dockerignore`, `deploy/nginx.conf`
+- `frontend/Dockerfile`, `frontend/Dockerfile.dockerignore`, `deploy/nginx.conf`
 
 **Estimated scope:** Small
 
@@ -403,15 +403,15 @@
 **Description:** `compose.yaml` com perfis `cpu` e `gpu`, volumes `snook-db`, `snook-models`, bind `./audios`, sub-rede `172.28.0.0/24`, healthcheck e logs `json-file`; `.env.example` sem segredo; `.gitignore`; README mínimo.
 
 **Acceptance criteria:**
-- [ ] `docker compose up --build` sobe backend e frontend e `http://localhost:8080` responde (transversal 1).
-- [ ] `docker compose down` sem `-v` mantém o banco e `./audios` (transversal 2, manual).
-- [ ] `.gitignore` cobre `.env`, `*.db`, `*.db-*`, `*.db.bak-*`, `audios/`, `models/`, `snook-lan-ca.crt`; `.env.example` não traz valor secreto e mostra o comando que gera `SNOOK_MASTER_KEY` (transversal 8; SEC-08).
+- [x] `docker compose up --build` sobe backend e frontend e `http://localhost:8080` responde (transversal 1).
+- [x] `docker compose down` sem `-v` mantém o banco e `./audios` (transversal 2, manual).
+- [x] `.gitignore` cobre `.env`, `*.db`, `*.db-*`, `*.db.bak-*`, `audios/`, `models/`, `snook-lan-ca.crt`; `.env.example` não traz valor secreto e mostra o comando que gera `SNOOK_MASTER_KEY` (transversal 8; SEC-08).
 
 **Verification:**
-- [ ] `docker compose up --build -d`, depois `curl -sI http://localhost:8080/` e `curl -s http://localhost:8080/api/health`.
-- [ ] `docker compose ps` não mostra porta publicada do backend; `docker compose exec backend id -u` imprime `1000` (SEC-23).
-- [ ] `docker compose stop backend backend-gpu` com o serviço fora do perfil ativo: se falhar, `08-deployment.md` passa a trazer um comando por perfil (decisão do plano, Task 6).
-- [ ] `git check-ignore .env audios/x snook.db` lista os três.
+- [x] `docker compose up --build -d`, depois `curl -sI http://localhost:8080/` e `curl -s http://localhost:8080/api/health`.
+- [x] `docker compose ps` não mostra porta publicada do backend; `docker compose exec backend id -u` imprime `1000` (SEC-23).
+- [x] `docker compose stop backend backend-gpu` com o serviço fora do perfil ativo: se falhar, `08-deployment.md` passa a trazer um comando por perfil (decisão do plano, Task 6). Conferido: sai com 0; um comando só basta.
+- [x] `git check-ignore .env audios/x snook.db` lista os três.
 
 **Dependencies:** Tasks 6.1, 6.2
 
