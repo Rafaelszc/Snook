@@ -41,12 +41,12 @@ it("Salvar fica desabilitado até um teste bem-sucedido com os valores atuais (l
   const save = openai.getByRole("button", { name: "Salvar" })
   expect(save).toBeDisabled()
 
-  await user.type(openai.getByLabelText("Chave de API"), "sk-test-123456789")
+  await user.type(openai.getByLabelText("Chave de API"), "TesteChave-123456789")
   await user.click(openai.getByRole("button", { name: "Testar conexão" }))
   expect(await openai.findByText("Conexão bem-sucedida.")).toBeVisible()
   expect(save).toBeEnabled()
   expect(sent).toEqual({
-    api_key: "sk-test-123456789",
+    api_key: "TesteChave-123456789",
     model: "gpt-5-mini",
     context_window: 400000,
   })
@@ -147,7 +147,7 @@ it("salvar com sucesso limpa a chave e atualiza a lista", async () => {
   renderWithProviders(<SettingsPage />)
 
   const openai = within(await openSection("OpenAI"))
-  await user.type(openai.getByLabelText("Chave de API"), "sk-test-123456789")
+  await user.type(openai.getByLabelText("Chave de API"), "TesteChave-123456789")
   await user.click(openai.getByRole("button", { name: "Testar conexão" }))
   await user.click(await openai.findByRole("button", { name: "Salvar" }))
   expect(await openai.findByText("sk-...abcd")).toBeVisible()
@@ -227,7 +227,7 @@ it("feedback do teste entra com classe de movimento que respeita reduced-motion"
   renderWithProviders(<SettingsPage />)
 
   const openai = within(await openSection("OpenAI"))
-  await user.type(openai.getByLabelText("Chave de API"), "sk-test-123456789")
+  await user.type(openai.getByLabelText("Chave de API"), "TesteChave-123456789")
   await user.click(openai.getByRole("button", { name: "Testar conexão" }))
   expect(await openai.findByText("Conexão bem-sucedida.")).toHaveClass(
     "motion-enter"
