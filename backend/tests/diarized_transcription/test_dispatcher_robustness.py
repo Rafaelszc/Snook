@@ -2,10 +2,8 @@
 
 import inspect
 import sqlite3
-import time
 from collections.abc import Callable
-from concurrent.futures import BrokenExecutor, Executor, Future
-from concurrent.futures.process import BrokenProcessPool
+from concurrent.futures import Executor, Future
 from datetime import timedelta
 from pathlib import Path
 from typing import Any
@@ -21,12 +19,9 @@ from snook.core.settings import Settings
 from snook.main import create_app
 from snook.modules.diarized_transcription import dispatcher as dispatcher_module
 from snook.modules.diarized_transcription import messages
-from snook.modules.diarized_transcription.dispatcher import (
-    TranscriptionDispatcher,
-    process_pool,
-    terminate_workers,
-)
+from snook.modules.diarized_transcription.dispatcher import TranscriptionDispatcher
 from snook.modules.diarized_transcription.engines.fakes import FakeEngines, SyncExecutor
+from snook.modules.diarized_transcription.spawn_executor import WorkerDied
 from snook.modules.meetings import service as meetings_service
 from tests.auth.helpers import rows
 from tests.diarized_transcription.conftest import install, wait_for
@@ -73,14 +68,37 @@ def test_meeting_without_original_yet_is_not_claimed(
     assert _status(settings, meeting_id) == "transcribed"
 
 
-def test_unsafe_path_does_not_block_queue(
+def test_original_missing_after_grace_goes_failed(
+    ana: TestClient,
+    settings: Settings,
+    clock: FakeClock,
+    dispatcher: TranscriptionDispatcher,
+    engines: FakeEngines,
+) -> None:
+    """Move do upload falhou: depois da folga, `failed` em vez de `pending` para sempre."""
+    meeting_id = create(ana)
+    (settings.audio_root / meeting_id / "original.mp3").unlink()
+    set_fields(settings.database_path, meeting_id, status="pending")
+
+    clock.advance(timedelta(seconds=meetings_service.ORIGINAL_GRACE_SECONDS + 1))
+    dispatcher.wake()
+
+    assert state(settings.database_path, meeting_id) == (
+        "failed",
+        "transcription",
+        messages.ORIGINAL_UNAVAILABLE,
+    )
+    assert len(engines.audio.sources) == 1
+
+
+def test_unsafe_path_goes_failed_and_queue_moves_on(
     ana: TestClient,
     settings: Settings,
     clock: FakeClock,
     dispatcher: TranscriptionDispatcher,
     tmp_path: Path,
 ) -> None:
-    """SEC-15: diretório trocado por link é pulado; a Reunião seguinte transcreve."""
+    """SEC-15: diretório trocado por link vai a `failed`; a Reunião seguinte transcreve."""
     blocked = create(ana)
     target = settings.audio_root / blocked
     outside = tmp_path / "fora"
@@ -91,7 +109,11 @@ def test_unsafe_path_does_not_block_queue(
 
     other = create(ana)
 
-    assert _status(settings, blocked) == "pending"
+    assert state(settings.database_path, blocked) == (
+        "failed",
+        "transcription",
+        messages.ORIGINAL_UNAVAILABLE,
+    )
     assert _status(settings, other) == "transcribed"
 
 
@@ -176,59 +198,32 @@ def test_claim_failure_retries_and_queue_moves_on(
     wait_for(lambda: _status(settings, meeting_id) == "transcribed")
 
 
-class _DyingPool(Executor):
-    """Primeiro trabalho perde o subprocesso; depois o pool fica quebrado, como o real."""
+class _DyingWorker(Executor):
+    """Subprocesso morre (OOM, sinal) no primeiro trabalho; os seguintes rodam."""
 
     def __init__(self) -> None:
-        self.broken = False
+        self.died = False
 
     def submit(self, fn: Callable[..., Any], /, *args: Any, **kwargs: Any) -> Future[Any]:
-        if self.broken:
-            raise BrokenExecutor("pool quebrado")
-        self.broken = True
+        if self.died:
+            return SyncExecutor().submit(fn, *args)
+        self.died = True
         future: Future[Any] = Future()
-        future.set_exception(BrokenProcessPool("subprocesso morreu"))
+        future.set_exception(WorkerDied("subprocesso saiu com código -9"))
         return future
 
 
-def test_broken_pool_is_replaced_before_next_meeting(
+def test_dead_worker_fails_only_its_meeting(
     ana: TestClient, settings: Settings, engines: FakeEngines
 ) -> None:
-    pools: list[Executor] = []
-
-    def factory(_workers: int) -> Executor:
-        pool: Executor = _DyingPool() if not pools else SyncExecutor()
-        pools.append(pool)
-        return pool
-
-    install(ana, engines, factory, workers=2, max_per_user=1)
+    executor = _DyingWorker()
+    install(ana, engines, lambda _n: executor, workers=2, max_per_user=1)
 
     first = create(ana)
     second = create(ana)
 
     assert state(settings.database_path, first) == ("failed", "transcription", messages.UNEXPECTED)
     assert _status(settings, second) == "transcribed"
-    assert len(pools) == 2
-
-
-def _sleep(seconds: float) -> None:
-    time.sleep(seconds)
-
-
-def test_terminate_workers_kills_running_subprocess() -> None:
-    """Parada não espera a transcrição em andamento."""
-    pool = process_pool(1)
-    future = pool.submit(_sleep, 60)
-    wait_for(lambda: future.running(), timeout=30)
-    processes = list(pool._processes.values())  # type: ignore[attr-defined]
-
-    started = time.monotonic()
-    terminate_workers(pool)
-    for process in processes:
-        process.join(10)
-
-    assert time.monotonic() - started < 10
-    assert not any(process.is_alive() for process in processes)
 
 
 def test_startup_failure_after_dispatcher_start_still_stops_it(

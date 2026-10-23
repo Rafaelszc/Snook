@@ -2,10 +2,9 @@
 de `TRANSCRIPTION_MAX_PER_USER`, com até `TRANSCRIPTION_WORKERS` trabalhos ao mesmo tempo."""
 
 import logging
-import multiprocessing
 import threading
 from collections.abc import Callable
-from concurrent.futures import BrokenExecutor, Executor, Future, ProcessPoolExecutor
+from concurrent.futures import Executor, Future
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -19,6 +18,7 @@ from snook.modules.diarized_transcription import messages, repository
 from snook.modules.diarized_transcription.engines.base import EngineFailure, Engines
 from snook.modules.diarized_transcription.merge import Segment
 from snook.modules.diarized_transcription.pipeline import Job, run_job
+from snook.modules.diarized_transcription.spawn_executor import SpawnExecutor
 from snook.modules.meetings import service as meetings
 
 logger = logging.getLogger("snook.transcription")
@@ -27,17 +27,9 @@ TREATED_FILE = "treated.flac"
 CLAIM_RETRY_SECONDS = 5.0
 
 
-def process_pool(workers: int) -> Executor:
-    return ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context("spawn"))
-
-
-def terminate_workers(executor: Executor) -> None:
-    """Para o executor sem esperar trabalho em andamento. Subprocesso é morto: senão o `atexit`
-    do `concurrent.futures` segura a parada até a transcrição acabar."""
-    processes = getattr(executor, "_processes", None) or {}
-    for process in list(processes.values()):
-        process.terminate()
-    executor.shutdown(wait=False, cancel_futures=True)
+def process_pool(_workers: int) -> Executor:
+    """Um subprocesso `spawn` por trabalho; o dispatcher limita a `TRANSCRIPTION_WORKERS`."""
+    return SpawnExecutor()
 
 
 @dataclass(frozen=True)
@@ -100,7 +92,7 @@ class TranscriptionDispatcher:
             self._stopped = True
             executor, self._executor = self._executor, None
         if executor is not None:
-            terminate_workers(executor)
+            executor.shutdown(wait=False, cancel_futures=True)  # mata subprocesso em andamento
 
     def on_event(self, event: MeetingCreated | RetryRequested) -> None:
         """Aviso só acorda o dispatcher; ele escolhe no banco a `pending` certa, então aviso
@@ -161,29 +153,50 @@ class TranscriptionDispatcher:
         return UnitOfWork(self._session_factory, self._publish)
 
     def _claim(self) -> _Claim | None:
-        """`pending` -> `processing` num commit, descartando dado de tentativa anterior."""
+        """`pending` -> `processing` num commit, descartando dado de tentativa anterior.
+        Original indisponível vai a `failed` no mesmo commit, e a escolha segue para a próxima."""
+        while True:
+            claim, unavailable = self._claim_one()
+            if not unavailable:
+                return claim
+
+    def _claim_one(self) -> tuple[_Claim | None, bool]:
         root = self._audio_root
+        now = self._now()
         with self._uow() as uow:
             work = meetings.next_pending_for_transcription(
-                uow, max_per_user=self._max_per_user, audio_root=root
+                uow, max_per_user=self._max_per_user, audio_root=root, now=now
             )
             if work is None:
-                return None
+                return None, False
             meeting_id = work.meeting_id
-            run_id = meetings.update_status(uow, meeting_id, "processing", now=self._now())
+            run_id = meetings.update_status(uow, meeting_id, "processing", now=now)
+            if work.original_path is None:
+                meetings.update_status(
+                    uow,
+                    meeting_id,
+                    "failed",
+                    failed_stage="transcription",
+                    message=messages.ORIGINAL_UNAVAILABLE,
+                    now=now,
+                )
+                logger.warning(
+                    "transcription.original_unavailable", extra={"meeting_id": meeting_id}
+                )
+                return None, True
             repository.delete_segments(uow.session, meeting_id)
             uow.after_commit(lambda: files.remove_meeting_file(root, meeting_id, TREATED_FILE))
+            original_path = work.original_path
         job = Job(
-            original_path=work.original_path,
+            original_path=original_path,
             treated_path=files.new_tmp_path(root).with_suffix(".flac"),
             duration_seconds=work.duration_seconds,
             expected_speakers=work.expected_speakers,
         )
         logger.info("transcription.started", extra={"meeting_id": meeting_id})
-        return _Claim(meeting_id=meeting_id, run_id=run_id, job=job)
+        return _Claim(meeting_id=meeting_id, run_id=run_id, job=job), False
 
     def _submit(self, claim: _Claim) -> None:
-        executor: Executor | None = None
         try:
             with self._lock:
                 if self._executor is None:
@@ -195,23 +208,10 @@ class TranscriptionDispatcher:
             failed: Future[list[Segment]] = Future()
             failed.set_exception(exc)
             future = failed
-        future.add_done_callback(lambda done: self._done(claim, done, executor))
+        future.add_done_callback(lambda done: self._done(claim, done))
 
-    def _drop_broken(self, executor: Executor | None, future: "Future[list[Segment]]") -> None:
-        """Subprocesso morreu: o pool quebrado sai já, e o próximo trabalho cria outro."""
-        if executor is None or not isinstance(future.exception(), BrokenExecutor):
-            return
-        with self._lock:
-            if self._executor is not executor:
-                return
-            self._executor = None
-        terminate_workers(executor)
-
-    def _done(
-        self, claim: _Claim, future: "Future[list[Segment]]", executor: Executor | None
-    ) -> None:
+    def _done(self, claim: _Claim, future: "Future[list[Segment]]") -> None:
         try:
-            self._drop_broken(executor, future)
             self._finish(claim, future)
         except Exception:
             logger.exception("transcription.save_failed", extra={"meeting_id": claim.meeting_id})

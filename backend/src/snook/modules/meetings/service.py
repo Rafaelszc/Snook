@@ -7,7 +7,7 @@ from pathlib import Path, PurePosixPath
 from typing import cast
 
 from snook.core import files
-from snook.core.clock import to_iso
+from snook.core.clock import from_iso, to_iso
 from snook.core.errors import AppError
 from snook.core.events import MeetingCreated, RetryRequested, Stage
 from snook.core.uow import UnitOfWork
@@ -23,6 +23,7 @@ logger = logging.getLogger("snook.meetings")
 ORIGINAL_FILENAME_MAX = 255
 EXPECTED_SPEAKERS_MIN = 1
 EXPECTED_SPEAKERS_MAX = 20
+ORIGINAL_GRACE_SECONDS = 60
 _DIGITS = re.compile(r"^[0-9]{1,3}$")
 
 
@@ -290,32 +291,36 @@ def requeue_pending(uow: UnitOfWork) -> None:
 
 @dataclass(frozen=True)
 class TranscriptionWork:
-    """Reunião escolhida para transcrever; só o que o subprocesso precisa."""
+    """Reunião escolhida para transcrever; só o que o subprocesso precisa.
+    `original_path` `None`: original recusado (SEC-15) ou sumido; quem chama leva a `failed`."""
 
     meeting_id: str
-    original_path: Path
+    original_path: Path | None
     duration_seconds: float
     expected_speakers: int | None
 
 
 def next_pending_for_transcription(
-    uow: UnitOfWork, *, max_per_user: int, audio_root: Path
+    uow: UnitOfWork, *, max_per_user: int, audio_root: Path, now: datetime
 ) -> TranscriptionWork | None:
     """`pending` mais antiga de Usuário com menos de `max_per_user` em `processing` (ADR-0010).
-    Pula a que ainda não tem o original no lugar: o upload move o arquivo depois do commit e só
-    então publica `MeetingCreated`. Pula também caminho recusado por SEC-15 (já vai ao log)."""
+    Original ausente em Reunião recém-criada: pula, porque o upload move o arquivo depois do
+    commit e só então publica `MeetingCreated`. Passado `ORIGINAL_GRACE_SECONDS`, o move falhou."""
     for meeting in repository.pending_below_limit(uow.session, max_per_user):
         try:
-            path = original_audio_path(audio_root, meeting)
+            path: Path | None = original_audio_path(audio_root, meeting)
         except files.UnsafePathError:
-            continue
-        if path.is_file():
-            return TranscriptionWork(
-                meeting_id=meeting.id,
-                original_path=path,
-                duration_seconds=meeting.duration_seconds,
-                expected_speakers=meeting.expected_speakers,
-            )
+            path = None
+        if path is not None and not path.is_file():
+            if (now - from_iso(meeting.created_at)).total_seconds() < ORIGINAL_GRACE_SECONDS:
+                continue
+            path = None
+        return TranscriptionWork(
+            meeting_id=meeting.id,
+            original_path=path,
+            duration_seconds=meeting.duration_seconds,
+            expected_speakers=meeting.expected_speakers,
+        )
     return None
 
 
