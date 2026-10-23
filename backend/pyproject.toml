@@ -44,7 +44,7 @@ src = ["src", "tests"]
 select = ["E", "F", "I", "UP", "B", "S", "SIM"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101", "S106"]
+"tests/**" = ["S101", "S105", "S106"]
 
 [tool.mypy]
 strict = true
