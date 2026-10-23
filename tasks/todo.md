@@ -383,18 +383,18 @@
 **Description:** `frontend/Dockerfile` (build Node, runtime nginx) e `deploy/nginx.conf` com proxy de `/api` para `backend:8000`, limite de corpo e headers.
 
 **Acceptance criteria:**
-- [ ] `location /api/` repassa ao `backend:8000` com `Host`; a SPA volta `index.html` nas rotas do cliente.
-- [ ] Corpo limitado em 1 MiB nas rotas JSON e em 524.288.000 bytes só no `POST /api/meetings` (SEC-25, ADR-0018).
-- [ ] O container roda como UID 1000 (SEC-23).
+- [x] `location /api/` repassa ao `backend:8000` com `Host`; a SPA volta `index.html` nas rotas do cliente.
+- [x] Corpo limitado em 1 MiB nas rotas JSON e em 510m (500 MiB mais folga de multipart, ADR-0018) só no `POST /api/meetings` (SEC-25).
+- [x] O container roda como UID 1000 (SEC-23).
 
 **Verification:**
-- [ ] `docker build -f frontend/Dockerfile frontend` termina.
-- [ ] `docker run --rm <img> nginx -t -c /etc/nginx/nginx.conf` passa.
+- [x] `docker build -f frontend/Dockerfile .` termina (contexto = raiz, porque a imagem copia `deploy/nginx.conf`).
+- [x] `docker run --rm <img> nginx -t -c /etc/nginx/nginx.conf` passa.
 
 **Dependencies:** Tasks 4.3, 6.1
 
 **Files likely touched:**
-- `frontend/Dockerfile`, `frontend/.dockerignore`, `deploy/nginx.conf`
+- `frontend/Dockerfile`, `frontend/Dockerfile.dockerignore`, `deploy/nginx.conf`
 
 **Estimated scope:** Small
 
