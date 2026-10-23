@@ -5,6 +5,7 @@ from urllib.parse import urlsplit
 from fastapi import FastAPI
 from starlette.datastructures import Headers
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from snook.core.errors import error_response
 from snook.core.settings import Settings
@@ -176,3 +177,7 @@ def install_http_security(app: FastAPI, settings: Settings) -> None:
     app.add_middleware(OriginCheckMiddleware, allowed_origins=settings.allowed_origins)
     app.add_middleware(AllowedHostMiddleware, allowed_hosts=settings.allowed_hosts)
     app.add_middleware(SecurityHeadersMiddleware)
+    # SEC-27. O do uvicorn 0.54 já segue a regra: X-Forwarded-* só de IP confiável, e o
+    # IP do cliente é o primeiro fora da lista, da direita para a esquerda. Fica dentro
+    # da app para ler TRUSTED_PROXY_IPS do Settings; o da CLI fica desligado no Dockerfile.
+    app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=settings.trusted_proxy_ips)
