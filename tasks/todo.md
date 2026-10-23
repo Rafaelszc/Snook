@@ -425,13 +425,13 @@
 **Description:** Middleware em `core/http_security.py`: headers de SEC-13 em toda resposta e `TrustedHostMiddleware` com `ALLOWED_HOSTS`. Sem CORS.
 
 **Acceptance criteria:**
-- [ ] Toda resposta traz CSP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` e `Cross-Origin-Opener-Policy` exatamente como em SEC-13; nenhum HSTS no backend.
-- [ ] `Host: evil.example` recebe 400 `invalid_host` (SEC-14; abuse case do threat model).
-- [ ] Nenhuma resposta traz `Access-Control-Allow-Origin`, mesmo com `Origin` estranho.
+- [x] Toda resposta traz CSP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` e `Cross-Origin-Opener-Policy` exatamente como em SEC-13; nenhum HSTS no backend.
+- [x] `Host: evil.example` recebe 400 `invalid_host` (SEC-14; abuse case do threat model).
+- [x] Nenhuma resposta traz `Access-Control-Allow-Origin`, mesmo com `Origin` estranho.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/core/test_http_headers_host.py -q`.
-- [ ] Gate backend. SEC-13, SEC-14.
+- [x] `cd backend && uv run pytest tests/core/test_http_headers_host.py -q`.
+- [x] Gate backend. SEC-13, SEC-14.
 
 **Dependencies:** Task 3.2
 
@@ -446,13 +446,13 @@
 **Description:** Middleware que exige `Origin` (ou `Referer`) em `ALLOWED_ORIGINS` nos métodos que mudam estado, e corta corpo JSON acima de 1 MiB.
 
 **Acceptance criteria:**
-- [ ] `POST`, `PUT`, `PATCH` e `DELETE` sem `Origin` ou com `Origin` estranho recebem 403 `invalid_origin`; com `Origin` válido passam (SEC-04; um teste por método).
-- [ ] Nenhum `GET` muda o banco (teste de snapshot antes e depois nas rotas existentes; SEC-04).
-- [ ] Corpo JSON acima de 1 MiB recebe 413 `payload_too_large` (SEC-25).
+- [x] `POST`, `PUT`, `PATCH` e `DELETE` sem `Origin` ou com `Origin` estranho recebem 403 `invalid_origin`; com `Origin` válido passam (SEC-04; um teste por método).
+- [x] Nenhum `GET` muda o banco (teste de snapshot antes e depois nas rotas existentes; SEC-04).
+- [x] Corpo JSON acima de 1 MiB recebe 413 `payload_too_large` (SEC-25).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/core/test_origin_body_limit.py -q`.
-- [ ] Gate backend. SEC-04, SEC-25.
+- [x] `cd backend && uv run pytest tests/core/test_origin_body_limit.py -q`.
+- [x] Gate backend. SEC-04, SEC-25.
 
 **Dependencies:** Task 7.1
 
@@ -467,13 +467,13 @@
 **Description:** Função que resolve IP do cliente e esquema a partir de `X-Forwarded-For` e `X-Forwarded-Proto`, só quando a conexão vem de IP em `TRUSTED_PROXY_IPS`. Usa `--forwarded-allow-ips` do uvicorn se a versão travada seguir a regra; senão, middleware próprio. O teste decide (`08-deployment.md`, "Perfil lan").
 
 **Acceptance criteria:**
-- [ ] Conexão de IP em `TRUSTED_PROXY_IPS` com `X-Forwarded-For: 1.2.3.4, <IP do cliente>` resolve `<IP do cliente>`: primeiro IP fora da lista, da direita para a esquerda (SEC-27).
-- [ ] `X-Forwarded-Proto: https` só vale vindo de IP em `TRUSTED_PROXY_IPS`.
-- [ ] Conexão de IP fora da lista: cabeçalhos ignorados; valem IP e esquema da conexão.
+- [x] Conexão de IP em `TRUSTED_PROXY_IPS` com `X-Forwarded-For: 1.2.3.4, <IP do cliente>` resolve `<IP do cliente>`: primeiro IP fora da lista, da direita para a esquerda (SEC-27).
+- [x] `X-Forwarded-Proto: https` só vale vindo de IP em `TRUSTED_PROXY_IPS`.
+- [x] Conexão de IP fora da lista: cabeçalhos ignorados; valem IP e esquema da conexão.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/core/test_proxy_resolver.py -q` (direto na função ou por rota de teste registrada só na suíte, nunca na app de produção).
-- [ ] Gate backend. SEC-27.
+- [x] `cd backend && uv run pytest tests/core/test_proxy_resolver.py -q` (direto na função ou por rota de teste registrada só na suíte, nunca na app de produção).
+- [x] Gate backend. SEC-27.
 
 **Dependencies:** Task 7.1
 
@@ -488,13 +488,13 @@
 **Description:** `core/logging.py`: logs JSON em stdout, `LOG_LEVEL`, filtro que redige segredos e eventos de segurança (`07-observability.md`).
 
 **Acceptance criteria:**
-- [ ] Log sai em JSON, um objeto por linha, com nível e evento.
-- [ ] Com senha, token de sessão, chave de LLM, `HF_TOKEN` e chave-mestra de teste conhecidos, nenhum aparece em texto claro no `caplog` (transversal 7; SEC-20), inclusive dentro de mensagem de exceção.
-- [ ] Texto de Transcrição nunca entra em log (teste com marcador de texto) (SEC-20).
+- [x] Log sai em JSON, um objeto por linha, com nível e evento.
+- [x] Com senha, token de sessão, chave de LLM, `HF_TOKEN` e chave-mestra de teste conhecidos, nenhum aparece em texto claro no `caplog` (transversal 7; SEC-20), inclusive dentro de mensagem de exceção.
+- [x] Texto de Transcrição nunca entra em log (teste com marcador de texto) (SEC-20).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/core/test_logging.py -q`.
-- [ ] Gate backend. SEC-20.
+- [x] `cd backend && uv run pytest tests/core/test_logging.py -q`.
+- [x] Gate backend. SEC-20.
 
 **Dependencies:** Task 3.1
 
