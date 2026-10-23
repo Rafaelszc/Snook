@@ -13,6 +13,7 @@ from snook.modules.llm_providers.adapters.base import (
     ProviderTarget,
     ProviderUnreachable,
     build_client,
+    model_ids,
     raise_for_status,
     send,
 )
@@ -95,3 +96,17 @@ class AnthropicAdapter:
                 read_timeout=TEST_CONNECTION_READ_TIMEOUT,
             )
         raise_for_status(response)
+
+    def list_models(self, target: ProviderTarget) -> list[str]:
+        with build_client(self._read_timeout) as client:
+            response = send(
+                client,
+                "GET",
+                f"{BASE_URL}/models?limit=1000",
+                provider=self.provider,
+                operation="list_models",
+                headers=self._headers(target),
+                read_timeout=TEST_CONNECTION_READ_TIMEOUT,
+            )
+        raise_for_status(response)
+        return model_ids(response.json(), "data", "id")

@@ -72,3 +72,25 @@ def test_without_session_is_401(client: TestClient) -> None:
     response = client.get(URL)
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "not_authenticated"
+
+
+def test_models_lists_from_adapter_with_body_key(ana: TestClient, fakes) -> None:  # type: ignore[no-untyped-def]
+    response = ana.post(
+        f"{URL}/deepseek/models", json={"api_key": "sk-TesteChave-0123456789abcdef"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "ok": True,
+        "models": ["model-a", "model-b"],
+        "reason": None,
+        "message": None,
+    }
+    assert fakes["deepseek"].calls[-1].api_key == "sk-TesteChave-0123456789abcdef"
+
+
+def test_models_without_key_or_saved_config_is_422(ana: TestClient) -> None:
+    assert ana.post(f"{URL}/deepseek/models", json={}).status_code == 422
+
+
+def test_models_requires_login(client: TestClient) -> None:
+    assert client.post(f"{URL}/deepseek/models", json={}).status_code == 401

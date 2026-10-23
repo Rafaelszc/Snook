@@ -14,6 +14,7 @@ from snook.modules.llm_providers.adapters.base import (
     ProviderTarget,
     ProviderUnreachable,
     build_client,
+    model_ids,
     raise_for_status,
     send,
 )
@@ -117,3 +118,17 @@ class OpenAICompatAdapter:
             raise ProviderUnreachable("invalid_response")
         if not any(isinstance(m, dict) and m.get("id") == target.model for m in models):
             raise ModelNotFound("model_not_found")
+
+    def list_models(self, target: ProviderTarget) -> list[str]:
+        with build_client(self._read_timeout) as client:
+            response = send(
+                client,
+                "GET",
+                f"{self._flavor.base_url}/models",
+                provider=self._provider,
+                operation="list_models",
+                headers=self._headers(target),
+                read_timeout=TEST_CONNECTION_READ_TIMEOUT,
+            )
+        raise_for_status(response, classify=_classify)
+        return model_ids(response.json(), "data", "id")

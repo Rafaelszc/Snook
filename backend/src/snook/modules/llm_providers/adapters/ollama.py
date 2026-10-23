@@ -14,6 +14,7 @@ from snook.modules.llm_providers.adapters.base import (
     ProviderTarget,
     ProviderUnreachable,
     build_client,
+    model_ids,
     raise_for_status,
     send,
 )
@@ -127,3 +128,17 @@ class OllamaAdapter:
                 read_timeout=TEST_CONNECTION_READ_TIMEOUT,
             )
         raise_for_status(response, classify=_classify)
+
+    def list_models(self, target: ProviderTarget) -> list[str]:
+        base = self._base(target)
+        with build_client(self._read_timeout) as client:
+            response = send(
+                client,
+                "GET",
+                f"{base}/api/tags",
+                provider=self.provider,
+                operation="list_models",
+                read_timeout=TEST_CONNECTION_READ_TIMEOUT,
+            )
+        raise_for_status(response, classify=_classify)
+        return model_ids(response.json(), "models", "name")

@@ -28,11 +28,18 @@ class FakeAdapter:
     def __init__(self) -> None:
         self.error: LLMError | None = None
         self.calls: list[ProviderTarget] = []
+        self.models: list[str] = ["model-a", "model-b"]
 
     def test_connection(self, target: ProviderTarget) -> None:
         self.calls.append(target)
         if self.error is not None:
             raise self.error
+
+    def list_models(self, target: ProviderTarget) -> list[str]:
+        self.calls.append(target)
+        if self.error is not None:
+            raise self.error
+        return self.models
 
     def generate(self, target: ProviderTarget, request: GenerationRequest) -> str:
         raise NotImplementedError

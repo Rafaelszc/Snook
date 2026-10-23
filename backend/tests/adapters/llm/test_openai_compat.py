@@ -235,3 +235,25 @@ def test_fixtures_never_contain_the_key() -> None:
         text = path.read_text()
         assert API_KEY not in text, path
         assert "authorization" not in text.lower(), path
+
+
+@respx.mock
+def test_list_models_returns_sorted_ids() -> None:
+    """Lista de modelos da chave, usada pelo select da tela."""
+    route = respx.get("https://api.deepseek.com/models").mock(
+        return_value=recorded("deepseek", "models_list")
+    )
+    assert _adapter("deepseek").list_models(_target("deepseek")) == [
+        "deepseek-chat",
+        "deepseek-reasoner",
+    ]
+    assert route.calls.last.request.headers["authorization"] == f"Bearer {API_KEY}"
+
+
+@respx.mock
+def test_list_models_rejected_key_raises() -> None:
+    respx.get("https://api.deepseek.com/models").mock(
+        return_value=recorded("deepseek", "unauthorized")
+    )
+    with pytest.raises(CredentialRejected):
+        _adapter("deepseek").list_models(_target("deepseek"))

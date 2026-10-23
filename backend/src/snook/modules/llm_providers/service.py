@@ -317,6 +317,27 @@ def check_connection(
     adapters[attempt.provider].test_connection(attempt.target)
 
 
+def list_models(
+    attempt: ConnectionAttempt,
+    *,
+    adapters: Mapping[str, LLMAdapter],
+    limiter: SlidingWindowLimiter,
+    user_id: str,
+    now: datetime,
+) -> list[str]:
+    """Mesmas guardas e limite do teste de conexão; lista os modelos da chave."""
+    if attempt.key_unreadable:
+        raise CredentialRejected("unreadable_key")
+    retry_after = limiter.retry_after(user_id, now)
+    if retry_after:
+        logger.warning("security.rate_limited", extra={"limiter": "llm_test", "user_id": user_id})
+        raise AppError(
+            "rate_limited", messages.RATE_LIMITED, 429, headers={"Retry-After": str(retry_after)}
+        )
+    limiter.hit(user_id, now)
+    return adapters[attempt.provider].list_models(attempt.target)
+
+
 def save_attempt(
     uow: UnitOfWork,
     cipher: KeyCipher,
