@@ -1372,13 +1372,13 @@
 **Description:** `ConsentNotice` em `components/surfaces/ConsentNotice/` com `messages.ts` e `CONSENT_NOTICE_TEXT`, só texto (Q71, Q72).
 
 **Acceptance criteria:**
-- [ ] `CONSENT_NOTICE_TEXT` é exatamente: "Antes de gravar ou enviar, obtenha o consentimento de todos os participantes da reunião (LGPD). O áudio fica só neste servidor; o texto da transcrição vai ao provedor de LLM ativo." (`meetings` 52).
-- [ ] O componente mostra esse texto, sem checkbox, sem confirmação e sem bloquear nada (Q71).
-- [ ] O texto existe em um único lugar do código (teste que busca a frase em `src/` e acha só `messages.ts`).
+- [x] `CONSENT_NOTICE_TEXT` é exatamente: "Antes de gravar ou enviar, obtenha o consentimento de todos os participantes da reunião (LGPD). O áudio fica só neste servidor; o texto da transcrição vai ao provedor de LLM ativo." (`meetings` 52).
+- [x] O componente mostra esse texto, sem checkbox, sem confirmação e sem bloquear nada (Q71).
+- [x] O texto existe em um único lugar do código (teste que busca a frase em `src/` e acha só `messages.ts`).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces/ConsentNotice`.
-- [ ] Gate frontend. Mudar o texto exige aprovação ("Perguntar antes").
+- [x] `cd frontend && npm test -- --run src/components/surfaces/ConsentNotice`.
+- [x] Gate frontend. Mudar o texto exige aprovação ("Perguntar antes").
 
 **Dependencies:** Task 5.4
 
@@ -1395,12 +1395,12 @@
 **Description:** Tela de upload com área de soltar arquivo (mouse-tracking), título pré-preenchido, `expected_speakers`, validação no navegador, progresso e `ConsentNotice` junto do botão de envio.
 
 **Acceptance criteria:**
-- [ ] Aceita arquivo, título e número de participantes e mostra envio em andamento (`meetings` 35); ao escolher o arquivo, o título recebe o nome dele, editável (`meetings` 36).
-- [ ] Recusa antes de enviar extensão fora da lista ou mais de 524.288.000 bytes, com a mesma mensagem da API (`meetings` 37); erros da API aparecem (`meetings` 38); depois do upload leva ao detalhe (`meetings` 39).
-- [ ] O aviso mostra exatamente `CONSENT_NOTICE_TEXT` junto do botão de envio (`meetings` 52); o mouse-tracking só liga com `(hover: hover) and (pointer: fine)` e sem movimento reduzido.
+- [x] Aceita arquivo, título e número de participantes e mostra envio em andamento (`meetings` 35); ao escolher o arquivo, o título recebe o nome dele, editável (`meetings` 36).
+- [x] Recusa antes de enviar extensão fora da lista ou mais de 524.288.000 bytes, com a mesma mensagem da API (`meetings` 37); erros da API aparecem (`meetings` 38); depois do upload leva ao detalhe (`meetings` 39).
+- [x] O aviso mostra exatamente `CONSENT_NOTICE_TEXT` junto do botão de envio (`meetings` 52); o mouse-tracking só liga com `(hover: hover) and (pointer: fine)` e sem movimento reduzido.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/meetings`.
+- [x] `cd frontend && npm test -- --run src/features/meetings`.
 - [ ] Gate frontend. Manual: quadros do spotlight abaixo de 16 ms no DevTools Performance (NFR-08).
 
 **Dependencies:** Tasks 22.1, 18.4, 5.3, 10.2
@@ -1418,13 +1418,13 @@
 **Description:** Lista de Reuniões e detalhe com `StatusBadge`, polling a cada 3 s nos status ativos e edição de título.
 
 **Acceptance criteria:**
-- [ ] Lista e detalhe atualizam o status sem recarregar enquanto `pending`, `processing`, `generating`, ou `transcribed` com `participants_confirmed` verdadeiro; fora disso não há polling (`meetings` 40).
-- [ ] O detalhe permite editar o título (`meetings` 41).
-- [ ] Mudança de status é anunciada em `aria-live`; `vitest-axe` sem violação.
+- [x] Lista e detalhe atualizam o status sem recarregar enquanto `pending`, `processing`, `generating`, ou `transcribed` com `participants_confirmed` verdadeiro; fora disso não há polling (`meetings` 40).
+- [x] O detalhe permite editar o título (`meetings` 41).
+- [x] Mudança de status é anunciada em `aria-live`; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/meetings` (relógio falso do Vitest).
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/meetings` (relógio falso do Vitest).
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 22.2, 19.1
 
@@ -1441,13 +1441,13 @@
 **Description:** Botão "Tentar novamente" em `failed` e diálogo de exclusão com confirmação.
 
 **Acceptance criteria:**
-- [ ] Em `failed`, mostra o motivo e "Tentar novamente"; o botão não aparece em outro status; com `has_backlog` verdadeiro, pede confirmação com o aviso de que as edições do backlog se perdem se a nova geração terminar bem (`meetings` 42).
-- [ ] Excluir pede confirmação e avisa que o áudio e o backlog serão apagados (`meetings` 43).
-- [ ] Diálogos usam `GlassPanel`; `vitest-axe` sem violação.
+- [x] Em `failed`, mostra o motivo e "Tentar novamente"; o botão não aparece em outro status; com `has_backlog` verdadeiro, pede confirmação com o aviso de que as edições do backlog se perdem se a nova geração terminar bem (`meetings` 42).
+- [x] Excluir pede confirmação e avisa que o áudio e o backlog serão apagados (`meetings` 43).
+- [x] Diálogos usam `GlassPanel`; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/meetings`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/meetings`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 22.3, 21.1, 19.2
 

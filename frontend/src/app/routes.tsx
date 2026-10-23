@@ -3,6 +3,9 @@ import type { RouteObject } from "react-router"
 import { LoginPage } from "@/features/auth/LoginPage"
 import { RegisterPage } from "@/features/auth/RegisterPage"
 import { SettingsPage } from "@/features/llm-providers/SettingsPage"
+import { MeetingDetailPage } from "@/features/meetings/MeetingDetailPage"
+import { MeetingListPage } from "@/features/meetings/MeetingListPage"
+import { UploadPage } from "@/features/meetings/UploadPage"
 
 import { AuthGuard } from "./AuthGuard"
 import { Layout } from "./Layout"
@@ -22,7 +25,9 @@ export const routes: RouteObject[] = [
       {
         element: <Layout />,
         children: [
-          { index: true, element: <Placeholder title="Reuniões" /> },
+          { index: true, element: <MeetingListPage /> },
+          { path: "meetings/new", element: <UploadPage /> },
+          { path: "meetings/:id", element: <MeetingDetailPage /> },
           ...(import.meta.env.DEV
             ? [{ path: "dev/components", element: <SamplePage /> }]
             : []),
