@@ -98,6 +98,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = settings
     app.state.clock = SystemClock()  # teste troca por FakeClock
+    app.state.login_throttle = auth_service.LoginThrottle.from_settings(settings)
     register_error_handlers(app, server_error_headers=SECURITY_HEADERS)
     install_http_security(app, settings)
     app.add_middleware(RequestLogMiddleware)  # por fora: loga também as rejeições

@@ -8,9 +8,14 @@ from snook.core.errors import AppError
 from snook.core.settings import Settings
 from snook.core.uow import UnitOfWork
 from snook.modules.auth import messages, service
-from snook.modules.auth.service import AuthUser
+from snook.modules.auth.service import AuthUser, LoginThrottle
 
 SESSION_COOKIE = "snook_session"
+
+
+def get_login_throttle(request: Request) -> LoginThrottle:
+    throttle: LoginThrottle = request.app.state.login_throttle
+    return throttle
 
 
 def current_user(

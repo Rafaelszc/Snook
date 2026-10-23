@@ -6,3 +6,4 @@ PASSWORD_TOO_SHORT = "senha com no mínimo 8 caracteres"  # noqa: S105 - mensage
 PASSWORD_TOO_LONG = "senha com no máximo 72 bytes"  # noqa: S105 - mensagem, não senha
 NOT_AUTHENTICATED = "Faça login para continuar."
 INVALID_CREDENTIALS = "Email, nome de usuário ou senha inválidos."
+RATE_LIMITED = "Muitas tentativas. Aguarde alguns minutos e tente de novo."
