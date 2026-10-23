@@ -1,4 +1,4 @@
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from datetime import UTC, datetime
 
 import pytest
@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 from snook.core.clock import FakeClock
 from snook.core.events import Event, MeetingCreated
+from snook.core.uow import UnitOfWork
 from tests.auth.helpers import Users
 from tests.meetings.helpers import FakeProbe
 
@@ -47,3 +48,10 @@ def events(client: TestClient) -> list[Event]:
     app: FastAPI = client.app  # type: ignore[assignment]
     app.state.event_bus.subscribe(MeetingCreated, received.append)
     return received
+
+
+@pytest.fixture
+def uow(client: TestClient) -> Callable[[], UnitOfWork]:
+    """Unidade de trabalho como a de outro módulo do backend."""
+    app: FastAPI = client.app  # type: ignore[assignment]
+    return lambda: UnitOfWork(app.state.session_factory, app.state.event_bus.publish)

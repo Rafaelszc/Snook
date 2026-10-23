@@ -1282,13 +1282,13 @@
 **Description:** `state_machine.py` com a tabela de transições do PRD, `update_status(uow, meeting_id, new_status, *, failed_stage=None, message=None)` e helper de `run_id`.
 
 **Acceptance criteria:**
-- [ ] Depois de `update_status`, `GET /meetings/{id}` devolve o novo status (`meetings` 22).
-- [ ] A interface recusa status fora da lista, transição fora da tabela e `failed` sem etapa ou sem mensagem, e o status gravado não muda (`meetings` 23; `03-security.md` A06).
-- [ ] Transição que inicia trabalho novo troca o `run_id`; consumidor tem helper para ignorar `run_id` que não bate (ADR-0007).
+- [x] Depois de `update_status`, `GET /meetings/{id}` devolve o novo status (`meetings` 22).
+- [x] A interface recusa status fora da lista, transição fora da tabela e `failed` sem etapa ou sem mensagem, e o status gravado não muda (`meetings` 23; `03-security.md` A06).
+- [x] Transição que inicia trabalho novo troca o `run_id`; consumidor tem helper para ignorar `run_id` que não bate (ADR-0007).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_state_machine.py -q` (uma linha da tabela de transições por caso).
-- [ ] Gate backend. SEC-19.
+- [x] `cd backend && uv run pytest tests/meetings/test_state_machine.py -q` (uma linha da tabela de transições por caso).
+- [x] Gate backend. SEC-19.
 
 **Dependencies:** Task 18.3
 
@@ -1303,13 +1303,13 @@
 **Description:** `mark_participants_confirmed(uow, id)`, `mark_backlog_saved(uow, id)` e `read_flags(uow, id)`, expostos no detalhe como booleanos.
 
 **Acceptance criteria:**
-- [ ] Depois das duas marcas, `read_flags` informa as duas e `GET /meetings/{id}` devolve `participants_confirmed` e `has_backlog` verdadeiros (`meetings` 51).
-- [ ] As marcas continuam depois de "Tentar novamente", de regeneração e de reinício (teste simula cada um) (`meetings` 51).
-- [ ] As marcas entram na unidade de trabalho de quem chama, num só commit (ADR-0006).
+- [x] Depois das duas marcas, `read_flags` informa as duas e `GET /meetings/{id}` devolve `participants_confirmed` e `has_backlog` verdadeiros (`meetings` 51).
+- [x] As marcas continuam depois de "Tentar novamente", de regeneração e de reinício (teste simula cada um) (`meetings` 51).
+- [x] As marcas entram na unidade de trabalho de quem chama, num só commit (ADR-0006).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_flags.py -q`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/meetings/test_flags.py -q`.
+- [x] Gate backend.
 
 **Dependencies:** Task 20.1
 
