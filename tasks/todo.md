@@ -403,15 +403,15 @@
 **Description:** `compose.yaml` com perfis `cpu` e `gpu`, volumes `snook-db`, `snook-models`, bind `./audios`, sub-rede `172.28.0.0/24`, healthcheck e logs `json-file`; `.env.example` sem segredo; `.gitignore`; README mínimo.
 
 **Acceptance criteria:**
-- [ ] `docker compose up --build` sobe backend e frontend e `http://localhost:8080` responde (transversal 1).
-- [ ] `docker compose down` sem `-v` mantém o banco e `./audios` (transversal 2, manual).
-- [ ] `.gitignore` cobre `.env`, `*.db`, `*.db-*`, `*.db.bak-*`, `audios/`, `models/`, `snook-lan-ca.crt`; `.env.example` não traz valor secreto e mostra o comando que gera `SNOOK_MASTER_KEY` (transversal 8; SEC-08).
+- [x] `docker compose up --build` sobe backend e frontend e `http://localhost:8080` responde (transversal 1).
+- [x] `docker compose down` sem `-v` mantém o banco e `./audios` (transversal 2, manual).
+- [x] `.gitignore` cobre `.env`, `*.db`, `*.db-*`, `*.db.bak-*`, `audios/`, `models/`, `snook-lan-ca.crt`; `.env.example` não traz valor secreto e mostra o comando que gera `SNOOK_MASTER_KEY` (transversal 8; SEC-08).
 
 **Verification:**
-- [ ] `docker compose up --build -d`, depois `curl -sI http://localhost:8080/` e `curl -s http://localhost:8080/api/health`.
-- [ ] `docker compose ps` não mostra porta publicada do backend; `docker compose exec backend id -u` imprime `1000` (SEC-23).
-- [ ] `docker compose stop backend backend-gpu` com o serviço fora do perfil ativo: se falhar, `08-deployment.md` passa a trazer um comando por perfil (decisão do plano, Task 6).
-- [ ] `git check-ignore .env audios/x snook.db` lista os três.
+- [x] `docker compose up --build -d`, depois `curl -sI http://localhost:8080/` e `curl -s http://localhost:8080/api/health`.
+- [x] `docker compose ps` não mostra porta publicada do backend; `docker compose exec backend id -u` imprime `1000` (SEC-23).
+- [x] `docker compose stop backend backend-gpu` com o serviço fora do perfil ativo: se falhar, `08-deployment.md` passa a trazer um comando por perfil (decisão do plano, Task 6). Conferido: sai com 0; um comando só basta.
+- [x] `git check-ignore .env audios/x snook.db` lista os três.
 
 **Dependencies:** Tasks 6.1, 6.2
 

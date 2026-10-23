@@ -14,6 +14,12 @@ FROM nginx:1.29-alpine@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e591939
 COPY deploy/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Entrypoint da imagem lê o DNS do container (Docker ou podman) e grava /tmp/resolver.conf.
+RUN mkdir -p /etc/nginx/templates \
+    && printf 'resolver ${NGINX_LOCAL_RESOLVERS} valid=10s ipv6=off;\n' > /etc/nginx/templates/resolver.conf.template
+ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1 \
+    NGINX_ENVSUBST_OUTPUT_DIR=/tmp
+
 USER 1000:1000
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
