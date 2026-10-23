@@ -1036,13 +1036,13 @@
 **Description:** `get_active_provider(user_id) -> ActiveProvider` (provedor, modelo, janela) e erro `NoActiveProvider` com mensagem que aponta para a tela de configurações.
 
 **Acceptance criteria:**
-- [ ] Sem provedor ativo, devolve `NoActiveProvider` com mensagem que aponta para a tela de configurações (`llm-providers` 22; transversal 4).
-- [ ] Com provedor ativo, devolve provedor, modelo e janela do Usuário pedido, nunca de outro (`llm-providers` 26, 31; SEC-26).
-- [ ] Nenhuma função da interface devolve a chave decifrada.
+- [x] Sem provedor ativo, devolve `NoActiveProvider` com mensagem que aponta para a tela de configurações (`llm-providers` 22; transversal 4).
+- [x] Com provedor ativo, devolve provedor, modelo e janela do Usuário pedido, nunca de outro (`llm-providers` 26, 31; SEC-26).
+- [x] Nenhuma função da interface devolve a chave decifrada.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_service_active.py -q`.
-- [ ] Gate backend (inclui `lint-imports` com `llm_providers` importando só `auth`). SEC-26.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_service_active.py -q`.
+- [x] Gate backend (inclui `lint-imports` com `llm_providers` importando só `auth`). SEC-26.
 
 **Dependencies:** Task 15.4
 
@@ -1057,13 +1057,13 @@
 **Description:** `tokens.py`: `estimate_tokens(provider, model, text) -> int`, heurística aditiva por linha com `chars_per_token` 3.0 (ADR-0011).
 
 **Acceptance criteria:**
-- [ ] Devolve inteiro positivo para texto não vazio (`llm-providers` 32).
-- [ ] Um texto que contém outro tem estimativa maior (`llm-providers` 32); a soma por linha é aditiva.
-- [ ] O parâmetro `chars_per_token` vem de configuração, ajustável pelo resultado do spike (Task 2).
+- [x] Devolve inteiro positivo para texto não vazio (`llm-providers` 32).
+- [x] Um texto que contém outro tem estimativa maior (`llm-providers` 32); a soma por linha é aditiva.
+- [x] O parâmetro `chars_per_token` vem de configuração, ajustável pelo resultado do spike (Task 2).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_tokens.py -q`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_tokens.py -q`.
+- [x] Gate backend.
 
 **Dependencies:** Task 16.1
 
@@ -1077,13 +1077,13 @@
 **Description:** `generate(user_id, provider_snapshot, system_prompt, content, json_schema, max_output_tokens) -> str` sobre o adapter do provedor ativo.
 
 **Acceptance criteria:**
-- [ ] Para cada um dos quatro provedores, "Gerar" com o adapter ligado a respostas gravadas devolve o texto (`llm-providers` 29).
-- [ ] "Gerar" usa o provedor ativo e o modelo salvos do Usuário dono (`llm-providers` 31).
-- [ ] Erros tipados do contrato sobem sem a chave (`llm-providers` 30, 27; SEC-17).
+- [x] Para cada um dos quatro provedores, "Gerar" com o adapter ligado a respostas gravadas devolve o texto (`llm-providers` 29).
+- [x] "Gerar" usa o provedor ativo e o modelo salvos do Usuário dono (`llm-providers` 31).
+- [x] Erros tipados do contrato sobem sem a chave (`llm-providers` 30, 27; SEC-17).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/llm_providers/test_service_generate.py -q`.
-- [ ] Gate backend. SEC-07, SEC-17, SEC-26.
+- [x] `cd backend && uv run pytest tests/llm_providers/test_service_generate.py -q`.
+- [x] Gate backend. SEC-07, SEC-17, SEC-26.
 
 **Dependencies:** Tasks 16.1, 13.2, 14.1, 14.2
 

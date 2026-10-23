@@ -1,3 +1,4 @@
+import sqlite3
 from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
@@ -6,9 +7,12 @@ from typing import Any
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session, sessionmaker
 
 from snook.core.clock import FakeClock
+from snook.core.db import create_db_engine, create_session_factory, upgrade_database
 from snook.core.settings import Settings
+from snook.core.uow import UnitOfWork
 from snook.modules.llm_providers.adapters.base import GenerationRequest, LLMError, ProviderTarget
 from tests.auth.helpers import registration, rows
 
@@ -87,6 +91,26 @@ def users(client: TestClient, clock: FakeClock, fakes: dict[str, FakeAdapter]) -
 def ana(users: Users, client: TestClient) -> Iterator[TestClient]:
     users.use("ana")
     yield client
+
+
+@pytest.fixture
+def factory(tmp_path: Path) -> Iterator[sessionmaker[Session]]:
+    """SQLite migrado com Usuários `u1` e `u2`, para testar o service sem HTTP."""
+    path = tmp_path / "service.db"
+    upgrade_database(path)
+    with sqlite3.connect(path) as conn:
+        for user_id in ("u1", "u2"):
+            conn.execute(
+                "INSERT INTO users VALUES (?, ?, ?, ?, ?, 'hash', '2026-10-23T12:00:00Z')",
+                (user_id, f"{user_id}@x.com", f"{user_id}@x.com", user_id, user_id),
+            )
+    engine = create_db_engine(path)
+    yield create_session_factory(engine)
+    engine.dispose()
+
+
+def new_uow(factory: sessionmaker[Session]) -> UnitOfWork:
+    return UnitOfWork(factory, lambda _event: None)
 
 
 def save(client: TestClient, provider: str = "openai", **body: Any) -> Any:
