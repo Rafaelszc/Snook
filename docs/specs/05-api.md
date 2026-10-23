@@ -93,6 +93,7 @@ Legenda de auth: **P** = pública; **S** = exige sessão; **S+D** = exige sessã
 |---|---|---|---|
 | `GET /api/llm-configs` | S | 200 lista dos 4: `provider`, `state` (`not_configured`, `configured`, `active`), `model`, `context_window`, `key_mask` ou `base_url`, `key_status`, `default_model`, `default_context_window` | 401 |
 | `POST /api/llm-configs/{provider}/test` `{api_key?,base_url?,model?,context_window?}` | S | 200 `{ok:true}` ou 200 `{ok:false,reason,message}` | 422 (`invalid_url_scheme`, `url_with_credentials`, `invalid_url`; chave ou URL ausente sem config salva); 429 |
+| `POST /api/llm-configs/{provider}/models` `{api_key?,base_url?}` | S | 200 `{ok:true,models:[id]}` ou `{ok:false,reason,message}`; não grava; usa chave salva se o corpo não traz | 422 (chave ou URL ausente sem config salva); 429 (mesmo limite do teste) |
 | `PUT /api/llm-configs/{provider}` | S | 200 configuração (só máscara) | 422 com `reason` do teste; 429 |
 | `POST /api/llm-configs/{provider}/activate` | S | 200 | 409 `provider_not_configured` |
 | `DELETE /api/llm-configs/{provider}` | S | 204 | 404 |

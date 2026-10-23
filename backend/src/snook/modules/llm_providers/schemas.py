@@ -39,6 +39,13 @@ class ConfigOut(BaseModel):
     default_context_window: int
 
 
+class ModelList(BaseModel):
+    ok: bool
+    models: list[str] = []
+    reason: str | None = None
+    message: str | None = None
+
+
 class ConnectionResult(BaseModel):
     ok: bool
     reason: str | None = None

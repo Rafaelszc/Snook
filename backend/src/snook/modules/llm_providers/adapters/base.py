@@ -95,6 +95,10 @@ class LLMAdapter(Protocol):
         """Confere chave e modelo sem gerar texto. Falha vira `LLMError`."""
         ...
 
+    def list_models(self, target: ProviderTarget) -> list[str]:
+        """Ids dos modelos que a chave enxerga, ordenados. Falha vira `LLMError`."""
+        ...
+
 
 @dataclass(frozen=True)
 class ProviderResponse:
@@ -119,6 +123,15 @@ class ProviderResponse:
         if isinstance(error, str):
             return "", error
         return "", ""
+
+
+def model_ids(data: Any, key: str, id_field: str) -> list[str]:
+    """Ids de `data[key][*][id_field]`, únicos e ordenados. Formato inesperado falha."""
+    items = data.get(key) if isinstance(data, dict) else None
+    if not isinstance(items, list):
+        raise ProviderUnreachable("invalid_response")
+    ids = {m[id_field] for m in items if isinstance(m, dict) and isinstance(m.get(id_field), str)}
+    return sorted(ids)
 
 
 def build_client(read_timeout: float) -> httpx.Client:

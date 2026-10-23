@@ -52,8 +52,39 @@ it("Salvar fica desabilitado até um teste bem-sucedido com os valores atuais (l
   })
 
   // Mudar qualquer campo invalida o teste anterior.
-  await user.type(openai.getByLabelText("Modelo"), "x")
+  await user.type(openai.getByLabelText("Chave de API"), "x")
   expect(save).toBeDisabled()
+})
+
+it("Carregar modelos preenche o select com os modelos da chave", async () => {
+  const user = userEvent.setup()
+  let sent: unknown
+  listReturns(NOT_CONFIGURED)
+  server.use(
+    http.post("/api/llm-configs/deepseek/models", async ({ request }) => {
+      sent = await request.json()
+      return HttpResponse.json({
+        ok: true,
+        models: ["deepseek-chat", "deepseek-reasoner"],
+      })
+    })
+  )
+  renderWithProviders(<SettingsPage />)
+
+  const deepseek = within(await openSection("DeepSeek"))
+  await user.type(
+    deepseek.getByLabelText("Chave de API"),
+    "TesteChave-123456789"
+  )
+  await user.click(deepseek.getByRole("button", { name: "Carregar modelos" }))
+  expect(await deepseek.findByText("2 modelos disponíveis.")).toBeVisible()
+  expect(sent).toEqual({ api_key: "TesteChave-123456789" })
+
+  await user.selectOptions(
+    deepseek.getByLabelText("Modelo"),
+    "deepseek-reasoner"
+  )
+  expect(deepseek.getByLabelText("Modelo")).toHaveValue("deepseek-reasoner")
 })
 
 it("teste que falha mostra o motivo da API e mantém Salvar desabilitado (llm-providers 35)", async () => {

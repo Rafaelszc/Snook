@@ -8,6 +8,7 @@ import {
   type ConfigDraft,
   type ConnectionResult,
   type LlmConfig,
+  type ModelListResult,
   type Provider,
 } from "./api"
 
@@ -23,6 +24,14 @@ export function useTestConnection(provider: Provider) {
   return useMutation<ConnectionResult, ApiError, ConfigDraft>({
     mutationFn: (draft) =>
       api.post<ConnectionResult>(`/llm-configs/${provider}/test`, draft),
+  })
+}
+
+// Lista os modelos que a chave enxerga; não grava nada.
+export function useListModels(provider: Provider) {
+  return useMutation<ModelListResult, ApiError, ConfigDraft>({
+    mutationFn: (draft) =>
+      api.post<ModelListResult>(`/llm-configs/${provider}/models`, draft),
   })
 }
 

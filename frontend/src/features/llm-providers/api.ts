@@ -26,4 +26,8 @@ export interface ConfigDraft {
 export type ConnectionResult =
   { ok: true } | { ok: false; reason: string; message: string }
 
+export type ModelListResult =
+  | { ok: true; models: string[] }
+  | { ok: false; reason: string; message: string }
+
 export const llmConfigsQueryKey = ["llm-configs"] as const

@@ -25,7 +25,7 @@ it("mostra os 4 provedores com estado, máscara, modelo, janela e ativo (llm-pro
   const openai = await screen.findByRole("region", { name: "OpenAI" })
   expect(within(openai).getByText("Ativo")).toBeVisible()
   expect(within(openai).getByText("sk-...abcd")).toBeVisible()
-  expect(within(openai).getByText("gpt-5")).toBeVisible()
+  expect(within(openai).getByLabelText("Modelo")).toHaveValue("gpt-5")
   expect(within(openai).getByText("300.000 tokens")).toBeVisible()
 
   const anthropic = section("Anthropic")

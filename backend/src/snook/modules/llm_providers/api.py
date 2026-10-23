@@ -12,7 +12,7 @@ from snook.modules.auth.deps import CurrentUser
 from snook.modules.llm_providers import service
 from snook.modules.llm_providers.adapters.base import LLMAdapter, LLMError
 from snook.modules.llm_providers.crypto import KeyCipher
-from snook.modules.llm_providers.schemas import ConfigDraft, ConfigOut, ConnectionResult
+from snook.modules.llm_providers.schemas import ConfigDraft, ConfigOut, ConnectionResult, ModelList
 
 router = APIRouter(prefix="/api/llm-configs")
 
@@ -79,6 +79,28 @@ def test_connection(
     except LLMError as exc:
         return ConnectionResult(ok=False, reason=service.reason_of(exc), message=exc.message)
     return ConnectionResult(ok=True)
+
+
+@router.post("/{provider}/models")
+def list_models(
+    provider: str,
+    body: ConfigDraft,
+    user: CurrentUser,
+    uow: Uow,
+    cipher: Cipher,
+    adapters: Adapters,
+    limiter: Limiter,
+    clock: CurrentClock,
+) -> ModelList:
+    """Modelos que a chave (do corpo ou a salva) enxerga. Não grava nada."""
+    attempt = _attempt(uow, cipher, user.id, provider, body)
+    try:
+        models = service.list_models(
+            attempt, adapters=adapters, limiter=limiter, user_id=user.id, now=clock.now()
+        )
+    except LLMError as exc:
+        return ModelList(ok=False, reason=service.reason_of(exc), message=exc.message)
+    return ModelList(ok=True, models=models)
 
 
 @router.put("/{provider}")

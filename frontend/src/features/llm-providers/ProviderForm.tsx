@@ -6,9 +6,11 @@ import type { ApiError, FieldErrors } from "@/lib/api/errors"
 
 import type { ConfigDraft, LlmConfig } from "./api"
 import { MESSAGES, OLLAMA_URL_HINT, PROVIDER_LABELS } from "./messages"
+import { ModelSelect } from "./ModelSelect"
 import { RemoveDialog } from "./RemoveDialog"
 import {
   useActivateConfig,
+  useListModels,
   useRemoveConfig,
   useSaveConfig,
   useTestConnection,
@@ -65,11 +67,13 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
   const configured = config.state !== "not_configured"
 
   const test = useTestConnection(config.provider)
+  const listModels = useListModels(config.provider)
   const save = useSaveConfig(config.provider)
   const activate = useActivateConfig(config.provider)
   const remove = useRemoveConfig(config.provider)
 
   const [values, setValues] = useState(() => initialValues(config))
+  const [models, setModels] = useState<string[]>([])
   const [localErrors, setLocalErrors] = useState<FieldErrors>({})
   // Corpo exato do último teste bem-sucedido; qualquer mudança trava o Salvar (llm-providers 34).
   const [testedDraft, setTestedDraft] = useState<string | null>(null)
@@ -78,18 +82,23 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
   const current = "draft" in parsed ? JSON.stringify(parsed.draft) : null
   const canSave = current !== null && current === testedDraft
   const busy =
-    test.isPending || save.isPending || activate.isPending || remove.isPending
+    test.isPending ||
+    save.isPending ||
+    activate.isPending ||
+    remove.isPending ||
+    listModels.isPending
 
   function clearFeedback() {
     test.reset()
     save.reset()
     activate.reset()
     remove.reset()
+    listModels.reset()
     setLocalErrors({})
   }
 
   function update(name: keyof FormValues) {
-    return (event: ChangeEvent<HTMLInputElement>) => {
+    return (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       setValues((prev) => ({ ...prev, [name]: event.target.value }))
       clearFeedback()
     }
@@ -105,6 +114,29 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
     test.mutate(parsed.draft, {
       onSuccess: (result) => setTestedDraft(result.ok ? snapshot : null),
     })
+  }
+
+  // Corpo sem modelo: só chave (ou URL) importa para listar.
+  function onLoadModels() {
+    clearFeedback()
+    if ("fieldErrors" in parsed) {
+      setLocalErrors(parsed.fieldErrors)
+      return
+    }
+    const { api_key, base_url } = parsed.draft
+    listModels.mutate(
+      { ...(api_key && { api_key }), ...(base_url && { base_url }) },
+      {
+        onSuccess: (result) => {
+          if (!result.ok) return
+          setModels(result.models)
+          // Modelo padrão fora da lista da chave: cai no primeiro disponível.
+          const first = result.models[0]
+          if (first && !result.models.includes(values.model))
+            setValues((prev) => ({ ...prev, model: first }))
+        },
+      }
+    )
   }
 
   function onSave(event: FormEvent<HTMLFormElement>) {
@@ -127,9 +159,16 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
   const apiError =
     test.data && !test.data.ok
       ? test.data.message
-      : [test.error, save.error, activate.error, remove.error].find(
-          (error) => error && Object.keys(error.fields).length === 0
-        )?.message
+      : listModels.data && !listModels.data.ok
+        ? listModels.data.message
+        : [
+            test.error,
+            save.error,
+            activate.error,
+            remove.error,
+            listModels.error,
+          ].find((error) => error && Object.keys(error.fields).length === 0)
+            ?.message
 
   const keyHint =
     config.key_status === "unreadable"
@@ -173,15 +212,28 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
         />
       )}
       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
-        <FormField
-          label={MESSAGES.model}
-          name="model"
-          autoComplete="off"
-          spellCheck={false}
-          error={fields.model}
-          value={values.model}
-          onChange={update("model")}
-        />
+        <div className="flex flex-col gap-2">
+          <ModelSelect
+            label={MESSAGES.model}
+            models={models}
+            hint={models.length ? undefined : MESSAGES.modelsHint}
+            error={fields.model}
+            value={values.model}
+            onChange={update("model")}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="self-start"
+            onClick={onLoadModels}
+            disabled={busy}
+          >
+            {listModels.isPending
+              ? MESSAGES.loadingModels
+              : MESSAGES.loadModels}
+          </Button>
+        </div>
         <FormField
           label={MESSAGES.contextWindow}
           name="context_window"
@@ -198,7 +250,11 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
       </div>
 
       <div aria-live="polite" className="text-sm empty:hidden">
-        {test.data?.ok ? (
+        {listModels.data?.ok ? (
+          <p className="motion-enter text-status-done">
+            {MESSAGES.modelsLoaded(listModels.data.models.length)}
+          </p>
+        ) : test.data?.ok ? (
           <p className="motion-enter text-status-done">{MESSAGES.testOk}</p>
         ) : save.isSuccess ? (
           <p className="motion-enter text-status-done">{MESSAGES.saved}</p>
