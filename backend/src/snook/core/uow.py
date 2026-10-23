@@ -9,6 +9,11 @@ logger = logging.getLogger("snook.uow")
 Publisher = Callable[[object], None]
 
 
+class _AfterCommit:
+    def __init__(self, action: Callable[[], None]) -> None:
+        self.action = action
+
+
 class UnitOfWork:
     """Uma transação, um commit. Avisos só saem depois do commit; rollback os descarta."""
 
@@ -26,6 +31,10 @@ class UnitOfWork:
 
     def publish_after_commit(self, event: object) -> None:
         self._pending.append(event)
+
+    def after_commit(self, action: Callable[[], None]) -> None:
+        """Passo depois do commit, na ordem dos avisos. Se falha, os avisos seguintes não saem."""
+        self._pending.append(_AfterCommit(action))
 
     def __enter__(self) -> "UnitOfWork":
         self._session = self._session_factory()
@@ -56,6 +65,13 @@ class UnitOfWork:
 
     def _flush(self, events: list[object]) -> None:
         for event in events:
+            if isinstance(event, _AfterCommit):
+                try:
+                    event.action()
+                except Exception:
+                    logger.exception("after-commit action failed")
+                    return
+                continue
             try:
                 self._publish(event)
             except Exception:

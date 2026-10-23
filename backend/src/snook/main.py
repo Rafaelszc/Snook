@@ -21,6 +21,8 @@ from snook.modules.auth import api as auth_api
 from snook.modules.auth import service as auth_service
 from snook.modules.llm_providers import api as llm_api
 from snook.modules.llm_providers import service as llm_service
+from snook.modules.meetings import api as meetings_api
+from snook.modules.meetings import service as meetings_service
 
 logger = logging.getLogger("snook.main")
 
@@ -104,12 +106,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.key_cipher = llm_service.build_cipher(settings)
     app.state.llm_adapters = llm_service.build_adapters(settings)  # teste troca por fakes
     app.state.llm_test_limiter = llm_service.build_test_limiter(settings)
+    app.state.media_probe = meetings_service.FfprobeProbe()  # teste troca por fake
     register_error_handlers(app, server_error_headers=SECURITY_HEADERS)
     install_http_security(app, settings)
     app.add_middleware(RequestLogMiddleware)  # por fora: loga também as rejeições
     app.include_router(health_router)
     app.include_router(auth_api.router)
     app.include_router(llm_api.router)
+    app.include_router(meetings_api.router)
     return app
 
 

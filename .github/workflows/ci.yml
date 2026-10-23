@@ -28,6 +28,9 @@ jobs:
       - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
           version: "0.13.5"
+      # ffprobe real nos testes de `meetings` (ADR-0014); sem ele, esses testes seriam pulados.
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - run: ffprobe -version
       - run: uv sync --frozen
       - run: uv run ruff check .
       - run: uv run ruff format --check .
