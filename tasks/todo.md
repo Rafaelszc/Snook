@@ -722,13 +722,13 @@
 **Description:** `core/ratelimit.py`: `SlidingWindowLimiter` em memória, com relógio injetável (ADR-0010).
 
 **Acceptance criteria:**
-- [ ] Após N eventos na janela, o seguinte é negado e devolve `Retry-After` em segundos.
-- [ ] Passada a janela (relógio falso), a contagem libera; contagem por chave é independente.
-- [ ] Reset explícito de uma chave zera a contagem.
+- [x] Após N eventos na janela, o seguinte é negado e devolve `Retry-After` em segundos.
+- [x] Passada a janela (relógio falso), a contagem libera; contagem por chave é independente.
+- [x] Reset explícito de uma chave zera a contagem.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/core/test_ratelimit.py -q`.
-- [ ] Gate backend. SEC-06.
+- [x] `cd backend && uv run pytest tests/core/test_ratelimit.py -q`.
+- [x] Gate backend. SEC-06.
 
 **Dependencies:** Task 3.1
 
@@ -742,13 +742,13 @@
 **Description:** Login usa o limitador: 5 falhas por identificador e 20 por IP do cliente em 15 min, valores por `.env`.
 
 **Acceptance criteria:**
-- [ ] Depois de N falhas na janela, as seguintes recebem 429 `rate_limited` com `Retry-After`, mesmo com a senha correta (`auth` 27); login correto antes do limite zera a contagem.
-- [ ] O IP contado é o do cliente resolvido por SEC-27: `X-Forwarded-For` forjado direto ao backend não muda o IP; 21 falhas a partir de um IP geram 429 (abuse case).
-- [ ] N e a janela vêm de `LOGIN_MAX_FAILURES`, `LOGIN_MAX_FAILURES_PER_IP`, `LOGIN_WINDOW_SECONDS`; o 429 é registrado em log (SEC-20, sem senha).
+- [x] Depois de N falhas na janela, as seguintes recebem 429 `rate_limited` com `Retry-After`, mesmo com a senha correta (`auth` 27); login correto antes do limite zera a contagem.
+- [x] O IP contado é o do cliente resolvido por SEC-27: `X-Forwarded-For` forjado direto ao backend não muda o IP; 21 falhas a partir de um IP geram 429 (abuse case).
+- [x] N e a janela vêm de `LOGIN_MAX_FAILURES`, `LOGIN_MAX_FAILURES_PER_IP`, `LOGIN_WINDOW_SECONDS`; o 429 é registrado em log (SEC-20, sem senha).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/auth/test_api_login_ratelimit.py -q`.
-- [ ] Gate backend. SEC-06, SEC-20, SEC-27.
+- [x] `cd backend && uv run pytest tests/auth/test_api_login_ratelimit.py -q`.
+- [x] Gate backend. SEC-06, SEC-20, SEC-27.
 
 **Dependencies:** Tasks 11.1, 10.1, 7.3
 

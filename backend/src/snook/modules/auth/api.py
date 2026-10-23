@@ -8,8 +8,9 @@ from snook.core.logging import register_secret
 from snook.core.settings import Settings
 from snook.core.uow import UnitOfWork
 from snook.modules.auth import service
-from snook.modules.auth.deps import SESSION_COOKIE, CurrentUser
+from snook.modules.auth.deps import SESSION_COOKIE, CurrentUser, get_login_throttle
 from snook.modules.auth.schemas import LoginRequest, RegisterRequest, UserOut
+from snook.modules.auth.service import LoginThrottle
 
 router = APIRouter(prefix="/api/auth")
 
@@ -72,14 +73,24 @@ def login(
     uow: Annotated[UnitOfWork, Depends(get_uow)],
     settings: Annotated[Settings, Depends(get_settings)],
     clock: Annotated[Clock, Depends(get_clock)],
+    throttle: Annotated[LoginThrottle, Depends(get_login_throttle)],
 ) -> UserOut:
     register_secret(body.password)
+    now = clock.now()
+    # IP já resolvido por SEC-27 (ProxyHeadersMiddleware).
+    ip = request.client.host if request.client else "unknown"
     with uow:
         user = service.login(
-            uow, identifier=body.identifier, password=body.password, rounds=settings.bcrypt_rounds
+            uow,
+            identifier=body.identifier,
+            password=body.password,
+            rounds=settings.bcrypt_rounds,
+            throttle=throttle,
+            ip=ip,
+            now=now,
         )
         token = service.create_session(
-            uow, user.id, now=clock.now(), max_seconds=settings.session_max_seconds
+            uow, user.id, now=now, max_seconds=settings.session_max_seconds
         )
     register_secret(token)
     _set_session_cookie(response, request, settings, token)

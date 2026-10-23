@@ -1,5 +1,6 @@
 import functools
 import hashlib
+import logging
 import secrets
 import uuid
 from dataclasses import dataclass
@@ -9,6 +10,8 @@ import bcrypt
 
 from snook.core.clock import from_iso, to_iso
 from snook.core.errors import AppError
+from snook.core.ratelimit import SlidingWindowLimiter
+from snook.core.settings import Settings
 from snook.core.text import normalize
 from snook.core.uow import UnitOfWork
 from snook.modules.auth import messages, repository
@@ -16,6 +19,8 @@ from snook.modules.auth.models import User, UserSession
 from snook.modules.auth.schemas import PASSWORD_MAX_BYTES
 
 SESSION_TOKEN_BYTES = 32
+
+logger = logging.getLogger("snook.auth")
 
 
 @dataclass(frozen=True)
@@ -73,19 +78,71 @@ def _dummy_hash(rounds: int) -> bytes:
     return bcrypt.hashpw(secrets.token_bytes(16), bcrypt.gensalt(rounds))
 
 
-def login(uow: UnitOfWork, *, identifier: str, password: str, rounds: int) -> AuthUser:
+@dataclass(frozen=True)
+class LoginThrottle:
+    """Falhas de login por identificador normalizado e por IP do cliente (ADR-0010; SEC-06)."""
+
+    by_identifier: SlidingWindowLimiter
+    by_ip: SlidingWindowLimiter
+
+    @classmethod
+    def from_settings(cls, settings: Settings) -> "LoginThrottle":
+        window = settings.login_window_seconds
+        return cls(
+            by_identifier=SlidingWindowLimiter(
+                max_events=settings.login_max_failures, window_seconds=window
+            ),
+            by_ip=SlidingWindowLimiter(
+                max_events=settings.login_max_failures_per_ip, window_seconds=window
+            ),
+        )
+
+
+def _check_throttle(throttle: LoginThrottle, key: str, ip: str, now: datetime) -> None:
+    for limiter_name, retry_after in (
+        ("login_identifier", throttle.by_identifier.retry_after(key, now)),
+        ("login_ip", throttle.by_ip.retry_after(ip, now)),
+    ):
+        if retry_after:
+            logger.warning("security.rate_limited", extra={"limiter": limiter_name, "ip": ip})
+            raise AppError(
+                "rate_limited",
+                messages.RATE_LIMITED,
+                429,
+                headers={"Retry-After": str(retry_after)},
+            )
+
+
+def login(
+    uow: UnitOfWork,
+    *,
+    identifier: str,
+    password: str,
+    rounds: int,
+    throttle: LoginThrottle,
+    ip: str,
+    now: datetime,
+) -> AuthUser:
     """Login por email ou nome de usuário, sem caixa (`auth` 12 a 16).
 
     Toda falha responde a mesma mensagem e paga um bcrypt, inclusive conta inexistente
-    e senha acima de 72 bytes: tempo parecido (SEC-05).
+    e senha acima de 72 bytes: tempo parecido (SEC-05). Acima do limite de falhas, 429
+    antes de olhar a senha (`auth` 27).
     """
-    user = repository.find_user_by_login(uow.session, normalize(identifier))
+    key = normalize(identifier)
+    _check_throttle(throttle, key, ip, now)
+    user = repository.find_user_by_login(uow.session, key)
     secret = password.encode()
     fits = len(secret) <= PASSWORD_MAX_BYTES
     hashed = user.password_hash.encode() if user and fits else _dummy_hash(rounds)
     matches = bcrypt.checkpw(secret if fits else b"", hashed)
     if user is None or not fits or not matches:
+        throttle.by_identifier.hit(key, now)
+        throttle.by_ip.hit(ip, now)
+        logger.warning("auth.login_failed", extra={"reason": "bad_credentials", "ip": ip})
         raise AppError("invalid_credentials", messages.INVALID_CREDENTIALS, 401)
+    # Zera só o identificador; o limite por IP segue contando (ADR-0010).
+    throttle.by_identifier.reset(key)
     return _public(user)
 
 
