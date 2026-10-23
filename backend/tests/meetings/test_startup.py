@@ -19,6 +19,7 @@ from snook.core.events import (
 from snook.core.settings import Settings
 from snook.main import create_app
 from tests.auth.helpers import Users
+from tests.conftest import InertTranscription
 from tests.meetings.helpers import URL, FakeProbe, set_fields, upload
 
 INTERRUPTED = "processamento interrompido"
@@ -29,6 +30,7 @@ CONFIRMED_AT = "2026-10-23T12:00:00Z"
 def _running(settings: Settings, received: list[Event] | None = None) -> Iterator[TestClient]:
     """Sobe a app sobre o mesmo banco; consumidores entram antes da subida."""
     app: FastAPI = create_app(settings)
+    app.state.transcription = InertTranscription()
     app.state.media_probe = FakeProbe()
     app.state.clock = FakeClock(datetime(2026, 10, 23, 12, 0, tzinfo=UTC))
     if received is not None:
@@ -105,6 +107,7 @@ def test_marking_ends_before_requests_and_emits_nothing(settings: Settings) -> N
         seen_at_requeue.append(_state(settings.database_path, ids["processing"])[0])
 
     app: FastAPI = create_app(settings)
+    app.state.transcription = InertTranscription()
     app.state.event_bus.subscribe(MeetingCreated, watch)
     for kind in (MeetingCreated, RetryRequested, ParticipantsConfirmed, PartsReady):
         app.state.event_bus.subscribe(kind, received.append)

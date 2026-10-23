@@ -19,6 +19,7 @@ from snook.core.settings import Settings, load_settings
 from snook.core.uow import UnitOfWork
 from snook.modules.auth import api as auth_api
 from snook.modules.auth import service as auth_service
+from snook.modules.diarized_transcription import service as transcription_service
 from snook.modules.llm_providers import api as llm_api
 from snook.modules.llm_providers import service as llm_service
 from snook.modules.meetings import api as meetings_api
@@ -87,12 +88,16 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.engine = engine
         app.state.session_factory = create_session_factory(engine)
         _recover_meetings(app)  # 4 e 5
-        _cleanup_sessions(app)
-        cleanup = asyncio.create_task(_session_cleanup_loop(app))
+        cleanup: asyncio.Task[None] | None = None
         try:
+            app.state.transcription.start(app.state.session_factory, app.state.event_bus.publish)
+            _cleanup_sessions(app)  # 6
+            cleanup = asyncio.create_task(_session_cleanup_loop(app))
             yield  # 7
         finally:
-            cleanup.cancel()
+            if cleanup is not None:
+                cleanup.cancel()
+            app.state.transcription.stop()
             engine.dispose()
     finally:
         lock.release()
@@ -116,6 +121,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.llm_adapters = llm_service.build_adapters(settings)  # teste troca por fakes
     app.state.llm_test_limiter = llm_service.build_test_limiter(settings)
     app.state.media_probe = meetings_service.FfprobeProbe()  # teste troca por fake
+    app.state.transcription = transcription_service.build_dispatcher(
+        settings, now=lambda: app.state.clock.now()
+    )  # teste troca por dispatcher com engines falsas
+    transcription_service.subscribe(app.state.event_bus, lambda: app.state.transcription)
     register_error_handlers(app, server_error_headers=SECURITY_HEADERS)
     install_http_security(app, settings)
     app.add_middleware(RequestLogMiddleware)  # por fora: loga também as rejeições

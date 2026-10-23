@@ -128,3 +128,12 @@ def test_discard_tmp_refuses_path_outside_tmp(root: Path, tmp_path: Path) -> Non
     with pytest.raises(files.UnsafePathError):
         files.discard_tmp(root, outside)
     assert outside.exists()
+
+
+def test_move_without_create_dir_refuses_missing_meeting_dir(root: Path) -> None:
+    """Reunião excluída: o diretório não volta a existir."""
+    source = _tmp_file(root)
+    with pytest.raises(FileNotFoundError):
+        files.move_into_meeting_dir(root, source, MEETING_ID, "treated.flac", create_dir=False)
+    assert not (root / MEETING_ID).exists()
+    assert source.exists()

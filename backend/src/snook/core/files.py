@@ -57,13 +57,17 @@ def _check_tmp_file(root: Path, path: Path) -> Path:
     return real
 
 
-def move_into_meeting_dir(root: Path, source: Path, meeting_id: str, file_name: str) -> Path:
-    """Move um temporário de `/audios/.tmp/` para `/audios/<meeting_id>/<file_name>`."""
+def move_into_meeting_dir(
+    root: Path, source: Path, meeting_id: str, file_name: str, *, create_dir: bool = True
+) -> Path:
+    """Move um temporário de `/audios/.tmp/` para `/audios/<meeting_id>/<file_name>`.
+    Com `create_dir=False`, diretório ausente (Reunião excluída) dá `FileNotFoundError`."""
     if _FILE_NAME.match(file_name) is None:
         raise _reject(meeting_id, "invalid_file_name")
     real_source = _check_tmp_file(root, source)
     target_dir = meeting_dir(root, meeting_id)
-    target_dir.mkdir(exist_ok=True)
+    if create_dir:
+        target_dir.mkdir(exist_ok=True)
     target = target_dir / file_name
     os.replace(real_source, target)  # mesmo volume: atômico (ADR-0018)
     return target
@@ -72,6 +76,13 @@ def move_into_meeting_dir(root: Path, source: Path, meeting_id: str, file_name: 
 def discard_tmp(root: Path, path: Path) -> None:
     """Apaga um temporário de `/audios/.tmp/`, se ainda existe."""
     _check_tmp_file(root, path).unlink(missing_ok=True)
+
+
+def remove_meeting_file(root: Path, meeting_id: str, file_name: str) -> None:
+    """Apaga `/audios/<meeting_id>/<file_name>`, se existe."""
+    if _FILE_NAME.match(file_name) is None:
+        raise _reject(meeting_id, "invalid_file_name")
+    (meeting_dir(root, meeting_id) / file_name).unlink(missing_ok=True)
 
 
 def remove_meeting_dir(root: Path, meeting_id: str) -> None:
