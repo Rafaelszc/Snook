@@ -1,6 +1,6 @@
 import re
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic_core import PydanticCustomError
 
 from snook.core.errors import FIELD_MESSAGE_ERROR
@@ -49,6 +49,15 @@ class RegisterRequest(BaseModel):
         if len(value.encode()) > PASSWORD_MAX_BYTES:
             raise _invalid(messages.PASSWORD_TOO_LONG)
         return value
+
+
+class LoginRequest(BaseModel):
+    """Sem regra de formato: falha de login responde sempre 401 genérico (SEC-05)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    identifier: str = Field(max_length=EMAIL_MAX)
+    password: str = Field(max_length=PASSWORD_MAX_BYTES * 4)
 
 
 class UserOut(BaseModel):

@@ -21,6 +21,15 @@ def get_user(session: Session, user_id: str) -> User | None:
     return session.get(User, user_id)
 
 
+def find_user_by_login(session: Session, identifier_norm: str) -> User | None:
+    """Email ou nome de usuário. Nome não aceita `@`, email exige: não colidem."""
+    return session.scalar(
+        select(User).where(
+            or_(User.email_norm == identifier_norm, User.username_norm == identifier_norm)
+        )
+    )
+
+
 def add_session(session: Session, row: UserSession) -> None:
     session.add(row)
     session.flush()
