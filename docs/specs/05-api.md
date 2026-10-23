@@ -92,12 +92,12 @@ Legenda de auth: **P** = pública; **S** = exige sessão; **S+D** = exige sessã
 | Método e rota | Auth | Sucesso | Erros |
 |---|---|---|---|
 | `GET /api/llm-configs` | S | 200 lista dos 4: `provider`, `state` (`not_configured`, `configured`, `active`), `model`, `context_window`, `key_mask` ou `base_url`, `key_status`, `default_model`, `default_context_window` | 401 |
-| `POST /api/llm-configs/{provider}/test` `{api_key?,base_url?,model?,context_window?}` | S | 200 `{ok:true}` ou 200 `{ok:false,reason}` | 422 (esquema da URL, credencial na URL); 429 |
+| `POST /api/llm-configs/{provider}/test` `{api_key?,base_url?,model?,context_window?}` | S | 200 `{ok:true}` ou 200 `{ok:false,reason,message}` | 422 (`invalid_url_scheme`, `url_with_credentials`, `invalid_url`; chave ou URL ausente sem config salva); 429 |
 | `PUT /api/llm-configs/{provider}` | S | 200 configuração (só máscara) | 422 com `reason` do teste; 429 |
 | `POST /api/llm-configs/{provider}/activate` | S | 200 | 409 `provider_not_configured` |
 | `DELETE /api/llm-configs/{provider}` | S | 204 | 404 |
 
-`reason` em `credential_rejected`, `provider_unreachable`, `model_not_found`, `rate_limited`, `context_limit`. Teste usa a chave salva quando `api_key` vem vazio e já há configuração.
+`reason` em `credential_rejected`, `provider_unreachable`, `model_not_found`, `rate_limited`, `context_limit`. Teste usa a chave salva quando `api_key` vem vazio e já há configuração. Campo ausente ou vazio no teste e no salvar: valor salvo, senão o padrão do ADR-0013. `message`: texto pt-BR do motivo. No `PUT`, o 422 do teste traz `code` = `reason`.
 
 ### `meetings`
 
