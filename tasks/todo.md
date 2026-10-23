@@ -1476,13 +1476,13 @@
 **Description:** Tabela `transcript_segments` (migração `0004_diarized_transcription_segments`), Protocols de tratamento, diarização e transcrição, e fakes configuráveis (`engines/fakes.py`).
 
 **Acceptance criteria:**
-- [ ] Segmentos têm `speaker_label`, `start_seconds`, `end_seconds`, `text`, `position`, com `ON DELETE CASCADE` a partir da Reunião (`04-data-model.md`).
-- [ ] Os fakes simulam sucesso, falha, "nenhuma fala" e `HF_TOKEN` inválido, e só terminam quando o teste libera.
-- [ ] `pytest` roda sem GPU, sem rede e sem modelo (transversal 18, RT-13).
+- [x] Segmentos têm `speaker_label`, `start_seconds`, `end_seconds`, `text`, `position`, com `ON DELETE CASCADE` a partir da Reunião (`04-data-model.md`).
+- [x] Os fakes simulam sucesso, falha, "nenhuma fala" e `HF_TOKEN` inválido, e só terminam quando o teste libera.
+- [x] `pytest` roda sem GPU, sem rede e sem modelo (transversal 18, RT-13).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_storage_fakes.py -q`; `uv run alembic upgrade head`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_storage_fakes.py -q`; `uv run alembic upgrade head`.
+- [x] Gate backend.
 
 **Dependencies:** Task 20.1
 
@@ -1497,13 +1497,13 @@
 **Description:** Consome `MeetingCreated` e `RetryRequested(transcription)`; leva a Reunião a `processing`, roda o pipeline (executor injetável; fake síncrono nos testes) e grava segmentos e `transcribed` numa transação que confere Reunião e `run_id`.
 
 **Acceptance criteria:**
-- [ ] `pending` vai a `processing` antes do trabalho e a `transcribed` ao fim; "Nova tentativa" descarta dado parcial e reprocessa do original (`diarized-transcription` 1, 2); aviso com a Reunião fora de `pending` é ignorado (`diarized-transcription` 3); o original não muda (`diarized-transcription` 4).
-- [ ] Falha em qualquer etapa leva a `failed` etapa `transcription` com mensagem pt-BR e nenhum segmento parcial (`diarized-transcription` 14); `HF_TOKEN` ausente ou sem aceite dá mensagem que cita `HF_TOKEN` e o aceite, sem o valor (`diarized-transcription` 15); sem fala dá "nenhuma fala detectada" (`diarized-transcription` 16).
-- [ ] Reunião excluída durante o processamento: nenhum segmento nem áudio tratado é gravado depois (`diarized-transcription` 17); `expected_speakers` chega à diarização, ausente roda sem número, e o idioma é sempre pt-BR (`diarized-transcription` 7, 8); a exceção no consumidor vira `failed`, nunca status preso (SEC-19).
+- [x] `pending` vai a `processing` antes do trabalho e a `transcribed` ao fim; "Nova tentativa" descarta dado parcial e reprocessa do original (`diarized-transcription` 1, 2); aviso com a Reunião fora de `pending` é ignorado (`diarized-transcription` 3); o original não muda (`diarized-transcription` 4).
+- [x] Falha em qualquer etapa leva a `failed` etapa `transcription` com mensagem pt-BR e nenhum segmento parcial (`diarized-transcription` 14); `HF_TOKEN` ausente ou sem aceite dá mensagem que cita `HF_TOKEN` e o aceite, sem o valor (`diarized-transcription` 15); sem fala dá "nenhuma fala detectada" (`diarized-transcription` 16).
+- [x] Reunião excluída durante o processamento: nenhum segmento nem áudio tratado é gravado depois (`diarized-transcription` 17); `expected_speakers` chega à diarização, ausente roda sem número, e o idioma é sempre pt-BR (`diarized-transcription` 7, 8); a exceção no consumidor vira `failed`, nunca status preso (SEC-19).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_api_pipeline.py -q`.
-- [ ] Gate backend. SEC-19, SEC-20 (sem texto da Transcrição em log).
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_api_pipeline.py -q`.
+- [x] Gate backend. SEC-19, SEC-20 (sem texto da Transcrição em log).
 
 **Dependencies:** Tasks 23.1, 21.1
 
@@ -1518,13 +1518,13 @@
 **Description:** O dispatcher pega a `pending` mais antiga de Usuário abaixo de `TRANSCRIPTION_MAX_PER_USER`, com `TRANSCRIPTION_WORKERS` de capacidade global (ADR-0010).
 
 **Acceptance criteria:**
-- [ ] Com limite N, um Usuário nunca tem mais de N Reuniões em `processing` (`diarized-transcription` 28).
-- [ ] Reunião acima do limite fica em `pending` e começa quando outra do mesmo Usuário sai de `processing`, na ordem de criação (`diarized-transcription` 29).
-- [ ] Com `TRANSCRIPTION_WORKERS` 2 e `TRANSCRIPTION_MAX_PER_USER` 1, o limite de um Usuário não atrasa o outro (`diarized-transcription` 30).
+- [x] Com limite N, um Usuário nunca tem mais de N Reuniões em `processing` (`diarized-transcription` 28).
+- [x] Reunião acima do limite fica em `pending` e começa quando outra do mesmo Usuário sai de `processing`, na ordem de criação (`diarized-transcription` 29).
+- [x] Com `TRANSCRIPTION_WORKERS` 2 e `TRANSCRIPTION_MAX_PER_USER` 1, o limite de um Usuário não atrasa o outro (`diarized-transcription` 30).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_api_limits.py -q` (fake que só termina quando o teste libera).
-- [ ] Gate backend. SEC-25.
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_api_limits.py -q` (fake que só termina quando o teste libera).
+- [x] Gate backend. SEC-25.
 
 **Dependencies:** Task 23.2
 

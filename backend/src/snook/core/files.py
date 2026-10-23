@@ -74,6 +74,13 @@ def discard_tmp(root: Path, path: Path) -> None:
     _check_tmp_file(root, path).unlink(missing_ok=True)
 
 
+def remove_meeting_file(root: Path, meeting_id: str, file_name: str) -> None:
+    """Apaga `/audios/<meeting_id>/<file_name>`, se existe."""
+    if _FILE_NAME.match(file_name) is None:
+        raise _reject(meeting_id, "invalid_file_name")
+    (meeting_dir(root, meeting_id) / file_name).unlink(missing_ok=True)
+
+
 def remove_meeting_dir(root: Path, meeting_id: str) -> None:
     target = meeting_dir(root, meeting_id)
     if target.exists():

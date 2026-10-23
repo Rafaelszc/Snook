@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from snook.modules.meetings.models import Meeting
@@ -26,3 +26,12 @@ def delete_meeting(session: Session, meeting: Meeting) -> None:
     """FKs `ON DELETE CASCADE` levam os dados derivados (04-data-model)."""
     session.delete(meeting)
     session.flush()
+
+
+def count_by_user(session: Session, status: str) -> dict[str, int]:
+    query = (
+        select(Meeting.user_id, func.count())
+        .where(Meeting.status == status)
+        .group_by(Meeting.user_id)
+    )
+    return {user_id: count for user_id, count in session.execute(query)}

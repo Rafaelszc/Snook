@@ -285,6 +285,37 @@ def requeue_pending(uow: UnitOfWork) -> None:
 
 
 @dataclass(frozen=True)
+class TranscriptionWork:
+    """Reunião escolhida para transcrever; só o que o subprocesso precisa."""
+
+    meeting_id: str
+    original_path: Path
+    duration_seconds: float
+    expected_speakers: int | None
+
+
+def next_pending_for_transcription(
+    uow: UnitOfWork, *, max_per_user: int, audio_root: Path
+) -> TranscriptionWork | None:
+    """`pending` mais antiga de Usuário com menos de `max_per_user` em `processing` (ADR-0010)."""
+    busy = repository.count_by_user(uow.session, "processing")
+    for meeting in startup.pending_in_creation_order(uow.session):
+        if busy.get(meeting.user_id, 0) < max_per_user:
+            return TranscriptionWork(
+                meeting_id=meeting.id,
+                original_path=original_audio_path(audio_root, meeting),
+                duration_seconds=meeting.duration_seconds,
+                expected_speakers=meeting.expected_speakers,
+            )
+    return None
+
+
+def original_audio_path(audio_root: Path, meeting: Meeting) -> Path:
+    """Interface "Ler arquivo": `/audios/<id>/original.<ext>`, com as checagens de SEC-15."""
+    return files.meeting_dir(audio_root, meeting.id) / f"original.{meeting.file_ext}"
+
+
+@dataclass(frozen=True)
 class MeetingFlags:
     """Interface "Ler marcas" (`meetings` 51)."""
 

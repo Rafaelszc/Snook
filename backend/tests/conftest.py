@@ -57,9 +57,21 @@ def settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Settings:
     return load_settings(env_file=None)
 
 
+class InertTranscription:
+    """Dispatcher parado: fora de `tests/diarized_transcription`, a Reunião fica em `pending`."""
+
+    def start(self, *_args: object) -> None: ...
+
+    def stop(self) -> None: ...
+
+    def on_event(self, _event: object) -> None: ...
+
+
 @pytest.fixture
 def app(settings: Settings) -> FastAPI:
-    return create_app(settings)
+    created = create_app(settings)
+    created.state.transcription = InertTranscription()
+    return created
 
 
 @pytest.fixture

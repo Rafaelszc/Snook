@@ -11,6 +11,7 @@ from snook.core.uow import UnitOfWork
 from snook.main import create_app
 from snook.modules.meetings import service
 from tests.auth.helpers import Users, rows
+from tests.conftest import InertTranscription
 from tests.meetings.helpers import URL, FakeProbe, set_fields, upload
 
 Uow = Callable[[], UnitOfWork]
@@ -120,6 +121,7 @@ def test_marks_survive_regeneration(
 
 def _running(settings: Settings) -> tuple[FastAPI, TestClient]:
     app = create_app(settings)
+    app.state.transcription = InertTranscription()
     app.state.media_probe = FakeProbe()
     client = TestClient(
         app, base_url="http://localhost", headers={"Origin": "http://localhost:8080"}
