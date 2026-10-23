@@ -26,7 +26,7 @@ const TOKENS = [
 export function SamplePage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 p-4">
-      <h1 className="text-xl font-semibold">Componentes</h1>
+      <h1 className="text-xl font-semibold text-balance">Componentes</h1>
 
       <section aria-labelledby="sample-tokens" className="flex flex-col gap-3">
         <h2 id="sample-tokens" className="text-base font-semibold">
@@ -40,7 +40,9 @@ export function SamplePage() {
                 className="h-10 rounded-md border border-border"
                 style={{ background: `var(--${token})` }}
               />
-              <span className="font-mono text-sm tabular-nums">{token}</span>
+              <span translate="no" className="font-mono text-sm tabular-nums">
+                {token}
+              </span>
             </li>
           ))}
         </ul>
