@@ -4,6 +4,7 @@
 @import "./styles/tokens.css";
 @import "./styles/motion.css";
 @import "./styles/glass.css";
+@import "./styles/spotlight.css";
 
 @custom-variant dark (&:is(.dark *));
 
