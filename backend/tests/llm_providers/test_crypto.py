@@ -10,7 +10,7 @@ from snook.modules.llm_providers.crypto import (
 
 KEY_A = bytes(range(32))
 KEY_B = bytes(range(32, 64))
-API_KEY = "sk-test-0123456789abcdef"
+API_KEY = "sk-TesteChave-0123456789abcdef"  # nome libera no .gitleaks.toml
 
 
 def test_roundtrip_returns_original_and_differs_from_it() -> None:

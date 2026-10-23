@@ -17,7 +17,7 @@ from tests.auth.helpers import rows
 
 KEY_OLD = bytes(range(32))
 KEY_NEW = bytes(range(32, 64))
-API_KEYS = {"u1": "sk-test-0123456789abcdef", "u2": "sk-ant-test-fedcba9876543210"}
+API_KEYS = {"u1": "sk-TesteChave-0123456789abcdef", "u2": "sk-OutraChave-fedcba9876543210"}
 
 
 def _b64(key: bytes) -> str:

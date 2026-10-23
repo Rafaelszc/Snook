@@ -15,7 +15,7 @@ from tests.auth.helpers import rows
 
 KEY_A = bytes(range(32))
 KEY_B = bytes(range(32, 64))
-API_KEY = "sk-test-0123456789abcdef"
+API_KEY = "sk-TesteChave-0123456789abcdef"  # nome libera no .gitleaks.toml
 NOW = datetime(2026, 10, 23, 12, 0, tzinfo=UTC)
 
 
