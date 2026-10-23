@@ -10,7 +10,7 @@ from snook.core.settings import Settings
 from snook.core.uow import UnitOfWork
 from snook.modules.auth.deps import CurrentUser
 from snook.modules.meetings import service, storage
-from snook.modules.meetings.schemas import MeetingOut
+from snook.modules.meetings.schemas import MeetingDetail, MeetingOut, MeetingSummary, TitleUpdate
 
 router = APIRouter(prefix="/api/meetings")
 
@@ -78,3 +78,34 @@ async def upload_meeting(
     finally:
         # Toda recusa apaga o temporário; no sucesso ele já foi movido (SEC-16).
         files.discard_tmp(settings.audio_root, tmp_path)
+
+
+@router.get("")
+def list_meetings(user: CurrentUser, uow: Uow) -> list[MeetingSummary]:
+    """Só as do Usuário, mais recente primeiro (`meetings` 19, 32)."""
+    with uow:
+        return service.list_meetings(uow, user_id=user.id)
+
+
+@router.get("/{meeting_id}")
+def get_meeting(meeting_id: str, user: CurrentUser, uow: Uow) -> MeetingDetail:
+    with uow:
+        return service.get_owned_meeting(uow, user.id, meeting_id)
+
+
+@router.patch("/{meeting_id}")
+def rename_meeting(
+    meeting_id: str, body: TitleUpdate, user: CurrentUser, uow: Uow, clock: CurrentClock
+) -> MeetingDetail:
+    with uow:
+        return service.rename_meeting(
+            uow, user_id=user.id, meeting_id=meeting_id, title=body.title, now=clock.now()
+        )
+
+
+@router.delete("/{meeting_id}", status_code=204)
+def delete_meeting(meeting_id: str, user: CurrentUser, uow: Uow, settings: CurrentSettings) -> None:
+    with uow:
+        service.delete_meeting(
+            uow, user_id=user.id, meeting_id=meeting_id, audio_root=settings.audio_root
+        )

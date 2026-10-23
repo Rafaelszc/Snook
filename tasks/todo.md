@@ -1240,13 +1240,13 @@
 **Description:** `GET /api/meetings`, `GET /api/meetings/{id}`, `PATCH /api/meetings/{id}` e `get_owned_meeting(uow, user_id, meeting_id)`.
 
 **Acceptance criteria:**
-- [ ] Listagem devolve só as Reuniões do Usuário, da mais recente à mais antiga, com `id`, `title`, `created_at`, `duration_seconds`, `status`; detalhe soma `original_filename`, `expected_speakers`, `participants_confirmed`, `has_backlog` e, em `failed`, `failed_stage` e `error_message` (`meetings` 19, 20, 32); nenhuma resposta expõe o caminho (`meetings` 21).
-- [ ] `PATCH` grava o título sem espaços nas pontas e não muda status nem outros campos, em qualquer status; título vazio recebe 422 e o anterior fica (`meetings` 16, 17, 18).
-- [ ] `GET`, `PATCH` com `id` de outro Usuário respondem 404 sem mudar nada; sem sessão, 401 (`meetings` 31, 33; SEC-01, SEC-02).
+- [x] Listagem devolve só as Reuniões do Usuário, da mais recente à mais antiga, com `id`, `title`, `created_at`, `duration_seconds`, `status`; detalhe soma `original_filename`, `expected_speakers`, `participants_confirmed`, `has_backlog` e, em `failed`, `failed_stage` e `error_message` (`meetings` 19, 20, 32); nenhuma resposta expõe o caminho (`meetings` 21).
+- [x] `PATCH` grava o título sem espaços nas pontas e não muda status nem outros campos, em qualquer status; título vazio recebe 422 e o anterior fica (`meetings` 16, 17, 18).
+- [x] `GET`, `PATCH` com `id` de outro Usuário respondem 404 sem mudar nada; sem sessão, 401 (`meetings` 31, 33; SEC-01, SEC-02).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_api_list_detail_title.py -q`.
-- [ ] Gate backend. SEC-02.
+- [x] `cd backend && uv run pytest tests/meetings/test_api_list_detail_title.py -q`.
+- [x] Gate backend. SEC-02.
 
 **Dependencies:** Task 18.3
 
@@ -1261,13 +1261,13 @@
 **Description:** `DELETE /api/meetings/{id}`: uma transação apaga a Reunião; depois do commit, `core/files.py` remove `/audios/<meeting_id>/` com as checagens de SEC-15.
 
 **Acceptance criteria:**
-- [ ] Responde 204; `GET` seguinte responde 404 e o arquivo não existe em `/audios` (`meetings` 28); com registros fake de Transcrição e de User Story ligados à Reunião, nenhum resta (`meetings` 29).
-- [ ] Funciona em qualquer status; um processamento em andamento não recria Reunião, arquivo nem dado derivado depois da exclusão (`meetings` 30).
-- [ ] `DELETE` com `id` de outro Usuário responde 404 e a Reunião do outro fica intacta (`meetings` 31); sem `.tmp` nem cópia restante (SEC-24); a exclusão vai ao log (SEC-20).
+- [x] Responde 204; `GET` seguinte responde 404 e o arquivo não existe em `/audios` (`meetings` 28); com registros fake de Transcrição e de User Story ligados à Reunião, nenhum resta (`meetings` 29).
+- [x] Funciona em qualquer status; um processamento em andamento não recria Reunião, arquivo nem dado derivado depois da exclusão (`meetings` 30).
+- [x] `DELETE` com `id` de outro Usuário responde 404 e a Reunião do outro fica intacta (`meetings` 31); sem `.tmp` nem cópia restante (SEC-24); a exclusão vai ao log (SEC-20).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_api_delete.py -q` (inclui link simbólico e `meeting_id` forjado: recusa e log).
-- [ ] Gate backend. SEC-02, SEC-15, SEC-20, SEC-24.
+- [x] `cd backend && uv run pytest tests/meetings/test_api_delete.py -q` (inclui link simbólico e `meeting_id` forjado: recusa e log).
+- [x] Gate backend. SEC-02, SEC-15, SEC-20, SEC-24.
 
 **Dependencies:** Task 19.1
 

@@ -13,12 +13,11 @@ from snook.core.uow import UnitOfWork
 from snook.modules.meetings import messages, repository
 from snook.modules.meetings.media_probe import FfprobeProbe as FfprobeProbe
 from snook.modules.meetings.media_probe import MediaProbe as MediaProbe
-from snook.modules.meetings.models import FILE_EXTENSIONS, STATUS_PENDING, Meeting
-from snook.modules.meetings.schemas import MeetingOut
+from snook.modules.meetings.models import FILE_EXTENSIONS, STATUS_FAILED, STATUS_PENDING, Meeting
+from snook.modules.meetings.schemas import TITLE_MAX, MeetingDetail, MeetingOut, MeetingSummary
 
 logger = logging.getLogger("snook.meetings")
 
-TITLE_MAX = 200
 ORIGINAL_FILENAME_MAX = 255
 EXPECTED_SPEAKERS_MIN = 1
 EXPECTED_SPEAKERS_MAX = 20
@@ -147,4 +146,77 @@ def _out(meeting: Meeting) -> MeetingOut:
         expected_speakers=meeting.expected_speakers,
         status=meeting.status,
         created_at=meeting.created_at,
+    )
+
+
+def _owned(uow: UnitOfWork, user_id: str, meeting_id: str) -> Meeting:
+    """404 igual para inexistente e de outro Usuário; o segundo vai ao log (SEC-02, SEC-20)."""
+    meeting = (
+        repository.get_meeting(uow.session, meeting_id) if files.is_meeting_id(meeting_id) else None
+    )
+    if meeting is not None and meeting.user_id != user_id:
+        logger.warning(
+            "security.access_denied",
+            extra={"user_id": user_id, "resource": "meeting", "resource_id": meeting_id},
+        )
+        meeting = None
+    if meeting is None:
+        raise AppError("meeting_not_found", messages.MEETING_NOT_FOUND, 404)
+    return meeting
+
+
+def get_owned_meeting(uow: UnitOfWork, user_id: str, meeting_id: str) -> MeetingDetail:
+    """Interface pública: toda rota aninhada em `/meetings/{id}` chama antes (SEC-02)."""
+    return _detail(_owned(uow, user_id, meeting_id))
+
+
+def list_meetings(uow: UnitOfWork, *, user_id: str) -> list[MeetingSummary]:
+    return [_summary(m) for m in repository.list_meetings(uow.session, user_id)]
+
+
+def rename_meeting(
+    uow: UnitOfWork, *, user_id: str, meeting_id: str, title: str, now: datetime
+) -> MeetingDetail:
+    """Muda só o título, em qualquer status (`meetings` 16, 18)."""
+    meeting = _owned(uow, user_id, meeting_id)
+    meeting.title = title
+    meeting.updated_at = to_iso(now)
+    uow.session.flush()
+    return _detail(meeting)
+
+
+def delete_meeting(uow: UnitOfWork, *, user_id: str, meeting_id: str, audio_root: Path) -> None:
+    """Apaga a Reunião e derivados num commit; depois dele, o diretório em `/audios` (SEC-24).
+    Gravação tardia do pipeline acha a Reunião ausente e descarta o resultado."""
+    meeting = _owned(uow, user_id, meeting_id)
+    repository.delete_meeting(uow.session, meeting)
+
+    def remove_files() -> None:
+        logger.info("meeting.deleted", extra={"user_id": user_id, "meeting_id": meeting_id})
+        files.remove_meeting_dir(audio_root, meeting_id)  # checagens de SEC-15
+
+    uow.after_commit(remove_files)
+
+
+def _summary(meeting: Meeting) -> MeetingSummary:
+    return MeetingSummary(
+        id=meeting.id,
+        title=meeting.title,
+        created_at=meeting.created_at,
+        duration_seconds=meeting.duration_seconds,
+        status=meeting.status,
+    )
+
+
+def _detail(meeting: Meeting) -> MeetingDetail:
+    failed = meeting.status == STATUS_FAILED
+    return MeetingDetail(
+        **_summary(meeting).model_dump(),
+        original_filename=meeting.original_filename,
+        expected_speakers=meeting.expected_speakers,
+        participants_confirmed=meeting.participants_confirmed_at is not None,
+        has_backlog=meeting.backlog_saved_at is not None,
+        failed_stage=meeting.failed_stage if failed else None,
+        error_message=meeting.error_message if failed else None,
+        split_reason=meeting.split_reason,
     )

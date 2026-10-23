@@ -1,4 +1,5 @@
 import shutil
+import sqlite3
 from pathlib import Path
 from typing import Any
 
@@ -36,6 +37,16 @@ def upload(
 
 def meeting_rows(db: Path) -> list[tuple[Any, ...]]:
     return rows(db, "SELECT id, title, original_filename, status FROM meetings")
+
+
+def set_fields(db: Path, meeting_id: str, **values: Any) -> None:
+    """Muda colunas direto no banco, como faria outro módulo ou o pipeline."""
+    assignments = ", ".join(f"{name} = ?" for name in values)
+    with sqlite3.connect(db) as conn:
+        conn.execute(
+            f"UPDATE meetings SET {assignments} WHERE id = ?",  # noqa: S608 (nomes do teste)
+            (*values.values(), meeting_id),
+        )
 
 
 def stored_files(audio_root: Path) -> list[Path]:
