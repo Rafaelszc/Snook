@@ -103,6 +103,15 @@ def rename_meeting(
         )
 
 
+@router.post("/{meeting_id}/retry", status_code=202)
+def retry_meeting(
+    meeting_id: str, user: CurrentUser, uow: Uow, clock: CurrentClock
+) -> MeetingDetail:
+    """`failed/transcription` vai a `pending`; `failed/generation`, a `transcribed`."""
+    with uow:
+        return service.retry_meeting(uow, user_id=user.id, meeting_id=meeting_id, now=clock.now())
+
+
 @router.delete("/{meeting_id}", status_code=204)
 def delete_meeting(meeting_id: str, user: CurrentUser, uow: Uow, settings: CurrentSettings) -> None:
     with uow:

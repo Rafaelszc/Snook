@@ -56,6 +56,15 @@ def _cleanup_sessions(app: FastAPI) -> None:
         )
 
 
+def _recover_meetings(app: FastAPI) -> None:
+    """Marca interrompidas num commit, sem aviso; depois reenfileira `pending` (ADR-0007)."""
+    state = app.state
+    with UnitOfWork(state.session_factory, state.event_bus.publish) as uow:
+        meetings_service.mark_interrupted(uow, now=state.clock.now())
+    with UnitOfWork(state.session_factory, state.event_bus.publish) as uow:
+        meetings_service.requeue_pending(uow)
+
+
 async def _session_cleanup_loop(app: FastAPI) -> None:
     while True:
         await asyncio.sleep(SESSION_CLEANUP_SECONDS)
@@ -74,11 +83,10 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     try:
         migrate_with_backup(settings.database_path)  # 2
         _clear_tmp_dir(settings.audio_root)  # 3
-        # 4 e 5 (marcar interrompidas, reenfileirar) entram na Task 21.2.
         engine = create_db_engine(settings.database_path)
         app.state.engine = engine
         app.state.session_factory = create_session_factory(engine)
-        app.state.event_bus = EventBus()
+        _recover_meetings(app)  # 4 e 5
         _cleanup_sessions(app)
         cleanup = asyncio.create_task(_session_cleanup_loop(app))
         try:
@@ -102,6 +110,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = settings
     app.state.clock = SystemClock()  # teste troca por FakeClock
+    app.state.event_bus = EventBus()  # consumidores assinam antes da subida (reenfileirar)
     app.state.login_throttle = auth_service.LoginThrottle.from_settings(settings)
     app.state.key_cipher = llm_service.build_cipher(settings)
     app.state.llm_adapters = llm_service.build_adapters(settings)  # teste troca por fakes

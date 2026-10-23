@@ -4,13 +4,14 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path, PurePosixPath
+from typing import cast
 
 from snook.core import files
 from snook.core.clock import to_iso
 from snook.core.errors import AppError
-from snook.core.events import MeetingCreated
+from snook.core.events import MeetingCreated, RetryRequested, Stage
 from snook.core.uow import UnitOfWork
-from snook.modules.meetings import messages, repository, state_machine
+from snook.modules.meetings import messages, repository, startup, state_machine
 from snook.modules.meetings.media_probe import FfprobeProbe as FfprobeProbe
 from snook.modules.meetings.media_probe import MediaProbe as MediaProbe
 from snook.modules.meetings.models import FILE_EXTENSIONS, STATUS_FAILED, STATUS_PENDING, Meeting
@@ -199,6 +200,27 @@ def delete_meeting(uow: UnitOfWork, *, user_id: str, meeting_id: str, audio_root
     uow.after_commit(remove_files)
 
 
+def retry_meeting(
+    uow: UnitOfWork, *, user_id: str, meeting_id: str, now: datetime
+) -> MeetingDetail:
+    """ "Tentar novamente": retoma da etapa que falhou, com `run_id` novo (`meetings` 24 a 27).
+    `RetryRequested` sai uma vez, depois do commit."""
+    meeting = _owned(uow, user_id, meeting_id)
+    if meeting.status != STATUS_FAILED:
+        raise AppError("not_failed", messages.NOT_FAILED, 409)
+    stage = cast(Stage, meeting.failed_stage)
+    run_id = update_status(uow, meeting_id, state_machine.RETRY_TARGET[stage], now=now)
+
+    def log_retry() -> None:
+        logger.info(
+            "meeting.retry", extra={"user_id": user_id, "meeting_id": meeting_id, "stage": stage}
+        )
+
+    uow.after_commit(log_retry)
+    uow.publish_after_commit(RetryRequested(meeting_id=meeting_id, run_id=run_id, stage=stage))
+    return _detail(meeting)
+
+
 class MeetingGone(LookupError):
     """Reunião excluída antes da gravação: quem chama descarta o resultado."""
 
@@ -245,6 +267,21 @@ def is_current_run(
     if meeting is None or meeting.run_id != run_id:
         return False
     return status is None or meeting.status == status
+
+
+def mark_interrupted(uow: UnitOfWork, *, now: datetime) -> None:
+    """ "Marcar interrompidas" (`meetings` 44, 45, 49): na subida, antes de aceitar requisições."""
+    for meeting in startup.mark_interrupted(uow.session, now):
+        logger.info(
+            "meeting.interrupted",
+            extra={"meeting_id": meeting.id, "failed_stage": meeting.failed_stage},
+        )
+
+
+def requeue_pending(uow: UnitOfWork) -> None:
+    """Reenfileira `pending` em ordem de criação, como `MeetingCreated` interno (ADR-0007)."""
+    for meeting in startup.pending_in_creation_order(uow.session):
+        uow.publish_after_commit(MeetingCreated(meeting_id=meeting.id, run_id=meeting.run_id))
 
 
 @dataclass(frozen=True)
