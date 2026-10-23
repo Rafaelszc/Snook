@@ -1,0 +1,9 @@
+{
+  "status": 500,
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "error": "llama runner process has terminated: signal: killed"
+  }
+}
