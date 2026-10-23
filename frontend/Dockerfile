@@ -6,7 +6,8 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json frontend/.npmrc ./
 RUN npm ci --ignore-scripts
 COPY frontend/ ./
-RUN npm run build
+# Manifesto do Vite serve só ao check de bundle no CI; não vai para o nginx.
+RUN npm run build && rm -rf dist/.vite
 
 FROM nginx:1.29-alpine@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de
 

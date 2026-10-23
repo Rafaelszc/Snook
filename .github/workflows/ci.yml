@@ -1,0 +1,95 @@
+# CI (ADR-0017; 08-deployment.md, "CI/CD"). Actions fixadas por SHA (SEC-21).
+# Suítes models_real e llm_real não rodam aqui.
+name: ci
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: "0.13.5"
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy src
+      - run: uv run lint-imports
+      - run: uv run pytest
+      - run: uv run pip-audit
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test -- --run
+      - run: npm run build
+      # NFR-01 e NFR-02 (ADR-0023).
+      - run: node scripts/check-bundle-size.mjs
+      - run: npm audit --omit=dev
+
+  secrets:
+    runs-on: ubuntu-latest
+    # gitleaks-action lista os commits do PR pela API.
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # Em PR, varre só os commits do PR (SEC-08).
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_VERSION: 8.30.1
+      # Critério transversal 8.
+      - name: .gitignore cobre segredos e dados
+        run: |
+          for path in .env snook.db audios/x; do
+            git check-ignore -q "$path" || { echo "::error::.gitignore não cobre $path"; exit 1; }
+          done
+
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # compose exige o env_file; o exemplo não traz segredo.
+      - run: cp .env.example .env
+      - run: docker compose build
+        env:
+          COMPOSE_PROFILES: cpu

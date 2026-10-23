@@ -531,12 +531,12 @@
 **Description:** `.github/workflows/ci.yml` em `pull_request` para `develop` e `main` e `push` para `develop`, com os jobs `backend`, `frontend` e `images` de `08-deployment.md`, "CI/CD".
 
 **Acceptance criteria:**
-- [ ] Job `backend`: `uv sync --frozen`, `ruff check`, `ruff format --check`, `mypy src`, `lint-imports`, `pytest`, `pip-audit` (SEC-21).
-- [ ] Job `frontend`: `npm ci --ignore-scripts`, `npm run lint`, `npm run typecheck`, `npm test -- --run`, `npm run build`, `npm audit --omit=dev` (SEC-21).
-- [ ] Job `images`: `docker compose build` do perfil `cpu`, sem push. Suítes `models_real` e `llm_real` não rodam.
+- [x] Job `backend`: `uv sync --frozen`, `ruff check`, `ruff format --check`, `mypy src`, `lint-imports`, `pytest`, `pip-audit` (SEC-21).
+- [x] Job `frontend`: `npm ci --ignore-scripts`, `npm run lint`, `npm run typecheck`, `npm test -- --run`, `npm run build`, `npm audit --omit=dev` (SEC-21).
+- [x] Job `images`: `docker compose build` do perfil `cpu`, sem push. Suítes `models_real` e `llm_real` não rodam.
 
 **Verification:**
-- [ ] CI verde em PR de teste para `develop`.
+- [x] CI verde em PR de teste para `develop`.
 - [ ] Manual: `actionlint .github/workflows/ci.yml` (se instalado) sem erro.
 
 **Dependencies:** Tasks 6.3, 4.2
@@ -552,11 +552,11 @@
 
 **Acceptance criteria:**
 - [ ] `gitleaks` acha um segredo plantado num PR de teste e passa sem ele (SEC-08).
-- [ ] O job falha se `.gitignore` não cobre `.env`, `*.db`, `audios/` (transversal 8).
-- [ ] O CI falha se o JS inicial da rota de login passa de 200 KB gzip ou o total de 500 KB gzip (NFR-01, NFR-02).
+- [x] O job falha se `.gitignore` não cobre `.env`, `*.db`, `audios/` (transversal 8).
+- [x] O CI falha se o JS inicial da rota de login passa de 200 KB gzip ou o total de 500 KB gzip (NFR-01, NFR-02).
 
 **Verification:**
-- [ ] `cd frontend && npm run build && node scripts/check-bundle-size.mjs` passa; com limite reduzido por variável de teste, falha.
+- [x] `cd frontend && npm run build && node scripts/check-bundle-size.mjs` passa; com limite reduzido por variável de teste, falha.
 - [ ] PR de teste no GitHub: job `secrets` verde e job com segredo plantado vermelho.
 
 **Dependencies:** Task 8.1
