@@ -1,10 +1,10 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
 import { Link, useLocation, useNavigate } from "react-router"
 
+import { FormField } from "@/components/forms/FormField"
 import { Button } from "@/components/ui/button"
 
 import { AuthShell } from "./AuthShell"
-import { FormField } from "./FormField"
 import { useLogin } from "./useSession"
 
 const EMPTY = { identifier: "", password: "" }
