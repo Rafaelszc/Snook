@@ -93,60 +93,6 @@ def test_bcrypt_rounds_come_from_configuration(monkeypatch: pytest.MonkeyPatch) 
     assert load_settings(env_file=None).bcrypt_rounds == 4
 
 
-def test_lan_host_extends_allowed_hosts_and_origins(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
-    monkeypatch.setenv("SNOOK_LAN_HOST", "snook.casa.lan")
-    s = load_settings(env_file=None)
-    assert s.allowed_hosts == ["localhost", "127.0.0.1", "snook.casa.lan"]
-    assert s.allowed_origins == [
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-        "https://snook.casa.lan",
-    ]
-
-
-def test_lan_host_accepts_ip(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
-    monkeypatch.setenv("SNOOK_LAN_HOST", "192.168.0.10")
-    assert "192.168.0.10" in load_settings(env_file=None).allowed_hosts
-
-
-def test_explicit_allowed_lists_replace_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
-    monkeypatch.setenv("SNOOK_LAN_HOST", "snook.casa.lan")
-    monkeypatch.setenv("ALLOWED_HOSTS", "a.example, b.example")
-    monkeypatch.setenv("ALLOWED_ORIGINS", "https://a.example")
-    s = load_settings(env_file=None)
-    assert s.allowed_hosts == ["a.example", "b.example"]
-    assert s.allowed_origins == ["https://a.example"]
-
-
-@pytest.mark.parametrize(
-    "bad_host",
-    [
-        "https://snook.lan",
-        "snook.lan:8443",
-        "snook.lan/path",
-        "snook lan",
-        "-snook.lan",
-        "snook..lan",
-        "999.1.1.1.1",
-    ],
-)
-def test_invalid_lan_host_blocks_startup(monkeypatch: pytest.MonkeyPatch, bad_host: str) -> None:
-    monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
-    monkeypatch.setenv("SNOOK_LAN_HOST", bad_host)
-    with pytest.raises(SettingsError) as exc:
-        load_settings(env_file=None)
-    assert "SNOOK_LAN_HOST" in str(exc.value)
-
-
-def test_empty_lan_host_is_unset(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
-    monkeypatch.setenv("SNOOK_LAN_HOST", "")
-    assert load_settings(env_file=None).allowed_hosts == ["localhost", "127.0.0.1"]
-
-
 def test_trusted_proxy_ips_must_be_ips(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
     monkeypatch.setenv("TRUSTED_PROXY_IPS", "172.28.0.10,nginx")

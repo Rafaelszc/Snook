@@ -195,13 +195,13 @@
 **Description:** Cria `frontend/` com Vite, React, TypeScript estrito, Tailwind, shadcn/ui inicializado e ESLint com `react/no-danger`.
 
 **Acceptance criteria:**
-- [ ] `npm ci --ignore-scripts` instala só do lockfile; `.nvmrc` e `.npmrc` fixam a versão do Node e bloqueiam script de instalação (SEC-21).
-- [ ] `npm run lint`, `npm run typecheck` e `npm run build` passam numa página inicial vazia.
-- [ ] ESLint falha em `dangerouslySetInnerHTML` (SEC-12; teste com arquivo de amostra).
+- [x] `npm ci --ignore-scripts` instala só do lockfile; `.nvmrc` e `.npmrc` fixam a versão do Node e bloqueiam script de instalação (SEC-21).
+- [x] `npm run lint`, `npm run typecheck` e `npm run build` passam numa página inicial vazia.
+- [x] ESLint falha em `dangerouslySetInnerHTML` (SEC-12; teste com arquivo de amostra).
 
 **Verification:**
-- [ ] `cd frontend && npm ci --ignore-scripts && npm run lint && npm run typecheck && npm run build`.
-- [ ] Manual: `grep -R "dangerouslySetInnerHTML" frontend/src` sem achado.
+- [x] `cd frontend && npm ci --ignore-scripts && npm run lint && npm run typecheck && npm run build`.
+- [x] Manual: `grep -R "dangerouslySetInnerHTML" frontend/src` sem achado.
 
 **Dependencies:** None
 
@@ -218,13 +218,13 @@
 **Description:** Configura Vitest com jsdom, React Testing Library, MSW e `vitest-axe`, mais utilitário de render com providers.
 
 **Acceptance criteria:**
-- [ ] Um teste de exemplo renderiza um componente, mocka uma rota com MSW e passa `vitest-axe` sem violação (ADR-0015).
-- [ ] `npm test -- --run` roda sem rede.
-- [ ] O polling padrão lê `VITE_POLL_INTERVAL_MS` com padrão 3000 (`05-api.md`, "Polling").
+- [x] Um teste de exemplo renderiza um componente, mocka uma rota com MSW e passa `vitest-axe` sem violação (ADR-0015).
+- [x] `npm test -- --run` roda sem rede.
+- [x] O polling padrão lê `VITE_POLL_INTERVAL_MS` com padrão 3000 (`05-api.md`, "Polling").
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 4.1
 
@@ -509,14 +509,14 @@
 **Description:** Serviço `caddy` no perfil `lan`, `deploy/Caddyfile`, derivação de `ALLOWED_HOSTS` e `ALLOWED_ORIGINS` a partir de `SNOOK_LAN_HOST` e `map` do nginx para `X-Forwarded-Proto` (ADR-0016; `08-deployment.md`, "Perfil lan").
 
 **Acceptance criteria:**
-- [ ] `SNOOK_LAN_HOST` válido (nome DNS ou IP, sem esquema, porta ou caminho) entra em `ALLOWED_HOSTS` e `ALLOWED_ORIGINS` (`https://<host>`); valor inválido impede a subida com mensagem clara (SEC-14; um teste válido e um inválido).
-- [ ] O nginx repassa `X-Forwarded-Proto` só quando a conexão vem do Caddy (`172.28.0.11`); senão usa `$scheme` (SEC-27).
+- [x] `SNOOK_LAN_HOST` válido (nome DNS ou IP, sem esquema, porta ou caminho) entra em `ALLOWED_HOSTS` e `ALLOWED_ORIGINS` (`https://<host>`); valor inválido impede a subida com mensagem clara (SEC-14; um teste válido e um inválido).
+- [x] O nginx repassa `X-Forwarded-Proto` só quando a conexão vem do Caddy (`172.28.0.11`); senão usa `$scheme` (SEC-27).
 - [ ] `curl --cacert snook-lan-ca.crt -sI https://<SNOOK_LAN_HOST>/` responde por HTTPS e mostra `Strict-Transport-Security: max-age=31536000` (SEC-13).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/core/test_settings_lan.py -q`.
+- [x] `cd backend && uv run pytest tests/core/test_settings_lan.py -q`.
 - [ ] Manual: `COMPOSE_PROFILES=cpu,lan docker compose up -d`, exportar a CA com `docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt ./snook-lan-ca.crt`, rodar o `curl` acima.
-- [ ] Gate backend. SEC-13, SEC-14, SEC-27, SEC-08 (`caddy-data` fora do git).
+- [x] Gate backend. SEC-13, SEC-14, SEC-27, SEC-08 (`caddy-data` fora do git).
 
 **Dependencies:** Tasks 6.3, 7.1, 7.3
 
