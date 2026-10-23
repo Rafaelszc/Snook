@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Mapping
 from typing import Any, cast
 
 from fastapi import FastAPI, Request
@@ -82,13 +83,17 @@ async def _handle_http_exception(_request: Request, exc: Exception) -> JSONRespo
     return error_response(code, message, status)
 
 
-async def _handle_unexpected(request: Request, exc: Exception) -> JSONResponse:
-    logger.error("unhandled exception on %s %s", request.method, request.url.path, exc_info=exc)
-    return error_response("internal_error", "erro interno", 500)
+def register_error_handlers(
+    app: FastAPI, *, server_error_headers: Mapping[str, str] | None = None
+) -> None:
+    """`server_error_headers`: o 500 sai por fora dos middlewares da app e precisa deles aqui."""
 
+    async def handle_unexpected(request: Request, exc: Exception) -> JSONResponse:
+        logger.error("unhandled exception on %s %s", request.method, request.url.path, exc_info=exc)
+        headers = dict(server_error_headers) if server_error_headers else None
+        return error_response("internal_error", "erro interno", 500, headers=headers)
 
-def register_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, _handle_app_error)
     app.add_exception_handler(RequestValidationError, _handle_validation_error)
     app.add_exception_handler(StarletteHTTPException, _handle_http_exception)
-    app.add_exception_handler(Exception, _handle_unexpected)
+    app.add_exception_handler(Exception, handle_unexpected)

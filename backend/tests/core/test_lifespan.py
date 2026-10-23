@@ -66,7 +66,7 @@ def test_app_holds_the_lock_and_a_second_app_fails(settings: Settings) -> None:
 def test_lock_is_released_when_app_stops(settings: Settings) -> None:
     with TestClient(create_app(settings)):
         pass
-    with TestClient(create_app(settings)) as client:
+    with TestClient(create_app(settings), base_url="http://localhost") as client:
         assert client.get("/api/health").status_code == 200
 
 

@@ -63,5 +63,8 @@ def app(settings: Settings) -> FastAPI:
 
 @pytest.fixture
 def client(app: FastAPI) -> Iterator[TestClient]:
-    with TestClient(app) as test_client:
+    # Host e Origin locais: passam pela checagem de SEC-04 e SEC-14.
+    with TestClient(
+        app, base_url="http://localhost", headers={"Origin": "http://localhost:8080"}
+    ) as test_client:
         yield test_client

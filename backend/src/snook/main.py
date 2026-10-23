@@ -9,6 +9,8 @@ from fastapi import APIRouter, FastAPI
 from snook.core.db import create_db_engine, create_session_factory, migrate_with_backup
 from snook.core.errors import register_error_handlers
 from snook.core.events import EventBus
+from snook.core.http_security import SECURITY_HEADERS, install_http_security
+from snook.core.logging import RequestLogMiddleware, setup_logging
 from snook.core.runlock import RunLock
 from snook.core.settings import Settings, load_settings
 
@@ -55,6 +57,7 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or load_settings()
+    setup_logging(settings)
     app = FastAPI(
         title="Snook",
         docs_url=None,
@@ -63,7 +66,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=_lifespan,
     )
     app.state.settings = settings
-    register_error_handlers(app)
+    register_error_handlers(app, server_error_headers=SECURITY_HEADERS)
+    install_http_security(app, settings)
+    app.add_middleware(RequestLogMiddleware)  # por fora: loga também as rejeições
     app.include_router(health_router)
     return app
 
