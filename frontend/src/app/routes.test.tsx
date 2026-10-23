@@ -6,6 +6,7 @@ import { expect, it } from "vitest"
 import { axe } from "vitest-axe"
 
 import { routes } from "./routes"
+import { CONSENT_NOTICE_TEXT } from "@/components/surfaces/ConsentNotice/messages"
 import { NOT_CONFIGURED } from "@/features/llm-providers/fixtures"
 import { renderWithProviders } from "@/test/render"
 import { server } from "@/test/server"
@@ -15,7 +16,8 @@ const ANA = { id: "u1", email: "ana@x.com", username: "ana" }
 function signedIn() {
   server.use(
     http.get("/api/auth/me", () => HttpResponse.json(ANA)),
-    http.get("/api/llm-configs", () => HttpResponse.json(NOT_CONFIGURED))
+    http.get("/api/llm-configs", () => HttpResponse.json(NOT_CONFIGURED)),
+    http.get("/api/meetings", () => HttpResponse.json([]))
   )
 }
 
@@ -40,7 +42,7 @@ function renderAt(path: string) {
   return renderWithProviders(<RouterProvider router={router} />)
 }
 
-it("navega entre rotas placeholder pelo layout", async () => {
+it("navega entre as telas pelo layout", async () => {
   signedIn()
   const { container } = renderAt("/")
   expect(
@@ -93,9 +95,16 @@ it("rota desconhecida mostra não encontrada", async () => {
   ).toBeInTheDocument()
 })
 
-it("o ConsentNotice ainda não existe (Task 22.1)", async () => {
+it("o aviso de consentimento aparece no upload", async () => {
   signedIn()
   renderAt("/")
-  await screen.findByRole("heading", { name: "Reuniões" })
-  expect(screen.queryByTestId("consent-notice")).not.toBeInTheDocument()
+  await userEvent.click(
+    await screen.findByRole("link", { name: "Nova reunião" })
+  )
+  expect(
+    await screen.findByRole("heading", { name: "Nova reunião" })
+  ).toBeInTheDocument()
+  expect(screen.getByTestId("consent-notice")).toHaveTextContent(
+    CONSENT_NOTICE_TEXT
+  )
 })
