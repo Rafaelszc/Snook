@@ -699,13 +699,13 @@
 **Description:** Tela de login (card de vidro e mouse-tracking), guarda de autenticação com redirecionamento ao login e botão de sair.
 
 **Acceptance criteria:**
-- [ ] Abrir página protegida sem sessão leva ao login (`auth` 24).
-- [ ] Erros de login aparecem com a mensagem da API (`auth` 25); depois do logout o frontend volta ao login (`auth` 26).
-- [ ] Sessão nunca vai a `localStorage` nem `sessionStorage` (`03-security.md`, "Never"); `vitest-axe` sem violação.
+- [x] Abrir página protegida sem sessão leva ao login (`auth` 24).
+- [x] Erros de login aparecem com a mensagem da API (`auth` 25); depois do logout o frontend volta ao login (`auth` 26).
+- [x] Sessão nunca vai a `localStorage` nem `sessionStorage` (`03-security.md`, "Never"); `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/auth src/app`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/auth src/app`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 10.1, 9.4
 
