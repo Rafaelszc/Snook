@@ -34,7 +34,7 @@ class FakeAudio:
         with self._lock:
             return store.setdefault(meeting_id, threading.Event())
 
-    def treat(self, source: Path, target: Path) -> None:
+    def treat(self, source: Path, target: Path, duration_seconds: float) -> None:
         meeting_id = source.parent.name
         self.sources.append(source)
         self._gate(self._started, meeting_id).set()

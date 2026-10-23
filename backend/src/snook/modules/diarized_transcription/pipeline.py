@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from snook.modules.diarized_transcription import messages
+from snook.modules.diarized_transcription.engines.audio import FfmpegAudio
 from snook.modules.diarized_transcription.engines.base import (
     LANGUAGE,
     Chunk,
@@ -24,7 +25,7 @@ class Job:
 
 
 def run_job(engines: Engines, job: Job) -> list[Segment]:
-    engines.audio.treat(job.original_path, job.treated_path)
+    engines.audio.treat(job.original_path, job.treated_path, job.duration_seconds)
     turns = engines.diarizer.diarize(job.treated_path, job.expected_speakers)
     chunks = engines.transcriber.transcribe(job.treated_path, LANGUAGE)
     segments = merge(turns, chunks, job.duration_seconds)
@@ -34,10 +35,7 @@ def run_job(engines: Engines, job: Job) -> list[Segment]:
 
 
 class _Unavailable:
-    """Engine real ainda não instalada (Tasks 25 e 26): a Reunião falha com mensagem clara."""
-
-    def treat(self, source: Path, target: Path) -> None:
-        raise EngineFailure(messages.ENGINES_UNAVAILABLE)
+    """Engine real ainda não instalada (Task 26): a Reunião falha com mensagem clara."""
 
     def diarize(self, audio: Path, num_speakers: int | None) -> list[Turn]:
         raise EngineFailure(messages.ENGINES_UNAVAILABLE)
@@ -48,4 +46,4 @@ class _Unavailable:
 
 def default_engines() -> Engines:
     unavailable = _Unavailable()
-    return Engines(audio=unavailable, diarizer=unavailable, transcriber=unavailable)
+    return Engines(audio=FfmpegAudio(), diarizer=unavailable, transcriber=unavailable)
