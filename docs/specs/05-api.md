@@ -105,7 +105,7 @@ Legenda de auth: **P** = pública; **S** = exige sessão; **S+D** = exige sessã
 | Método e rota | Auth | Sucesso | Erros |
 |---|---|---|---|
 | `POST /api/meetings` multipart `file`, `title?`, `expected_speakers?` | S | 201 Reunião | 413; 422 (`unsupported_format`, `no_audio`, `too_long`, `empty_file`, `invalid_expected_speakers`) |
-| `GET /api/meetings` | S | 200 lista (mais recente primeiro) | |
+| `GET /api/meetings` | S | 200 lista (mais recente primeiro), cada item com `participants_confirmed` | |
 | `GET /api/meetings/{id}` | S+D | 200 detalhe com `participants_confirmed`, `has_backlog`, `failed_stage`, `error_message`, `split_reason` | 404 |
 | `PATCH /api/meetings/{id}` `{title}` | S+D | 200 | 404; 422 |
 | `POST /api/meetings/{id}/retry` | S+D | 202 | 404; 409 `not_failed` |

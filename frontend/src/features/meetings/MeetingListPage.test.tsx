@@ -68,6 +68,19 @@ it("atualiza o status sozinha enquanto há trabalho em andamento (meetings 40)",
   expect(calls()).toBe(settled)
 })
 
+it("faz polling em transcrita com nomes confirmados (meetings 40)", async () => {
+  const calls = listSequence(
+    [{ ...SUMMARY, status: "transcribed", participants_confirmed: true }],
+    [{ ...SUMMARY, status: "generating", participants_confirmed: true }]
+  )
+  renderMeetings("/")
+
+  expect(await screen.findByText("Transcrita")).toBeVisible()
+  await tick()
+  expect(await screen.findByText("Gerando backlog")).toBeVisible()
+  expect(calls()).toBeGreaterThanOrEqual(2)
+})
+
 it.each(["transcribed", "needs_split", "done", "failed"] as const)(
   "sem polling com status %s (meetings 40)",
   async (status) => {

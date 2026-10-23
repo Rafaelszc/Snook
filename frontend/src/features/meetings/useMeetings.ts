@@ -13,13 +13,12 @@ import {
 } from "./api"
 
 // Polling só com trabalho em andamento; fora disso, nenhum (`meetings` 40; 05-api, "Polling").
-// A lista não traz `participants_confirmed`: lá só os status ativos contam.
 export function useMeetings() {
   return useQuery<MeetingSummary[], ApiError>({
     queryKey: meetingsQueryKey,
     queryFn: ({ signal }) => api.get<MeetingSummary[]>("/meetings", signal),
     refetchInterval: ({ state }) =>
-      state.data?.some((m) => isActive(m)) ? POLL_INTERVAL_MS : false,
+      state.data?.some(isActive) ? POLL_INTERVAL_MS : false,
   })
 }
 

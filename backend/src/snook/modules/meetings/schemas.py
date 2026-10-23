@@ -20,13 +20,14 @@ class MeetingOut(BaseModel):
 
 
 class MeetingSummary(BaseModel):
-    """Item da listagem (`meetings` 19)."""
+    """Item da listagem (`meetings` 19). `participants_confirmed` decide o polling da lista."""
 
     id: str
     title: str
     created_at: str
     duration_seconds: float
     status: str
+    participants_confirmed: bool
 
 
 class MeetingDetail(MeetingSummary):
@@ -34,7 +35,6 @@ class MeetingDetail(MeetingSummary):
 
     original_filename: str
     expected_speakers: int | None
-    participants_confirmed: bool
     has_backlog: bool
     failed_stage: str | None
     error_message: str | None

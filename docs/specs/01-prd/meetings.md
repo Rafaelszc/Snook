@@ -171,8 +171,8 @@ Em todos os casos abaixo: nenhuma Reunião criada, nenhum arquivo fica em `/audi
 
 ### Listagem e detalhe
 
-19. `GET /meetings` devolve só as Reuniões do Usuário autenticado, da mais recente para a mais antiga, cada uma com `id`, `title`, `created_at`, `duration_seconds` e `status`.
-20. `GET /meetings/{id}` devolve os campos da listagem mais `original_filename`, `expected_speakers` e os booleanos `participants_confirmed` e `has_backlog`, verdadeiros quando `participants_confirmed_at` e `backlog_saved_at` estão preenchidos. Quando o status é `failed`, devolve também `failed_stage` e `error_message`.
+19. `GET /meetings` devolve só as Reuniões do Usuário autenticado, da mais recente para a mais antiga, cada uma com `id`, `title`, `created_at`, `duration_seconds`, `status` e `participants_confirmed`. O booleano deixa a lista saber quando fazer polling (critério 40).
+20. `GET /meetings/{id}` devolve os campos da listagem mais `original_filename`, `expected_speakers` e o booleano `has_backlog`. `participants_confirmed` e `has_backlog` são verdadeiros quando `participants_confirmed_at` e `backlog_saved_at` estão preenchidos. Quando o status é `failed`, devolve também `failed_stage` e `error_message`.
 21. Nenhuma resposta de `/meetings` expõe o caminho interno do arquivo.
 22. Depois que outro módulo atualiza o status pela interface "Atualizar status", `GET /meetings/{id}` devolve o novo status.
 23. A interface "Atualizar status" recusa um valor fora da lista de status, uma transição fora da tabela do contrato e um `failed` sem etapa ou sem mensagem. Nesses casos, o status gravado não muda.
