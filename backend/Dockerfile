@@ -37,4 +37,5 @@ WORKDIR /app
 USER 1000:1000
 EXPOSE 8000
 # 1 worker: pipeline em processo e trava /data/snook.lock (ADR-0006, ADR-0007).
-CMD ["uvicorn", "snook.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# X-Forwarded-* e log de acesso ficam com a app (SEC-27; 07-observability.md).
+CMD ["uvicorn", "snook.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--no-proxy-headers", "--no-access-log"]
