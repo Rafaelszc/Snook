@@ -1,0 +1,8 @@
+NO_ACTIVE_PROVIDER = "Nenhum provedor ativo. Configure em Configurações."
+CREDENTIAL_REJECTED = "O provedor recusou a chave. Confira em Configurações."
+KEY_UNREADABLE = "Chave ilegível. Informe a chave de novo em Configurações."
+MODEL_NOT_FOUND = "Modelo não encontrado no provedor."
+CONTEXT_LIMIT_EXCEEDED = "A parte passou do limite de contexto do modelo."
+PROVIDER_RATE_LIMITED = "Limite de uso do provedor atingido. Tente mais tarde."
+PROVIDER_UNREACHABLE = "Provedor inacessível."
+PROVIDER_REDIRECT = "Provedor inacessível (redirecionamento recusado)."

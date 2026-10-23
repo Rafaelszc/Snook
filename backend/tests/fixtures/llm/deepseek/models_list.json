@@ -1,0 +1,21 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "object": "list",
+    "data": [
+      {
+        "id": "deepseek-chat",
+        "object": "model",
+        "owned_by": "deepseek"
+      },
+      {
+        "id": "deepseek-reasoner",
+        "object": "model",
+        "owned_by": "deepseek"
+      }
+    ]
+  }
+}
