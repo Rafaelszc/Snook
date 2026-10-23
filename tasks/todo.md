@@ -883,13 +883,13 @@
 **Description:** `adapters/anthropic.py` com URL fixa, saída JSON e teste de conexão.
 
 **Acceptance criteria:**
-- [ ] "Gerar" devolve o texto da resposta gravada (`llm-providers` 29).
-- [ ] Erros gravados viram os erros tipados do contrato (`llm-providers` 30).
-- [ ] Chave nunca aparece em erro, log ou fixture (`llm-providers` 27; SEC-07).
+- [x] "Gerar" devolve o texto da resposta gravada (`llm-providers` 29).
+- [x] Erros gravados viram os erros tipados do contrato (`llm-providers` 30).
+- [x] Chave nunca aparece em erro, log ou fixture (`llm-providers` 27; SEC-07).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/adapters/llm/test_anthropic.py -q`.
-- [ ] Gate backend. SEC-07, SEC-17.
+- [x] `cd backend && uv run pytest tests/adapters/llm/test_anthropic.py -q`.
+- [x] Gate backend. SEC-07, SEC-17.
 
 **Dependencies:** Task 13.1
 
@@ -904,13 +904,13 @@
 **Description:** `adapters/ollama.py` com URL do Usuário, regras de esquema e credenciais, sem redirecionamento (Q60, Q63).
 
 **Acceptance criteria:**
-- [ ] Aceita qualquer host (`localhost`, `host.docker.internal`, rede privada) com `http` ou `https`; recusa `file:` e `ftp:` como erro de validação (`llm-providers` 38).
-- [ ] Recusa URL com credenciais embutidas (`http://usuario:senha@host`) (`llm-providers` 40).
-- [ ] Resposta gravada de redirecionamento, no adapter real, vira "provedor inacessível" (`llm-providers` 39); "Gerar" e erros gravados passam (`llm-providers` 29, 30). Abuse case: 302 para `http://169.254.169.254/` não é seguido.
+- [x] Aceita qualquer host (`localhost`, `host.docker.internal`, rede privada) com `http` ou `https`; recusa `file:` e `ftp:` como erro de validação (`llm-providers` 38).
+- [x] Recusa URL com credenciais embutidas (`http://usuario:senha@host`) (`llm-providers` 40).
+- [x] Resposta gravada de redirecionamento, no adapter real, vira "provedor inacessível" (`llm-providers` 39); "Gerar" e erros gravados passam (`llm-providers` 29, 30). Abuse case: 302 para `http://169.254.169.254/` não é seguido.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/adapters/llm/test_ollama.py -q`.
-- [ ] Gate backend. SEC-17.
+- [x] `cd backend && uv run pytest tests/adapters/llm/test_ollama.py -q`.
+- [x] Gate backend. SEC-17.
 
 **Dependencies:** Task 13.1
 
@@ -922,8 +922,8 @@
 
 ### Checkpoint: Cifra e adapters
 
-- [ ] Critérios 29, 30, 38 a 40 de `01-prd/llm-providers.md` passam (38 e 40 no nível do adapter; a resposta 422 por API fecha na Task 15.2)
-- [ ] SEC-07, SEC-17 verificados
+- [x] Critérios 29, 30, 38 a 40 de `01-prd/llm-providers.md` passam (38 e 40 no nível do adapter; a resposta 422 por API fecha na Task 15.2)
+- [x] SEC-07, SEC-17 verificados
 - [ ] `/security-review` sobre o diff
 
 ### Task 15.1: `GET /llm-configs`

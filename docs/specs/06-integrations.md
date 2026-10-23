@@ -29,7 +29,7 @@
 
 1. `urllib.parse.urlsplit`; esquema em `http`, `https`; senão 422 `invalid_url_scheme`.
 2. `username` ou `password` presentes: 422 `url_with_credentials`.
-3. Host não vazio. Qualquer host aceito, inclusive privado.
+3. Host não vazio, senão 422 `invalid_url`. Qualquer host aceito, inclusive privado.
 4. URL guardada sem barra final. Caminho `/api/...` montado pelo adapter.
 
 ## Mapa de erros
