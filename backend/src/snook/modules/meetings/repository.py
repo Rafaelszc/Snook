@@ -1,7 +1,11 @@
+from collections.abc import Iterator
+
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from snook.modules.meetings.models import Meeting
+
+_PENDING_BATCH = 20
 
 
 def add_meeting(session: Session, meeting: Meeting) -> None:
@@ -28,10 +32,18 @@ def delete_meeting(session: Session, meeting: Meeting) -> None:
     session.flush()
 
 
-def count_by_user(session: Session, status: str) -> dict[str, int]:
-    query = (
-        select(Meeting.user_id, func.count())
-        .where(Meeting.status == status)
+def pending_below_limit(session: Session, max_per_user: int) -> Iterator[Meeting]:
+    """`pending` em ordem de criação, só de Usuário com menos de `max_per_user` em `processing`."""
+    busy_users = (
+        select(Meeting.user_id)
+        .where(Meeting.status == "processing")
         .group_by(Meeting.user_id)
+        .having(func.count() >= max_per_user)
     )
-    return {user_id: count for user_id, count in session.execute(query)}
+    query = (
+        select(Meeting)
+        .where(Meeting.status == "pending", Meeting.user_id.not_in(busy_users))
+        .order_by(Meeting.created_at, Meeting.id)
+        .execution_options(yield_per=_PENDING_BATCH)
+    )
+    return iter(session.scalars(query))

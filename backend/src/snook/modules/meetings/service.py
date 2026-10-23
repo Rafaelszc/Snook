@@ -259,6 +259,10 @@ def update_status(
     return meeting.run_id
 
 
+def meeting_exists(uow: UnitOfWork, meeting_id: str) -> bool:
+    return repository.get_meeting(uow.session, meeting_id) is not None
+
+
 def is_current_run(
     uow: UnitOfWork, meeting_id: str, run_id: str, *, status: str | None = None
 ) -> bool:
@@ -297,13 +301,18 @@ class TranscriptionWork:
 def next_pending_for_transcription(
     uow: UnitOfWork, *, max_per_user: int, audio_root: Path
 ) -> TranscriptionWork | None:
-    """`pending` mais antiga de Usuário com menos de `max_per_user` em `processing` (ADR-0010)."""
-    busy = repository.count_by_user(uow.session, "processing")
-    for meeting in startup.pending_in_creation_order(uow.session):
-        if busy.get(meeting.user_id, 0) < max_per_user:
+    """`pending` mais antiga de Usuário com menos de `max_per_user` em `processing` (ADR-0010).
+    Pula a que ainda não tem o original no lugar: o upload move o arquivo depois do commit e só
+    então publica `MeetingCreated`. Pula também caminho recusado por SEC-15 (já vai ao log)."""
+    for meeting in repository.pending_below_limit(uow.session, max_per_user):
+        try:
+            path = original_audio_path(audio_root, meeting)
+        except files.UnsafePathError:
+            continue
+        if path.is_file():
             return TranscriptionWork(
                 meeting_id=meeting.id,
-                original_path=original_audio_path(audio_root, meeting),
+                original_path=path,
                 duration_seconds=meeting.duration_seconds,
                 expected_speakers=meeting.expected_speakers,
             )

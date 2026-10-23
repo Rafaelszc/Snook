@@ -4,7 +4,6 @@ de `TRANSCRIPTION_MAX_PER_USER`, com até `TRANSCRIPTION_WORKERS` trabalhos ao m
 import logging
 import multiprocessing
 import threading
-import uuid
 from collections.abc import Callable
 from concurrent.futures import BrokenExecutor, Executor, Future, ProcessPoolExecutor
 from dataclasses import dataclass
@@ -25,10 +24,20 @@ from snook.modules.meetings import service as meetings
 logger = logging.getLogger("snook.transcription")
 
 TREATED_FILE = "treated.flac"
+CLAIM_RETRY_SECONDS = 5.0
 
 
 def process_pool(workers: int) -> Executor:
     return ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context("spawn"))
+
+
+def terminate_workers(executor: Executor) -> None:
+    """Para o executor sem esperar trabalho em andamento. Subprocesso é morto: senão o `atexit`
+    do `concurrent.futures` segura a parada até a transcrição acabar."""
+    processes = getattr(executor, "_processes", None) or {}
+    for process in list(processes.values()):
+        process.terminate()
+    executor.shutdown(wait=False, cancel_futures=True)
 
 
 @dataclass(frozen=True)
@@ -48,6 +57,7 @@ class TranscriptionDispatcher:
         audio_root: Path,
         now: Callable[[], datetime],
         executor_factory: Callable[[int], Executor] = process_pool,
+        claim_retry_seconds: float = CLAIM_RETRY_SECONDS,
     ) -> None:
         self.engines = engines
         self._workers = workers
@@ -55,12 +65,15 @@ class TranscriptionDispatcher:
         self._audio_root = audio_root
         self._now = now
         self._executor_factory = executor_factory
+        self._claim_retry_seconds = claim_retry_seconds
         self._executor: Executor | None = None
         self._session_factory: sessionmaker[Session] | None = None
         self._publish: Publisher = lambda _event: None
         self._running = 0
         self._stopped = False
-        self._lock = threading.RLock()
+        self._waking = False
+        self._wake_requested = False
+        self._lock = threading.Lock()
         if workers <= max_per_user:
             # Critério 30 de `diarized-transcription` não vale (ADR-0010).
             logger.warning(
@@ -87,29 +100,60 @@ class TranscriptionDispatcher:
             self._stopped = True
             executor, self._executor = self._executor, None
         if executor is not None:
-            executor.shutdown(wait=False, cancel_futures=True)
+            terminate_workers(executor)
 
     def on_event(self, event: MeetingCreated | RetryRequested) -> None:
-        """Aviso só acorda o dispatcher com a Reunião em `pending` e o `run_id` atual."""
+        """Aviso só acorda o dispatcher; ele escolhe no banco a `pending` certa, então aviso
+        repetido ou de Reunião fora de `pending` não começa nada (`diarized` 3)."""
         if isinstance(event, RetryRequested) and event.stage != "transcription":
             return
-        if self._session_factory is None:
-            return  # antes da subida: `start` lê as `pending` do banco
-        with self._uow() as uow:
-            current = meetings.is_current_run(uow, event.meeting_id, event.run_id, status="pending")
-        if current:
-            self.wake()
+        self.wake()
 
     def wake(self) -> None:
+        """Uma thread enche os workers por vez; pedido durante o enchimento repete o laço, sem
+        recursão (executor síncrono chama `_done` dentro do `submit`)."""
         with self._lock:
-            while not self._stopped and self._session_factory is not None:
+            self._wake_requested = True
+            if self._waking:
+                return
+            self._waking = True
+        try:
+            while True:
+                with self._lock:
+                    if not self._wake_requested:
+                        self._waking = False
+                        return
+                    self._wake_requested = False
+                self._fill()
+        except BaseException:
+            with self._lock:
+                self._waking = False
+            raise
+
+    def _fill(self) -> None:
+        while True:
+            with self._lock:
+                if self._stopped or self._session_factory is None:
+                    return
                 if self._running >= self._workers:
                     return
+            try:
                 claim = self._claim()
-                if claim is None:
-                    return
+            except Exception:
+                # Banco ocupado ou falha passageira: a fila não para (SEC-19).
+                logger.exception("transcription.claim_failed")
+                self._retry_later()
+                return
+            if claim is None:
+                return
+            with self._lock:
                 self._running += 1
-                self._submit(claim)
+            self._submit(claim)
+
+    def _retry_later(self) -> None:
+        timer = threading.Timer(self._claim_retry_seconds, self.wake)
+        timer.daemon = True
+        timer.start()
 
     def _uow(self) -> UnitOfWork:
         if self._session_factory is None:
@@ -131,7 +175,7 @@ class TranscriptionDispatcher:
             uow.after_commit(lambda: files.remove_meeting_file(root, meeting_id, TREATED_FILE))
         job = Job(
             original_path=work.original_path,
-            treated_path=files.tmp_dir(root) / f"{uuid.uuid4()}.flac",
+            treated_path=files.new_tmp_path(root).with_suffix(".flac"),
             duration_seconds=work.duration_seconds,
             expected_speakers=work.expected_speakers,
         )
@@ -139,21 +183,35 @@ class TranscriptionDispatcher:
         return _Claim(meeting_id=meeting_id, run_id=run_id, job=job)
 
     def _submit(self, claim: _Claim) -> None:
+        executor: Executor | None = None
         try:
-            if self._executor is None:
-                self._executor = self._executor_factory(self._workers)
-            future = self._executor.submit(run_job, self.engines, claim.job)
+            with self._lock:
+                if self._executor is None:
+                    self._executor = self._executor_factory(self._workers)
+                executor = self._executor
+            future = executor.submit(run_job, self.engines, claim.job)
         except Exception as exc:
-            if isinstance(exc, BrokenExecutor):
-                self._executor = None  # subprocesso morreu: o próximo trabalho cria outro pool
             logger.exception("transcription.submit_failed", extra={"meeting_id": claim.meeting_id})
             failed: Future[list[Segment]] = Future()
             failed.set_exception(exc)
             future = failed
-        future.add_done_callback(lambda done: self._done(claim, done))
+        future.add_done_callback(lambda done: self._done(claim, done, executor))
 
-    def _done(self, claim: _Claim, future: "Future[list[Segment]]") -> None:
+    def _drop_broken(self, executor: Executor | None, future: "Future[list[Segment]]") -> None:
+        """Subprocesso morreu: o pool quebrado sai já, e o próximo trabalho cria outro."""
+        if executor is None or not isinstance(future.exception(), BrokenExecutor):
+            return
+        with self._lock:
+            if self._executor is not executor:
+                return
+            self._executor = None
+        terminate_workers(executor)
+
+    def _done(
+        self, claim: _Claim, future: "Future[list[Segment]]", executor: Executor | None
+    ) -> None:
         try:
+            self._drop_broken(executor, future)
             self._finish(claim, future)
         except Exception:
             logger.exception("transcription.save_failed", extra={"meeting_id": claim.meeting_id})
@@ -186,24 +244,33 @@ class TranscriptionDispatcher:
         return current
 
     def _save_segments(self, claim: _Claim, segments: list[Segment]) -> None:
-        root = self._audio_root
         with self._uow() as uow:
             if not self._is_current(uow, claim):
                 return
             repository.add_segments(uow.session, claim.meeting_id, segments)
             meetings.update_status(uow, claim.meeting_id, "transcribed", now=self._now())
+            uow.after_commit(lambda: self._keep_treated_audio(claim))
+        logger.info(
+            "transcription.done",
+            extra={"meeting_id": claim.meeting_id, "segments": len(segments)},
+        )
 
-            def keep_treated_audio() -> None:
-                if files.meeting_dir(root, claim.meeting_id).is_dir():  # sem recriar excluída
-                    files.move_into_meeting_dir(
-                        root, claim.job.treated_path, claim.meeting_id, TREATED_FILE
-                    )
-                logger.info(
-                    "transcription.done",
-                    extra={"meeting_id": claim.meeting_id, "segments": len(segments)},
-                )
-
-            uow.after_commit(keep_treated_audio)
+    def _keep_treated_audio(self, claim: _Claim) -> None:
+        """Move sem recriar diretório de Reunião excluída; se a exclusão chega logo depois do
+        move, apaga o que sobrou (`diarized` 17, SEC-24)."""
+        root = self._audio_root
+        try:
+            files.move_into_meeting_dir(
+                root, claim.job.treated_path, claim.meeting_id, TREATED_FILE, create_dir=False
+            )
+        except FileNotFoundError:
+            logger.info("transcription.discarded", extra={"meeting_id": claim.meeting_id})
+            return
+        with self._uow() as uow:
+            exists = meetings.meeting_exists(uow, claim.meeting_id)
+        if not exists:
+            files.remove_meeting_dir(root, claim.meeting_id)
+            logger.info("transcription.discarded", extra={"meeting_id": claim.meeting_id})
 
     def _save_failure(self, claim: _Claim, message: str) -> None:
         with self._uow() as uow:

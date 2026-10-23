@@ -88,13 +88,15 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.engine = engine
         app.state.session_factory = create_session_factory(engine)
         _recover_meetings(app)  # 4 e 5
-        app.state.transcription.start(app.state.session_factory, app.state.event_bus.publish)  # 6
-        _cleanup_sessions(app)
-        cleanup = asyncio.create_task(_session_cleanup_loop(app))
+        cleanup: asyncio.Task[None] | None = None
         try:
+            app.state.transcription.start(app.state.session_factory, app.state.event_bus.publish)
+            _cleanup_sessions(app)  # 6
+            cleanup = asyncio.create_task(_session_cleanup_loop(app))
             yield  # 7
         finally:
-            cleanup.cancel()
+            if cleanup is not None:
+                cleanup.cancel()
             app.state.transcription.stop()
             engine.dispose()
     finally:
