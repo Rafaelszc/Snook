@@ -1,6 +1,6 @@
 """Junção dos turnos da diarização com os trechos da transcrição (ADR-0014)."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from snook.modules.diarized_transcription.engines.base import Chunk, Turn
 
@@ -11,6 +11,16 @@ class Segment:
     start_seconds: float
     end_seconds: float
     text: str
+
+
+@dataclass(frozen=True)
+class Speaker:
+    speaker_label: str
+    total_seconds: float
+    longest: Segment
+
+
+MAX_JOIN_PAUSE_SECONDS = 1.0
 
 
 def _overlap(chunk: Chunk, turn: Turn) -> float:
@@ -40,5 +50,32 @@ def merge(turns: list[Turn], chunks: list[Chunk], duration_seconds: float) -> li
         end = min(chunk.end_seconds, duration_seconds)
         if not text or start >= end:
             continue
-        segments.append(Segment(_speaker(chunk, turns), start, end, text))
+        segment = Segment(_speaker(chunk, turns), start, end, text)
+        previous = segments[-1] if segments else None
+        if (
+            previous is not None
+            and previous.speaker_label == segment.speaker_label
+            and segment.start_seconds - previous.end_seconds <= MAX_JOIN_PAUSE_SECONDS
+        ):
+            segments[-1] = replace(
+                previous,
+                end_seconds=max(previous.end_seconds, segment.end_seconds),
+                text=f"{previous.text} {segment.text}",
+            )
+        else:
+            segments.append(segment)
     return segments
+
+
+def speakers(segments: list[Segment]) -> list[Speaker]:
+    """Rótulos presentes nos segmentos, com tempo total de fala e maior segmento, por rótulo."""
+    totals: dict[str, float] = {}
+    longest: dict[str, Segment] = {}
+    for segment in segments:
+        label = segment.speaker_label
+        length = segment.end_seconds - segment.start_seconds
+        totals[label] = totals.get(label, 0.0) + length
+        best = longest.get(label)
+        if best is None or length > best.end_seconds - best.start_seconds:
+            longest[label] = segment
+    return [Speaker(label, totals[label], longest[label]) for label in sorted(totals)]
