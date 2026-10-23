@@ -2,6 +2,7 @@ import type { RouteObject } from "react-router"
 
 import { LoginPage } from "@/features/auth/LoginPage"
 import { RegisterPage } from "@/features/auth/RegisterPage"
+import { SettingsPage } from "@/features/llm-providers/SettingsPage"
 
 import { AuthGuard } from "./AuthGuard"
 import { Layout } from "./Layout"
@@ -25,7 +26,7 @@ export const routes: RouteObject[] = [
           ...(import.meta.env.DEV
             ? [{ path: "dev/components", element: <SamplePage /> }]
             : []),
-          { path: "settings", element: <Placeholder title="Configurações" /> },
+          { path: "settings", element: <SettingsPage /> },
           { path: "*", element: <Placeholder title="Página não encontrada" /> },
         ],
       },

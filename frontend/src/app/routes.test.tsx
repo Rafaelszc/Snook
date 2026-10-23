@@ -6,13 +6,17 @@ import { expect, it } from "vitest"
 import { axe } from "vitest-axe"
 
 import { routes } from "./routes"
+import { NOT_CONFIGURED } from "@/features/llm-providers/fixtures"
 import { renderWithProviders } from "@/test/render"
 import { server } from "@/test/server"
 
 const ANA = { id: "u1", email: "ana@x.com", username: "ana" }
 
 function signedIn() {
-  server.use(http.get("/api/auth/me", () => HttpResponse.json(ANA)))
+  server.use(
+    http.get("/api/auth/me", () => HttpResponse.json(ANA)),
+    http.get("/api/llm-configs", () => HttpResponse.json(NOT_CONFIGURED))
+  )
 }
 
 function signedOut() {

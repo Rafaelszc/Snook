@@ -1098,13 +1098,13 @@
 **Description:** Tela de configurações com os 4 provedores, estado, máscara, modelo e janela.
 
 **Acceptance criteria:**
-- [ ] Mostra os 4 provedores com estado, máscara, modelo, janela e indicação do ativo (`llm-providers` 33).
-- [ ] O campo de chave nunca é pré-preenchido; mostra a máscara como referência e vazio mantém a chave atual (`llm-providers` 36).
-- [ ] `vitest-axe` sem violação; layout de 360 a 1920 px.
+- [x] Mostra os 4 provedores com estado, máscara, modelo, janela e indicação do ativo (`llm-providers` 33).
+- [x] O campo de chave nunca é pré-preenchido; mostra a máscara como referência e vazio mantém a chave atual (`llm-providers` 36).
+- [x] `vitest-axe` sem violação; layout de 360 a 1920 px.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/llm-providers`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 15.1, 10.2
 
@@ -1121,13 +1121,13 @@
 **Description:** "Testar conexão", "Salvar" travado até o teste passar, erros, ativar e remover com diálogo de confirmação (vidro no diálogo).
 
 **Acceptance criteria:**
-- [ ] "Salvar" fica desabilitado até um "Testar conexão" bem-sucedido com os valores atuais do formulário (`llm-providers` 34); erros de teste e gravação aparecem com o motivo da API (`llm-providers` 35).
-- [ ] Remover pede confirmação antes de chamar a API (`llm-providers` 37).
-- [ ] Diálogo usa `GlassPanel`; feedback de teste respeita movimento reduzido; `vitest-axe` sem violação.
+- [x] "Salvar" fica desabilitado até um "Testar conexão" bem-sucedido com os valores atuais do formulário (`llm-providers` 34); erros de teste e gravação aparecem com o motivo da API (`llm-providers` 35).
+- [x] Remover pede confirmação antes de chamar a API (`llm-providers` 37).
+- [x] Diálogo usa `GlassPanel`; feedback de teste respeita movimento reduzido; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/llm-providers`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 17.1, 15.5, 15.4
 
@@ -1143,8 +1143,8 @@
 
 - [ ] Critérios 1 a 41 de `01-prd/llm-providers.md` cobertos
 - [ ] SEC-06, SEC-26 verificados
-- [ ] Checagem de UI; `impeccable-design-polish` na tela de configurações
-- [ ] `/security-review` sobre o diff
+- [x] Checagem de UI; `impeccable-design-polish` na tela de configurações
+- [x] `/security-review` sobre o diff
 - [ ] Revisão humana antes de seguir
 
 ---
