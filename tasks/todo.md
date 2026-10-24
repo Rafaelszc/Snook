@@ -1739,13 +1739,13 @@
 **Description:** A tela junta os segmentos com `GET /meetings/{id}/participants` e mostra o nome atual do Participante.
 
 **Acceptance criteria:**
-- [ ] Enquanto os speakers não têm nome, mostra o rótulo (`SPEAKER_00`); depois da nomeação, mostra o nome atual do Participante (`diarized-transcription` 26).
-- [ ] Participante renomeado aparece sem passo extra (nomes lidos na hora; `05-api.md`).
-- [ ] Resposta sem Participantes (404 ou lista vazia) não quebra a tela.
+- [x] Enquanto os speakers não têm nome, mostra o rótulo (`SPEAKER_00`); depois da nomeação, mostra o nome atual do Participante (`diarized-transcription` 26).
+- [x] Participante renomeado aparece sem passo extra (nomes lidos na hora; `05-api.md`).
+- [x] Resposta sem Participantes (404 ou lista vazia) não quebra a tela.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/diarized-transcription` (MSW). A rota real de Participantes só existe depois da Task 32.2; reconferir no checkpoint `participants`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/diarized-transcription` (MSW). A rota real de Participantes só existe depois da Task 32.2; reconferir no checkpoint `participants`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 27.2
 

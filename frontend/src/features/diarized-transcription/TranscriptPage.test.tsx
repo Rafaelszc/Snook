@@ -7,7 +7,7 @@ import { axe } from "vitest-axe"
 
 import { server } from "@/test/server"
 
-import type { MeetingStatus, Transcript } from "./api"
+import type { MeetingStatus, Participant, Transcript } from "./api"
 import { transcript2h, TRANSCRIPT_2H_COUNT } from "./fixtures/transcript-2h"
 import { TranscriptPage } from "./TranscriptPage"
 
@@ -32,8 +32,20 @@ beforeAll(() => {
   })
 })
 
-function serve(meeting: MeetingStatus, transcript?: Transcript) {
+function serve(
+  meeting: MeetingStatus,
+  transcript?: Transcript,
+  participants?: Participant[] | 404
+) {
   server.use(
+    http.get(`/api/meetings/${ID}/participants`, () =>
+      participants === undefined || participants === 404
+        ? HttpResponse.json(
+            { error: { code: "meeting_not_found", message: "x" } },
+            { status: 404 }
+          )
+        : HttpResponse.json(participants)
+    ),
     http.get(`/api/meetings/${ID}`, () => HttpResponse.json(meeting)),
     http.get(`/api/meetings/${ID}/transcript`, () =>
       transcript
@@ -157,4 +169,56 @@ it("renderiza texto de segmento escapado (SEC-12)", async () => {
     await screen.findByText('<img src=x onerror="alert(1)">')
   ).toBeVisible()
   expect(container.querySelector("img")).toBeNull()
+})
+
+const ONE_SEGMENT: Transcript = {
+  segments: [
+    {
+      id: 1,
+      speaker_label: "SPEAKER_00",
+      start_seconds: 0,
+      end_seconds: 1,
+      text: "Bom dia.",
+    },
+  ],
+}
+
+it("sem nomes (404), mostra o rótulo e não quebra (26)", async () => {
+  serve(done, ONE_SEGMENT, 404)
+  renderPage()
+
+  expect(await screen.findByText("SPEAKER_00")).toBeVisible()
+})
+
+it("lista vazia de Participantes mostra o rótulo (26)", async () => {
+  serve(done, ONE_SEGMENT, [])
+  renderPage()
+
+  expect(await screen.findByText("SPEAKER_00")).toBeVisible()
+})
+
+it("com Participante nomeado, mostra o nome atual no lugar do rótulo (26)", async () => {
+  serve(done, ONE_SEGMENT, [
+    { id: "p1", name: "Ana", speaker_labels: ["SPEAKER_00"] },
+  ])
+  renderPage()
+
+  expect(await screen.findByText("Ana")).toBeVisible()
+  expect(screen.queryByText("SPEAKER_00")).not.toBeInTheDocument()
+})
+
+it("nome renomeado aparece ao reabrir a tela, sem passo extra (26)", async () => {
+  serve(done, ONE_SEGMENT, [
+    { id: "p1", name: "Ana", speaker_labels: ["SPEAKER_00"] },
+  ])
+  const first = renderPage()
+  expect(await screen.findByText("Ana")).toBeVisible()
+  first.unmount()
+
+  serve(done, ONE_SEGMENT, [
+    { id: "p1", name: "Ana Souza", speaker_labels: ["SPEAKER_00"] },
+  ])
+  renderPage()
+
+  expect(await screen.findByText("Ana Souza")).toBeVisible()
 })

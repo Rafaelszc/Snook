@@ -8,12 +8,19 @@ import { StatusBadge } from "@/components/surfaces/StatusBadge"
 import { hasTranscript, type TranscriptSegment } from "./api"
 import { formatTimestamp } from "./format"
 import { MESSAGES } from "./messages"
+import { useParticipantNames } from "./useParticipantNames"
 import { useMeetingStatus, useTranscript } from "./useTranscript"
 
 const ROW_ESTIMATE_PX = 72
 const OVERSCAN = 8
 
-function SegmentList({ segments }: { segments: TranscriptSegment[] }) {
+function SegmentList({
+  segments,
+  names,
+}: {
+  segments: TranscriptSegment[]
+  names: ReadonlyMap<string, string>
+}) {
   const scrollRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line react-hooks/incompatible-library -- sem memoização própria aqui
   const virtualizer = useVirtualizer({
@@ -49,7 +56,9 @@ function SegmentList({ segments }: { segments: TranscriptSegment[] }) {
               <span className="font-mono text-muted-foreground tabular-nums">
                 {formatTimestamp(segment.start_seconds)}
               </span>
-              <span className="font-medium">{segment.speaker_label}</span>
+              <span className="font-medium">
+                {names.get(segment.speaker_label) ?? segment.speaker_label}
+              </span>
               <p className="col-start-2 text-base">{segment.text}</p>
             </li>
           )
@@ -65,6 +74,7 @@ export function TranscriptPage() {
   const { data: meeting, error: meetingError } = useMeetingStatus(id)
   const ready = meeting !== undefined && hasTranscript(meeting)
   const { data: transcript, error: transcriptError } = useTranscript(id, ready)
+  const names = useParticipantNames(id, ready)
   const error = meetingError ?? transcriptError
 
   return (
@@ -99,7 +109,7 @@ export function TranscriptPage() {
       ) : transcript.segments.length === 0 ? (
         <p className="text-sm text-muted-foreground">{MESSAGES.empty}</p>
       ) : (
-        <SegmentList segments={transcript.segments} />
+        <SegmentList segments={transcript.segments} names={names} />
       )}
     </div>
   )

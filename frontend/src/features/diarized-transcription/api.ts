@@ -34,3 +34,13 @@ export function hasTranscript(meeting: MeetingStatus): boolean {
     !(meeting.status === "failed" && meeting.failed_stage === "transcription")
   )
 }
+
+// `GET /meetings/{id}/participants` (05-api.md, `participants`).
+export interface Participant {
+  id: string
+  name: string
+  speaker_labels: string[]
+}
+
+export const participantsQueryKey = (meetingId: string) =>
+  ["meetings", meetingId, "transcript-participants"] as const
