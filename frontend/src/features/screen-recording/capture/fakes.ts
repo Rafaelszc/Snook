@@ -4,6 +4,8 @@ import type {
   DisplayCapture,
   MicCapture,
 } from "./interfaces"
+import type { AudioGraph } from "./mixer"
+import type { MediaRecorderCtor, MediaRecorderLike } from "./recorder"
 
 export function fakeBrowserEnv({
   secure = true,
@@ -52,6 +54,58 @@ export function fakeStream({
     getAudioTracks: () => tracks.filter((t) => t.kind === "audio"),
     getVideoTracks: () => tracks.filter((t) => t.kind === "video"),
   } as unknown as MediaStream
+}
+
+export function fakeAudioContext() {
+  const connected: MediaStream[] = []
+  const destination = { stream: fakeStream({ audio: true }) }
+  const fake = {
+    connected,
+    destination,
+    closed: false,
+    context: {
+      createMediaStreamDestination: () => destination,
+      createMediaStreamSource: (stream: MediaStream) => ({
+        connect: (node: unknown) => {
+          if (node === destination) connected.push(stream)
+        },
+      }),
+      close: () => {
+        fake.closed = true
+        return Promise.resolve()
+      },
+    } as unknown as AudioGraph,
+  }
+  return fake
+}
+
+class FakeMediaRecorder implements MediaRecorderLike {
+  ondataavailable: ((event: BlobEvent) => void) | null = null
+  onstop: ((event: Event) => void) | null = null
+  readonly stream: MediaStream
+  readonly options: MediaRecorderOptions
+  constructor(stream: MediaStream, options: MediaRecorderOptions) {
+    this.stream = stream
+    this.options = options
+  }
+  start() {}
+  stop() {
+    this.onstop?.(new Event("stop"))
+  }
+  emit(data: Blob) {
+    this.ondataavailable?.({ data } as BlobEvent)
+  }
+}
+
+export function fakeMediaRecorder() {
+  const instances: FakeMediaRecorder[] = []
+  const ctor = class extends FakeMediaRecorder {
+    constructor(stream: MediaStream, options: MediaRecorderOptions) {
+      super(stream, options)
+      instances.push(this)
+    }
+  }
+  return { ctor: ctor satisfies MediaRecorderCtor, instances }
 }
 
 // Resolve com o stream ou rejeita com o erro, como o pedido real.
