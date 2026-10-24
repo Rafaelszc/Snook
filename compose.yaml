@@ -44,6 +44,9 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile.gpu
+    environment:
+      # ADR-0014: float16 na GPU. Vence o valor do .env.
+      WHISPER_COMPUTE_TYPE: float16
     networks:
       snook-net:
         aliases: [backend]

@@ -5,14 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from snook.modules.diarized_transcription import messages
-from snook.modules.diarized_transcription.engines.audio import FfmpegAudio
-from snook.modules.diarized_transcription.engines.base import (
-    LANGUAGE,
-    Chunk,
-    EngineFailure,
-    Engines,
-    Turn,
-)
+from snook.modules.diarized_transcription.engines.base import LANGUAGE, EngineFailure, Engines
 from snook.modules.diarized_transcription.merge import Segment, merge
 
 
@@ -32,18 +25,3 @@ def run_job(engines: Engines, job: Job) -> list[Segment]:
     if not segments:
         raise EngineFailure(messages.NO_SPEECH)
     return segments
-
-
-class _Unavailable:
-    """Engine real ainda não instalada (Task 26): a Reunião falha com mensagem clara."""
-
-    def diarize(self, audio: Path, num_speakers: int | None) -> list[Turn]:
-        raise EngineFailure(messages.ENGINES_UNAVAILABLE)
-
-    def transcribe(self, audio: Path, language: str) -> list[Chunk]:
-        raise EngineFailure(messages.ENGINES_UNAVAILABLE)
-
-
-def default_engines() -> Engines:
-    unavailable = _Unavailable()
-    return Engines(audio=FfmpegAudio(), diarizer=unavailable, transcriber=unavailable)

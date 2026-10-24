@@ -193,7 +193,7 @@ Comandos que escrevem no banco rodam com o backend parado. A trava `/data/snook.
 
 | Job | Passos |
 |---|---|
-| `backend` | `uv sync --frozen`; `ruff check`; `ruff format --check`; `mypy src`; `lint-imports`; `pytest`; `pip-audit` |
+| `backend` | `uv sync --frozen`; `ruff check`; `ruff format --check`; `mypy src`; `lint-imports`; `pytest`; `pip-audit` (ambiente e extra `cpu` da imagem) |
 | `frontend` | `npm ci --ignore-scripts`; `npm run lint`; `npm run typecheck`; `npm test -- --run`; `npm run build`; `npm audit --omit=dev` |
 | `secrets` | `gitleaks detect` no diff; checagem de que `.gitignore` cobre `.env`, `*.db`, `audios/` |
 | `images` | `docker compose build` (perfil `cpu`), sem push |

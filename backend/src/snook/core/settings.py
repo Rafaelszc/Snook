@@ -10,6 +10,9 @@ from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 _DNS_LABEL = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$")
 _MASTER_KEY_BYTES = 32
+_COMMIT_HASH = re.compile(r"^[0-9a-f]{40}$")
+_HF_REPO_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$")
+_WHISPER_ALIASES = {"large-v3-turbo"}
 _LOCAL_HOSTS = ["localhost", "127.0.0.1"]
 _LOCAL_ORIGINS = ["http://localhost:8080", "http://127.0.0.1:8080"]
 
@@ -85,9 +88,10 @@ class Settings(BaseSettings):
 
     whisper_model: str = "large-v3-turbo"
     whisper_compute_type: str = "int8"
-    whisper_revision: str = ""
+    # Revisão fixa = hash de commit no HuggingFace (SEC-22). Trocar o modelo pede trocar a revisão.
+    whisper_revision: str = "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf"
     pyannote_pipeline: str = "pyannote/speaker-diarization-3.1"
-    pyannote_revision: str = ""
+    pyannote_revision: str = "84fd25912480287da0247647c3d2b4853cb3ee5d"
     models_offline: bool = False
 
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
@@ -123,6 +127,27 @@ class Settings(BaseSettings):
     def _check_lan_host(cls, value: str | None) -> str | None:
         if value is not None and not _is_valid_lan_host(value):
             raise ValueError("deve ser nome DNS ou IP, sem esquema, porta ou caminho")
+        return value
+
+    @field_validator("whisper_revision", "pyannote_revision")
+    @classmethod
+    def _check_revision(cls, value: str) -> str:
+        if not _COMMIT_HASH.match(value):
+            raise ValueError("deve ser hash de commit do HuggingFace (40 hex)")
+        return value
+
+    @field_validator("whisper_model")
+    @classmethod
+    def _check_whisper_model(cls, value: str) -> str:
+        if value not in _WHISPER_ALIASES and not _HF_REPO_ID.match(value):
+            raise ValueError("deve ser large-v3-turbo ou id dono/repo do HuggingFace")
+        return value
+
+    @field_validator("pyannote_pipeline")
+    @classmethod
+    def _check_pyannote_pipeline(cls, value: str) -> str:
+        if not _HF_REPO_ID.match(value):
+            raise ValueError("deve ser id dono/repo do HuggingFace")
         return value
 
     @field_validator("log_level", mode="before")

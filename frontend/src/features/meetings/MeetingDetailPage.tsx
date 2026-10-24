@@ -74,6 +74,10 @@ function Failure({ meeting }: { meeting: MeetingDetail }) {
 export function MeetingDetailPage() {
   const { id = "" } = useParams()
   const { data: meeting, error, isPending } = useMeeting(id)
+  const hasTranscript =
+    meeting !== undefined &&
+    !["pending", "processing"].includes(meeting.status) &&
+    !(meeting.status === "failed" && meeting.failed_stage === "transcription")
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 py-4">
@@ -111,6 +115,14 @@ export function MeetingDetailPage() {
           </header>
           <Failure meeting={meeting} />
           <Facts meeting={meeting} />
+          {hasTranscript ? (
+            <Link
+              to={`/meetings/${meeting.id}/transcript`}
+              className="self-start text-sm font-medium underline underline-offset-4"
+            >
+              {MESSAGES.openTranscript}
+            </Link>
+          ) : null}
           <div className="border-t border-border pt-5">
             <DeleteMeetingDialog meetingId={meeting.id} />
           </div>

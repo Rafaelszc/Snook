@@ -38,6 +38,10 @@ jobs:
       - run: uv run lint-imports
       - run: uv run pytest
       - run: uv run pip-audit
+      # Extra `cpu` da imagem (torch, faster-whisper, pyannote) fica fora do `uv sync` padrão.
+      - run: |
+          uv export --frozen --extra cpu --no-dev --no-emit-project --no-hashes -o "$RUNNER_TEMP/req-cpu.txt"
+          uv run pip-audit --disable-pip --no-deps -r "$RUNNER_TEMP/req-cpu.txt"
 
   frontend:
     runs-on: ubuntu-latest

@@ -1608,14 +1608,14 @@
 **Description:** `engines/whisper.py` com `large-v3-turbo` int8, idioma `pt`, revisão fixa e modelos em `/models`.
 
 **Acceptance criteria:**
-- [ ] Transcreve sempre em `pt`, sem detecção automática (`diarized-transcription` 8).
-- [ ] O modelo vem do repositório oficial e da revisão fixa de `WHISPER_REVISION`; sem revisão configurada, o settings falha (SEC-22).
-- [ ] Com `MODELS_OFFLINE=true`, não faz acesso à rede (transversal 14).
+- [x] Transcreve sempre em `pt`, sem detecção automática (`diarized-transcription` 8).
+- [x] O modelo vem do repositório oficial e da revisão fixa de `WHISPER_REVISION`; sem revisão configurada, o settings falha (SEC-22).
+- [x] Com `MODELS_OFFLINE=true`, não faz acesso à rede (transversal 14).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_whisper_settings.py -q` (settings e fábrica; sem modelo).
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_whisper_settings.py -q` (settings e fábrica; sem modelo).
 - [ ] Suíte `models_real` com áudio curto: `cd backend && uv run pytest -m models_real tests/models_real/test_whisper.py` (manual).
-- [ ] Gate backend. SEC-22.
+- [x] Gate backend. SEC-22.
 
 **Dependencies:** Task 23.2, Task 1
 
@@ -1630,14 +1630,14 @@
 **Description:** `engines/pyannote.py` com `pyannote/speaker-diarization-3.1`, revisão fixa, `expected_speakers` como dica e mensagens de `HF_TOKEN`.
 
 **Acceptance criteria:**
-- [ ] Recebe `expected_speakers` quando informado e roda sem número fixo quando ausente (`diarized-transcription` 7).
-- [ ] `HF_TOKEN` ausente, inválido ou sem aceite dos termos vira falha com mensagem que cita `HF_TOKEN` e o aceite, sem o valor (`diarized-transcription` 15; SEC-20).
-- [ ] Revisão fixa obrigatória em settings (SEC-22); `HF_TOKEN` nunca vai a log.
+- [x] Recebe `expected_speakers` quando informado e roda sem número fixo quando ausente (`diarized-transcription` 7).
+- [x] `HF_TOKEN` ausente, inválido ou sem aceite dos termos vira falha com mensagem que cita `HF_TOKEN` e o aceite, sem o valor (`diarized-transcription` 15; SEC-20).
+- [x] Revisão fixa obrigatória em settings (SEC-22); `HF_TOKEN` nunca vai a log.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_pyannote_settings.py -q`.
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_pyannote_settings.py -q`.
 - [ ] Manual: `cd backend && uv run pytest -m models_real tests/models_real/test_pyannote.py`.
-- [ ] Gate backend. SEC-20, SEC-22.
+- [x] Gate backend. SEC-20, SEC-22.
 
 **Dependencies:** Task 26.1
 
@@ -1652,14 +1652,14 @@
 **Description:** Comando `python -m snook.cli download-models`, cache em `/models` (volume `snook-models`) e transcrição em `ProcessPoolExecutor` com `spawn` (ADR-0007, ADR-0014).
 
 **Acceptance criteria:**
-- [ ] O download usa repositório e revisão fixos; modelos ficam em `/models` e a segunda execução não baixa de novo (`diarized-transcription` 23; SEC-22).
-- [ ] O subprocesso recebe só caminho de arquivo e parâmetros e não toca o banco (`03-security.md`, fronteira 3).
-- [ ] Durante o processamento, nenhuma chamada de rede envia áudio para fora do servidor (`diarized-transcription` 21; RT-06).
+- [x] O download usa repositório e revisão fixos; modelos ficam em `/models` e a segunda execução não baixa de novo (`diarized-transcription` 23; SEC-22).
+- [x] O subprocesso recebe só caminho de arquivo e parâmetros e não toca o banco (`03-security.md`, fronteira 3).
+- [x] Durante o processamento, nenhuma chamada de rede envia áudio para fora do servidor (`diarized-transcription` 21; RT-06).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/cli/test_download_models.py tests/diarized_transcription/test_subprocess_boundary.py -q` (fakes).
+- [x] `cd backend && uv run pytest tests/cli/test_download_models.py tests/diarized_transcription/test_subprocess_boundary.py -q` (fakes).
 - [ ] Manual: `docker compose exec backend python -m snook.cli download-models`; `docker compose down` sem `-v`, `up`, e a segunda execução não baixa (critério 23).
-- [ ] Gate backend. SEC-22.
+- [x] Gate backend. SEC-22.
 
 **Dependencies:** Tasks 26.2, 6.3
 
@@ -1676,7 +1676,7 @@
 **Acceptance criteria:**
 - [ ] Sem o perfil GPU, o processamento roda em CPU; com o perfil na máquina NVIDIA, roda na GPU; a forma da Transcrição é a mesma (`diarized-transcription` 24, manual).
 - [ ] Com os modelos em cache e a rede do container bloqueada, a Reunião chega a `transcribed` (`diarized-transcription` 22, manual; transversal 14).
-- [ ] `uv run pytest` padrão não coleta `models_real` (transversal 18).
+- [x] `uv run pytest` padrão não coleta `models_real` (transversal 18).
 
 **Verification:**
 - [ ] `cd backend && uv run pytest` (sem `models_real`); `cd backend && uv run pytest -m models_real` (manual, com modelos).
@@ -1695,13 +1695,13 @@
 **Description:** Rota da Transcrição, com segmentos em ordem.
 
 **Acceptance criteria:**
-- [ ] Em `transcribed` ou posterior, devolve os segmentos em ordem com `speaker_label`, `start_seconds`, `end_seconds`, `text` (`diarized-transcription` 18).
-- [ ] Em `pending`, `processing` ou `failed` etapa `transcription` responde 409 `transcript_not_ready` (`diarized-transcription` 19).
-- [ ] Reunião de outro Usuário responde 404; sem sessão, 401 (`diarized-transcription` 20; SEC-02).
+- [x] Em `transcribed` ou posterior, devolve os segmentos em ordem com `speaker_label`, `start_seconds`, `end_seconds`, `text` (`diarized-transcription` 18).
+- [x] Em `pending`, `processing` ou `failed` etapa `transcription` responde 409 `transcript_not_ready` (`diarized-transcription` 19).
+- [x] Reunião de outro Usuário responde 404; sem sessão, 401 (`diarized-transcription` 20; SEC-02).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_api_transcript.py -q`.
-- [ ] Gate backend. SEC-02.
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_api_transcript.py -q`.
+- [x] Gate backend. SEC-02.
 
 **Dependencies:** Tasks 24, 19.1
 
@@ -1716,13 +1716,13 @@
 **Description:** Tela da Transcrição com `@tanstack/react-virtual`, instante `hh:mm:ss` em mono tabular e status antes de `transcribed`.
 
 **Acceptance criteria:**
-- [ ] Mostra segmentos em ordem, cada um com instante de início em `hh:mm:ss`, speaker e texto (`diarized-transcription` 25).
-- [ ] Antes de `transcribed`, mostra o status da Reunião em vez do texto (`diarized-transcription` 27).
-- [ ] Com Transcrição de 2 h de fixture, mantém no DOM só os segmentos perto da área visível; rolar até o fim mostra o último com instante, speaker e texto (`diarized-transcription` 31; NFR-07). Texto de segmento renderiza escapado (SEC-12).
+- [x] Mostra segmentos em ordem, cada um com instante de início em `hh:mm:ss`, speaker e texto (`diarized-transcription` 25).
+- [x] Antes de `transcribed`, mostra o status da Reunião em vez do texto (`diarized-transcription` 27).
+- [x] Com Transcrição de 2 h de fixture, mantém no DOM só os segmentos perto da área visível; rolar até o fim mostra o último com instante, speaker e texto (`diarized-transcription` 31; NFR-07). Texto de segmento renderiza escapado (SEC-12).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/diarized-transcription`.
-- [ ] Gate frontend. SEC-12.
+- [x] `cd frontend && npm test -- --run src/features/diarized-transcription`.
+- [x] Gate frontend. SEC-12.
 
 **Dependencies:** Tasks 27.1, 22.3
 
@@ -1739,13 +1739,13 @@
 **Description:** A tela junta os segmentos com `GET /meetings/{id}/participants` e mostra o nome atual do Participante.
 
 **Acceptance criteria:**
-- [ ] Enquanto os speakers não têm nome, mostra o rótulo (`SPEAKER_00`); depois da nomeação, mostra o nome atual do Participante (`diarized-transcription` 26).
-- [ ] Participante renomeado aparece sem passo extra (nomes lidos na hora; `05-api.md`).
-- [ ] Resposta sem Participantes (404 ou lista vazia) não quebra a tela.
+- [x] Enquanto os speakers não têm nome, mostra o rótulo (`SPEAKER_00`); depois da nomeação, mostra o nome atual do Participante (`diarized-transcription` 26).
+- [x] Participante renomeado aparece sem passo extra (nomes lidos na hora; `05-api.md`).
+- [x] Resposta sem Participantes (404 ou lista vazia) não quebra a tela.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/diarized-transcription` (MSW). A rota real de Participantes só existe depois da Task 32.2; reconferir no checkpoint `participants`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/diarized-transcription` (MSW). A rota real de Participantes só existe depois da Task 32.2; reconferir no checkpoint `participants`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 27.2
 

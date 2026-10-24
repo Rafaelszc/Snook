@@ -14,3 +14,5 @@ $FF $VIDEO -c:v mpeg4 video_only.mp4
 # Saída sem seek: o muxer não grava a duração, como no webm do MediaRecorder.
 $FF $TONE -ac 1 -c:a libopus -b:a 16k -f webm pipe:1 > no_duration.webm
 printf 'isto e texto, nao audio\n' > text_as.mp3
+# Duas vozes sintéticas pt-BR para a suíte models_real (precisa de espeak-ng).
+python3 two_voices.py

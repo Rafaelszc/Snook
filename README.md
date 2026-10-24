@@ -20,6 +20,14 @@ Specs em `docs/specs/`. Regras para agentes em `AGENTS.md`.
 
 GPU: `COMPOSE_PROFILES=gpu` no `.env`. Rede confiável com HTTPS: `docs/specs/08-deployment.md`, "Perfil lan".
 
+## Modelos
+
+- Whisper `large-v3-turbo` e Pyannote `speaker-diarization-3.1`, em revisão fixa (hash de commit em `WHISPER_REVISION` e `PYANNOTE_REVISION`; SEC-22).
+- Aceitar no HuggingFace, com a conta do `HF_TOKEN`, os termos de `pyannote/speaker-diarization-3.1` e `pyannote/segmentation-3.0`.
+- Baixar antes (opcional; senão baixa na primeira transcrição): `docker compose exec backend python -m snook.cli download-models` (GPU: `backend-gpu`). Cache no volume `snook-models`; a segunda execução não baixa de novo.
+- Sem rede depois do download: `MODELS_OFFLINE=true` no `.env` e `docker compose up -d`.
+- Trocar `WHISPER_MODEL` pede trocar `WHISPER_REVISION` junto.
+
 ## Dados
 
 - Banco e modelos: volumes `snook-db` e `snook-models`. `docker compose down` mantém; `docker compose down -v` apaga.
@@ -43,3 +51,7 @@ Chave-mestra perdida ou trocada sem rotação: chaves ficam ilegíveis. Nada é 
 ## Desenvolvimento
 
 Comandos de teste e lint em `AGENTS.md`, "Comandos".
+
+- `uv sync` sem extra não instala torch, faster-whisper nem pyannote: testes padrão e CI usam engines falsas.
+- Suíte `models_real` (à mão, antes da release): `cd backend && uv sync --extra cpu && uv run pytest -m models_real`. Lê `HF_TOKEN` do `.env`; cache em `MODELS_REAL_ROOT` (padrão `~/.cache/snook/models`). Teste do pipeline pede `ffmpeg` no host.
+- Fixture de voz da suíte: `backend/tests/fixtures/audio/two_voices.py` (espeak-ng, vozes sintéticas).

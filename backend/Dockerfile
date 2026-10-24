@@ -1,5 +1,5 @@
 # Imagem CPU do backend. Bases fixadas por digest (SEC-21).
-# torch CPU, faster-whisper e pyannote entram quando forem dependências do projeto (Task 22+).
+# Extra `cpu`: torch do índice CPU, faster-whisper e pyannote (ADR-0014).
 FROM python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2 AS build
 
 COPY --from=ghcr.io/astral-sh/uv@sha256:538e0b39736e7feae937a65983e49d2ab75e1559d35041f9878b7b7e51de91e4 /uv /bin/uv
@@ -11,11 +11,11 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev --no-install-project
+RUN uv sync --frozen --no-dev --extra cpu --no-install-project
 COPY alembic.ini ./
 COPY alembic ./alembic
 COPY src ./src
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --extra cpu
 
 FROM python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2
 
