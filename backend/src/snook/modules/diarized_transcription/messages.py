@@ -11,3 +11,4 @@ MODELS_UNAVAILABLE = (
     "Modelos de transcrição ausentes no servidor: rode download-models ou desligue MODELS_OFFLINE."
 )
 ORIGINAL_UNAVAILABLE = "Arquivo original da reunião indisponível no servidor. Envie de novo."
+TRANSCRIPT_NOT_READY = "A transcrição ainda não está pronta."

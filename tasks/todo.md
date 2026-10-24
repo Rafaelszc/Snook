@@ -1695,13 +1695,13 @@
 **Description:** Rota da Transcrição, com segmentos em ordem.
 
 **Acceptance criteria:**
-- [ ] Em `transcribed` ou posterior, devolve os segmentos em ordem com `speaker_label`, `start_seconds`, `end_seconds`, `text` (`diarized-transcription` 18).
-- [ ] Em `pending`, `processing` ou `failed` etapa `transcription` responde 409 `transcript_not_ready` (`diarized-transcription` 19).
-- [ ] Reunião de outro Usuário responde 404; sem sessão, 401 (`diarized-transcription` 20; SEC-02).
+- [x] Em `transcribed` ou posterior, devolve os segmentos em ordem com `speaker_label`, `start_seconds`, `end_seconds`, `text` (`diarized-transcription` 18).
+- [x] Em `pending`, `processing` ou `failed` etapa `transcription` responde 409 `transcript_not_ready` (`diarized-transcription` 19).
+- [x] Reunião de outro Usuário responde 404; sem sessão, 401 (`diarized-transcription` 20; SEC-02).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_api_transcript.py -q`.
-- [ ] Gate backend. SEC-02.
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_api_transcript.py -q`.
+- [x] Gate backend. SEC-02.
 
 **Dependencies:** Tasks 24, 19.1
 
