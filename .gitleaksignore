@@ -4,3 +4,6 @@
 811986c2972ec22e2dbba47eb6685b530d154c6b:backend/tests/llm_providers/test_storage.py:generic-api-key:18
 # Commit d1b613b (Task 17): chave falsa do teste do formulário antes da convenção `TesteChave`.
 d1b613b4c8f7aca2263d8a249c92e1831d15ed5f:frontend/src/features/llm-providers/ProviderForm.test.tsx:generic-api-key:49
+# Commit fae3128 (Task 26): token HF falso dos testes antes da convenção `TesteToken`.
+fae3128af249d5b2f1818a3394508814f24596f9:backend/tests/cli/test_download_models.py:generic-api-key:13
+fae3128af249d5b2f1818a3394508814f24596f9:backend/tests/diarized_transcription/test_pyannote_settings.py:generic-api-key:36
