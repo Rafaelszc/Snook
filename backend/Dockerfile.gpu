@@ -1,5 +1,5 @@
 # Imagem GPU do backend (base CUDA). Bases fixadas por digest (SEC-21).
-# torch CUDA, faster-whisper e pyannote entram quando forem dependências do projeto (Task 22+).
+# Extra `gpu`: torch CUDA 12.6 (mesma da base), faster-whisper e pyannote (ADR-0014).
 FROM docker.io/nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04@sha256:8aef630a54bc5c5146ae5ce68e6af5caa3df0fb690bb91544175c91f307e4356
 
 COPY --from=ghcr.io/astral-sh/uv@sha256:538e0b39736e7feae937a65983e49d2ab75e1559d35041f9878b7b7e51de91e4 /uv /bin/uv
@@ -28,11 +28,11 @@ WORKDIR /app
 COPY --chown=1000:1000 pyproject.toml uv.lock ./
 RUN mkdir /opt/venv && chown 1000:1000 /opt/venv
 USER 1000:1000
-RUN uv sync --frozen --no-dev --no-install-project
+RUN uv sync --frozen --no-dev --extra gpu --no-install-project
 COPY --chown=1000:1000 alembic.ini ./
 COPY --chown=1000:1000 alembic ./alembic
 COPY --chown=1000:1000 src ./src
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --extra gpu
 
 EXPOSE 8000
 # 1 worker: pipeline em processo e trava /data/snook.lock (ADR-0006, ADR-0007).

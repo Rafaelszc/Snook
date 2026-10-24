@@ -16,7 +16,8 @@ from snook.modules.diarized_transcription import messages
 from snook.modules.diarized_transcription.dispatcher import TranscriptionDispatcher, process_pool
 from snook.modules.diarized_transcription.engines.base import EngineFailure
 from snook.modules.diarized_transcription.engines.fakes import CHUNKS, FakeEngines, fake_engines
-from snook.modules.diarized_transcription.pipeline import Job, default_engines, run_job
+from snook.modules.diarized_transcription.pipeline import Job, run_job
+from snook.modules.diarized_transcription.service import build_engines
 from snook.modules.meetings.media_probe import ProbeResult
 from tests.auth.helpers import rows
 from tests.diarized_transcription.conftest import install, wait_for
@@ -348,7 +349,7 @@ def test_segments_end_within_audio_duration(
     assert segments(settings.database_path, meeting_id)[-1][3] == 7.0
 
 
-def test_job_runs_in_spawned_process(tmp_path: Path) -> None:
+def test_job_runs_in_spawned_process(tmp_path: Path, settings: Settings) -> None:
     """ADR-0007: trabalho e engines atravessam o `ProcessPoolExecutor` (`spawn`)."""
     job = Job(
         original_path=tmp_path / "original.mp3",
@@ -358,7 +359,7 @@ def test_job_runs_in_spawned_process(tmp_path: Path) -> None:
     )
     pool = process_pool(1)
     try:
-        future = pool.submit(run_job, default_engines(), job)
+        future = pool.submit(run_job, build_engines(settings), job)
         with pytest.raises(EngineFailure) as caught:
             future.result(timeout=60)
     finally:

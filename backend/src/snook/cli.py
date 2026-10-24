@@ -15,6 +15,8 @@ from snook.core.logging import setup_logging
 from snook.core.runlock import RunLock, RunLockError
 from snook.core.settings import Settings, SettingsError, load_settings
 from snook.core.uow import UnitOfWork
+from snook.modules.diarized_transcription import service as transcription_service
+from snook.modules.diarized_transcription.engines.base import EngineFailure
 from snook.modules.llm_providers import service as llm_service
 from snook.modules.llm_providers.crypto import KeyCipher, decode_master_key
 
@@ -52,6 +54,18 @@ def _rotate_master_key(settings: Settings) -> None:
     print(f"Backup anterior à rotação: {backup}. Apague-o depois de conferir.")
 
 
+def _download_models(settings: Settings) -> None:
+    """Não escreve no banco: roda com o backend no ar, sem a trava."""
+    if settings.models_offline:
+        raise CommandError("MODELS_OFFLINE=true: desligue para baixar os modelos.")
+    try:
+        transcription_service.download_models(settings)
+    except EngineFailure as failure:
+        raise CommandError(failure.message) from None
+    logger.info("operator.models_downloaded")
+    print(f"Modelos prontos em {settings.models_root}.")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m snook.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -60,12 +74,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="recifra as chaves de LLM com SNOOK_MASTER_KEY; lê a anterior de "
         "SNOOK_MASTER_KEY_PREVIOUS",
     )
+    commands.add_parser(
+        "download-models",
+        help="baixa Whisper e Pyannote (revisão fixa) para MODELS_ROOT; usa HF_TOKEN",
+    )
     args = parser.parse_args(argv)
     try:
         settings = load_settings()
         setup_logging(settings)
         if args.command == "rotate-master-key":
             _rotate_master_key(settings)
+        elif args.command == "download-models":
+            _download_models(settings)
     except (SettingsError, RunLockError, CommandError) as exc:
         print(f"erro: {exc}", file=sys.stderr)
         return 1

@@ -46,6 +46,22 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     yield
 
 
+_HUB_ENV = (
+    "HF_HOME",
+    "HF_HUB_CACHE",
+    "HF_HUB_OFFLINE",
+    "HF_HUB_DISABLE_TELEMETRY",
+    "PYANNOTE_CACHE",
+)
+
+
+@pytest.fixture
+def hub_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`hub.configure` escreve no ambiente; o monkeypatch devolve o valor original no fim."""
+    for name in _HUB_ENV:
+        monkeypatch.delenv(name, raising=False)
+
+
 @pytest.fixture
 def settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Settings:
     monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)

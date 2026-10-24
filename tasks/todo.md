@@ -1608,14 +1608,14 @@
 **Description:** `engines/whisper.py` com `large-v3-turbo` int8, idioma `pt`, revisão fixa e modelos em `/models`.
 
 **Acceptance criteria:**
-- [ ] Transcreve sempre em `pt`, sem detecção automática (`diarized-transcription` 8).
-- [ ] O modelo vem do repositório oficial e da revisão fixa de `WHISPER_REVISION`; sem revisão configurada, o settings falha (SEC-22).
-- [ ] Com `MODELS_OFFLINE=true`, não faz acesso à rede (transversal 14).
+- [x] Transcreve sempre em `pt`, sem detecção automática (`diarized-transcription` 8).
+- [x] O modelo vem do repositório oficial e da revisão fixa de `WHISPER_REVISION`; sem revisão configurada, o settings falha (SEC-22).
+- [x] Com `MODELS_OFFLINE=true`, não faz acesso à rede (transversal 14).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_whisper_settings.py -q` (settings e fábrica; sem modelo).
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_whisper_settings.py -q` (settings e fábrica; sem modelo).
 - [ ] Suíte `models_real` com áudio curto: `cd backend && uv run pytest -m models_real tests/models_real/test_whisper.py` (manual).
-- [ ] Gate backend. SEC-22.
+- [x] Gate backend. SEC-22.
 
 **Dependencies:** Task 23.2, Task 1
 
@@ -1630,14 +1630,14 @@
 **Description:** `engines/pyannote.py` com `pyannote/speaker-diarization-3.1`, revisão fixa, `expected_speakers` como dica e mensagens de `HF_TOKEN`.
 
 **Acceptance criteria:**
-- [ ] Recebe `expected_speakers` quando informado e roda sem número fixo quando ausente (`diarized-transcription` 7).
-- [ ] `HF_TOKEN` ausente, inválido ou sem aceite dos termos vira falha com mensagem que cita `HF_TOKEN` e o aceite, sem o valor (`diarized-transcription` 15; SEC-20).
-- [ ] Revisão fixa obrigatória em settings (SEC-22); `HF_TOKEN` nunca vai a log.
+- [x] Recebe `expected_speakers` quando informado e roda sem número fixo quando ausente (`diarized-transcription` 7).
+- [x] `HF_TOKEN` ausente, inválido ou sem aceite dos termos vira falha com mensagem que cita `HF_TOKEN` e o aceite, sem o valor (`diarized-transcription` 15; SEC-20).
+- [x] Revisão fixa obrigatória em settings (SEC-22); `HF_TOKEN` nunca vai a log.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/diarized_transcription/test_pyannote_settings.py -q`.
+- [x] `cd backend && uv run pytest tests/diarized_transcription/test_pyannote_settings.py -q`.
 - [ ] Manual: `cd backend && uv run pytest -m models_real tests/models_real/test_pyannote.py`.
-- [ ] Gate backend. SEC-20, SEC-22.
+- [x] Gate backend. SEC-20, SEC-22.
 
 **Dependencies:** Task 26.1
 
@@ -1652,14 +1652,14 @@
 **Description:** Comando `python -m snook.cli download-models`, cache em `/models` (volume `snook-models`) e transcrição em `ProcessPoolExecutor` com `spawn` (ADR-0007, ADR-0014).
 
 **Acceptance criteria:**
-- [ ] O download usa repositório e revisão fixos; modelos ficam em `/models` e a segunda execução não baixa de novo (`diarized-transcription` 23; SEC-22).
-- [ ] O subprocesso recebe só caminho de arquivo e parâmetros e não toca o banco (`03-security.md`, fronteira 3).
-- [ ] Durante o processamento, nenhuma chamada de rede envia áudio para fora do servidor (`diarized-transcription` 21; RT-06).
+- [x] O download usa repositório e revisão fixos; modelos ficam em `/models` e a segunda execução não baixa de novo (`diarized-transcription` 23; SEC-22).
+- [x] O subprocesso recebe só caminho de arquivo e parâmetros e não toca o banco (`03-security.md`, fronteira 3).
+- [x] Durante o processamento, nenhuma chamada de rede envia áudio para fora do servidor (`diarized-transcription` 21; RT-06).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/cli/test_download_models.py tests/diarized_transcription/test_subprocess_boundary.py -q` (fakes).
+- [x] `cd backend && uv run pytest tests/cli/test_download_models.py tests/diarized_transcription/test_subprocess_boundary.py -q` (fakes).
 - [ ] Manual: `docker compose exec backend python -m snook.cli download-models`; `docker compose down` sem `-v`, `up`, e a segunda execução não baixa (critério 23).
-- [ ] Gate backend. SEC-22.
+- [x] Gate backend. SEC-22.
 
 **Dependencies:** Tasks 26.2, 6.3
 
@@ -1676,7 +1676,7 @@
 **Acceptance criteria:**
 - [ ] Sem o perfil GPU, o processamento roda em CPU; com o perfil na máquina NVIDIA, roda na GPU; a forma da Transcrição é a mesma (`diarized-transcription` 24, manual).
 - [ ] Com os modelos em cache e a rede do container bloqueada, a Reunião chega a `transcribed` (`diarized-transcription` 22, manual; transversal 14).
-- [ ] `uv run pytest` padrão não coleta `models_real` (transversal 18).
+- [x] `uv run pytest` padrão não coleta `models_real` (transversal 18).
 
 **Verification:**
 - [ ] `cd backend && uv run pytest` (sem `models_real`); `cd backend && uv run pytest -m models_real` (manual, com modelos).

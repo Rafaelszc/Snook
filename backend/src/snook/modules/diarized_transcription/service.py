@@ -13,13 +13,57 @@ from snook.modules.diarized_transcription.dispatcher import (
 )
 from snook.modules.diarized_transcription.engines.audio import AudioClipError as AudioClipError
 from snook.modules.diarized_transcription.engines.audio import FfmpegAudio
+from snook.modules.diarized_transcription.engines.base import Engines
+from snook.modules.diarized_transcription.engines.hub import ModelSource
+from snook.modules.diarized_transcription.engines.pyannote import PyannoteDiarizer
+from snook.modules.diarized_transcription.engines.whisper import WhisperTranscriber, repo_for
 from snook.modules.diarized_transcription.merge import Segment, Speaker, speakers
-from snook.modules.diarized_transcription.pipeline import default_engines
+
+
+def build_transcriber(settings: Settings) -> WhisperTranscriber:
+    source = ModelSource(
+        repo_id=repo_for(settings.whisper_model),
+        revision=settings.whisper_revision,
+        models_root=settings.models_root,
+        offline=settings.models_offline,
+    )
+    return WhisperTranscriber(source=source, compute_type=settings.whisper_compute_type)
+
+
+def build_diarizer(settings: Settings) -> PyannoteDiarizer:
+    source = ModelSource(
+        repo_id=settings.pyannote_pipeline,
+        revision=settings.pyannote_revision,
+        models_root=settings.models_root,
+        offline=settings.models_offline,
+    )
+    return PyannoteDiarizer(source=source, token=settings.hf_token)
+
+
+def build_engines(settings: Settings) -> Engines:
+    """Engines reais. Atravessam o `spawn` por pickle: só parâmetros, sem banco nem modelo."""
+    return Engines(
+        audio=FfmpegAudio(),
+        diarizer=build_diarizer(settings),
+        transcriber=build_transcriber(settings),
+    )
+
+
+def download_models(
+    settings: Settings,
+    *,
+    transcriber: WhisperTranscriber | None = None,
+    diarizer: PyannoteDiarizer | None = None,
+) -> None:
+    """`download-models`: Whisper e Pyannote em revisão fixa no cache `/models` (ADR-0014).
+    O cache do HuggingFace não baixa de novo o que já tem. Falha: `EngineFailure`."""
+    (transcriber or build_transcriber(settings)).download()
+    (diarizer or build_diarizer(settings)).download()
 
 
 def build_dispatcher(settings: Settings, now: Callable[[], datetime]) -> TranscriptionDispatcher:
     return TranscriptionDispatcher(
-        engines=default_engines(),
+        engines=build_engines(settings),
         workers=settings.transcription_workers,
         max_per_user=settings.transcription_max_per_user,
         audio_root=settings.audio_root,

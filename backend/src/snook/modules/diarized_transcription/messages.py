@@ -7,5 +7,7 @@ HF_ACCESS_DENIED = (
 )
 NO_SPEECH = "nenhuma fala detectada"
 UNEXPECTED = "Falha inesperada na transcrição."
-ENGINES_UNAVAILABLE = "Motores de transcrição ainda não instalados no servidor."
+MODELS_UNAVAILABLE = (
+    "Modelos de transcrição ausentes no servidor: rode download-models ou desligue MODELS_OFFLINE."
+)
 ORIGINAL_UNAVAILABLE = "Arquivo original da reunião indisponível no servidor. Envie de novo."
