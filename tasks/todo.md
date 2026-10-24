@@ -1716,13 +1716,13 @@
 **Description:** Tela da Transcrição com `@tanstack/react-virtual`, instante `hh:mm:ss` em mono tabular e status antes de `transcribed`.
 
 **Acceptance criteria:**
-- [ ] Mostra segmentos em ordem, cada um com instante de início em `hh:mm:ss`, speaker e texto (`diarized-transcription` 25).
-- [ ] Antes de `transcribed`, mostra o status da Reunião em vez do texto (`diarized-transcription` 27).
-- [ ] Com Transcrição de 2 h de fixture, mantém no DOM só os segmentos perto da área visível; rolar até o fim mostra o último com instante, speaker e texto (`diarized-transcription` 31; NFR-07). Texto de segmento renderiza escapado (SEC-12).
+- [x] Mostra segmentos em ordem, cada um com instante de início em `hh:mm:ss`, speaker e texto (`diarized-transcription` 25).
+- [x] Antes de `transcribed`, mostra o status da Reunião em vez do texto (`diarized-transcription` 27).
+- [x] Com Transcrição de 2 h de fixture, mantém no DOM só os segmentos perto da área visível; rolar até o fim mostra o último com instante, speaker e texto (`diarized-transcription` 31; NFR-07). Texto de segmento renderiza escapado (SEC-12).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/diarized-transcription`.
-- [ ] Gate frontend. SEC-12.
+- [x] `cd frontend && npm test -- --run src/features/diarized-transcription`.
+- [x] Gate frontend. SEC-12.
 
 **Dependencies:** Tasks 27.1, 22.3
 

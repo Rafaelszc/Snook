@@ -10,6 +10,7 @@ export const STAGE_LABELS = {
 } as const
 
 export const MESSAGES = {
+  openTranscript: "Ver transcrição",
   listTitle: "Reuniões",
   listDescription: "Gravações enviadas e o andamento de cada uma.",
   newMeeting: "Nova reunião",
