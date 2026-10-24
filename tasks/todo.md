@@ -1776,13 +1776,13 @@
 **Description:** `DisplayCapture`, `MicCapture`, `Recorder`, `Clock` e `SecureContext` como interfaces com fakes (ADR-0015), mais checagem de `window.isSecureContext`, de `getDisplayMedia` e de `MediaRecorder` com webm.
 
 **Acceptance criteria:**
-- [ ] Fora de contexto seguro, o botão "Gravar reunião" fica desabilitado com mensagem que diz que a gravação exige HTTPS ou `localhost`, que o Operador pode ativar o perfil `lan` e que o envio de arquivo continua disponível; essa mensagem tem prioridade sobre a do critério 22 (`screen-recording` 27).
-- [ ] Em `http://localhost` e em `https://`, a checagem de contexto seguro não bloqueia (fake) (`screen-recording` 28).
-- [ ] Sem `getDisplayMedia` ou sem `MediaRecorder` com webm, o botão fica desabilitado com mensagem que indica Chrome ou Edge e lembra o envio de arquivo (`screen-recording` 22); em navegador com as APIs que não é Chrome nem Edge, avisa sem bloquear (`screen-recording` 23).
+- [x] Fora de contexto seguro, o botão "Gravar reunião" fica desabilitado com mensagem que diz que a gravação exige HTTPS ou `localhost`, que o Operador pode ativar o perfil `lan` e que o envio de arquivo continua disponível; essa mensagem tem prioridade sobre a do critério 22 (`screen-recording` 27).
+- [x] Em `http://localhost` e em `https://`, a checagem de contexto seguro não bloqueia (fake) (`screen-recording` 28).
+- [x] Sem `getDisplayMedia` ou sem `MediaRecorder` com webm, o botão fica desabilitado com mensagem que indica Chrome ou Edge e lembra o envio de arquivo (`screen-recording` 22); em navegador com as APIs que não é Chrome nem Edge, avisa sem bloquear (`screen-recording` 23).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 4.3, 22.1
 
@@ -1799,13 +1799,13 @@
 **Description:** Fluxo que pede a tela com áudio antes do microfone, e decide entre gravar, avisar ou recusar conforme as fontes.
 
 **Acceptance criteria:**
-- [ ] "Gravar reunião" pede compartilhamento de tela ou aba com áudio e acesso ao microfone (`screen-recording` 2); com as duas fontes, grava sem aviso (`screen-recording` 3, parte do fluxo).
-- [ ] Sem som da tela: aviso nomeia a fonte ausente com "Gravar só com o microfone" e "Cancelar"; sem microfone: aviso com "Gravar só com o som da tela" e "Cancelar"; nada é gravado antes da escolha (`screen-recording` 4, 5).
-- [ ] Sem nenhuma fonte: recusa com mensagem, não grava e não cria Reunião (`screen-recording` 6); cancelar encerra tela e microfone (`screen-recording` 7).
+- [x] "Gravar reunião" pede compartilhamento de tela ou aba com áudio e acesso ao microfone (`screen-recording` 2); com as duas fontes, grava sem aviso (`screen-recording` 3, parte do fluxo).
+- [x] Sem som da tela: aviso nomeia a fonte ausente com "Gravar só com o microfone" e "Cancelar"; sem microfone: aviso com "Gravar só com o som da tela" e "Cancelar"; nada é gravado antes da escolha (`screen-recording` 4, 5).
+- [x] Sem nenhuma fonte: recusa com mensagem, não grava e não cria Reunião (`screen-recording` 6); cancelar encerra tela e microfone (`screen-recording` 7).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 28.1
 
@@ -1822,14 +1822,14 @@
 **Description:** Mistura de som da tela e microfone pela Web Audio API numa trilha única, `audio/webm;codecs=opus` a 64 kbps, sem trilha de vídeo (ADR-0015).
 
 **Acceptance criteria:**
-- [ ] O arquivo final tem só trilha de áudio, sem vídeo, com os dois sons misturados numa trilha (`screen-recording` 3, 9).
-- [ ] A taxa de 64 kbps mantém 1h59m50s abaixo de 524.288.000 bytes (projeção em teste) (`screen-recording` 24).
+- [x] O arquivo final tem só trilha de áudio, sem vídeo, com os dois sons misturados numa trilha (`screen-recording` 3, 9).
+- [x] A taxa de 64 kbps mantém 1h59m50s abaixo de 524.288.000 bytes (projeção em teste) (`screen-recording` 24).
 - [ ] Em Chrome e Edge, compartilhar uma aba com áudio produz som da aba e microfone (`screen-recording` 21, checklist manual).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording` (fake de `AudioContext` e `Recorder`).
+- [x] `cd frontend && npm test -- --run src/features/screen-recording` (fake de `AudioContext` e `Recorder`).
 - [ ] Manual: gravar 1 min em Chrome e Edge e conferir `ffprobe` (uma trilha de áudio, nenhuma de vídeo).
-- [ ] Gate frontend.
+- [x] Gate frontend.
 
 **Dependencies:** Task 28.2
 
