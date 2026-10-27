@@ -23,17 +23,17 @@ export type MediaRecorderCtor = new (
   options: MediaRecorderOptions
 ) => MediaRecorderLike
 
-// Trechos de 1 s; o Blob final junta todos.
-export function createRecorder(
-  Ctor: MediaRecorderCtor = MediaRecorder
-): Recorder {
+// Trechos de 1 s; o Blob final junta todos. `MediaRecorder` só é lido ao gravar:
+// navegador sem a API ainda abre a página com o botão desabilitado (`screen-recording` 22).
+export function createRecorder(Ctor?: MediaRecorderCtor): Recorder {
   let media: MediaRecorderLike | null = null
   const chunks: Blob[] = []
 
   return {
     start(stream) {
       chunks.length = 0
-      media = new Ctor(stream, {
+      const Impl = Ctor ?? MediaRecorder
+      media = new Impl(stream, {
         mimeType: RECORDING_MIME,
         audioBitsPerSecond: AUDIO_BITS_PER_SECOND,
       })

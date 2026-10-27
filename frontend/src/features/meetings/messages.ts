@@ -14,6 +14,8 @@ export const MESSAGES = {
   listTitle: "Reuniões",
   listDescription: "Gravações enviadas e o andamento de cada uma.",
   newMeeting: "Nova reunião",
+  // Entrada da gravação (`screen-recording` 1); a tela mora em `screen-recording`.
+  recordMeeting: "Gravar reunião",
   empty: "Nenhuma reunião ainda.",
   emptyHint: "Envie a gravação de uma reunião para começar.",
   loading: "Carregando…",

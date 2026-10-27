@@ -48,6 +48,16 @@ it("lista vazia convida a enviar", async () => {
   )
 })
 
+it("oferece as duas entradas: enviar arquivo e gravar (screen-recording 1)", async () => {
+  listSequence([])
+  renderMeetings("/")
+  await screen.findByText("Nenhuma reunião ainda.")
+  expect(screen.getByRole("link", { name: "Gravar reunião" })).toHaveAttribute(
+    "href",
+    "/meetings/record"
+  )
+})
+
 it("atualiza o status sozinha enquanto há trabalho em andamento (meetings 40)", async () => {
   const calls = listSequence(
     [{ ...SUMMARY, status: "pending" }],

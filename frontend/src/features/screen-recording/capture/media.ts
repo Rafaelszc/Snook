@@ -1,4 +1,4 @@
-import type { DisplayCapture, MicCapture } from "./interfaces"
+import type { Clock, DisplayCapture, MicCapture } from "./interfaces"
 
 // Chrome exige `video` em `getDisplayMedia`; a trilha de vídeo nunca é gravada (`screen-recording` 9).
 export const browserDisplay: DisplayCapture = {
@@ -9,3 +9,5 @@ export const browserDisplay: DisplayCapture = {
 export const browserMic: MicCapture = {
   request: () => navigator.mediaDevices.getUserMedia({ audio: true }),
 }
+
+export const systemClock: Clock = { now: () => Date.now() }

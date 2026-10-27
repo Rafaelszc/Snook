@@ -26,15 +26,21 @@ export function fakeBrowserEnv({
   }
 }
 
+// `stop()` não dispara `ended`, como no navegador; `endTrack` simula o fim pela barra do navegador.
 function fakeTrack(kind: "audio" | "video"): MediaStreamTrack {
-  const track = {
+  const track = Object.assign(new EventTarget(), {
     kind,
     readyState: "live" as MediaStreamTrackState,
     stop() {
       track.readyState = "ended"
     },
-  }
+  })
   return track as unknown as MediaStreamTrack
+}
+
+export function endTrack(track: MediaStreamTrack) {
+  ;(track as { readyState: MediaStreamTrackState }).readyState = "ended"
+  track.dispatchEvent(new Event("ended"))
 }
 
 // jsdom não tem MediaStream. `video` simula a trilha de vídeo que `getDisplayMedia` sempre traz.

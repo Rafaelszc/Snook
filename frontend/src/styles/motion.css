@@ -42,6 +42,17 @@
   animation: motion-fade-in var(--motion-base) var(--motion-ease) both;
 }
 
+/* Pulso do indicador de gravação: laço lento, só opacidade. */
+@keyframes motion-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.motion-pulse {
+  animation: motion-pulse 1600ms var(--motion-ease) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .motion-fade,
   .motion-rise,
@@ -50,7 +61,8 @@
   }
 
   .motion-enter,
-  .motion-fade-in {
+  .motion-fade-in,
+  .motion-pulse {
     animation: none;
   }
 }

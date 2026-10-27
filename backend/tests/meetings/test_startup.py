@@ -24,6 +24,8 @@ from tests.meetings.helpers import URL, FakeProbe, set_fields, upload
 
 INTERRUPTED = "processamento interrompido"
 CONFIRMED_AT = "2026-10-23T12:00:00Z"
+# Relógio fixo em toda app do arquivo: a sessão do `_seed` expiraria pelo relógio real.
+NOW = datetime(2026, 10, 23, 12, 0, tzinfo=UTC)
 
 
 @contextmanager
@@ -32,7 +34,7 @@ def _running(settings: Settings, received: list[Event] | None = None) -> Iterato
     app: FastAPI = create_app(settings)
     app.state.transcription = InertTranscription()
     app.state.media_probe = FakeProbe()
-    app.state.clock = FakeClock(datetime(2026, 10, 23, 12, 0, tzinfo=UTC))
+    app.state.clock = FakeClock(NOW)
     if received is not None:
         for kind in (MeetingCreated, RetryRequested, ParticipantsConfirmed, PartsReady):
             app.state.event_bus.subscribe(kind, received.append)
@@ -108,6 +110,7 @@ def test_marking_ends_before_requests_and_emits_nothing(settings: Settings) -> N
 
     app: FastAPI = create_app(settings)
     app.state.transcription = InertTranscription()
+    app.state.clock = FakeClock(NOW)
     app.state.event_bus.subscribe(MeetingCreated, watch)
     for kind in (MeetingCreated, RetryRequested, ParticipantsConfirmed, PartsReady):
         app.state.event_bus.subscribe(kind, received.append)
