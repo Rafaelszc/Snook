@@ -4,7 +4,10 @@ FROM node:24-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec
 
 WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json frontend/.npmrc ./
-RUN npm ci --ignore-scripts
+# npm ignora falha em dependência opcional: sem o binding musl do rolldown, a camada
+# ficaria no cache quebrada. O import falha o passo e nada é guardado.
+RUN npm ci --ignore-scripts \
+    && node --input-type=module -e "await import('rolldown')"
 COPY frontend/ ./
 # Manifesto do Vite serve só ao check de bundle no CI; não vai para o nginx.
 RUN npm run build && rm -rf dist/.vite
