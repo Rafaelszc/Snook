@@ -1846,13 +1846,13 @@
 **Description:** Tela de gravação com cronômetro (mono tabular), "Parar", parada em 1h59m50s, fim do compartilhamento pelo navegador e confirmação ao sair.
 
 **Acceptance criteria:**
-- [ ] Mostra o tempo decorrido e o botão "Parar"; ao parar, encerra tela e microfone (`screen-recording` 8, 13).
-- [ ] Aos 1h59m50s (relógio falso) a gravação para sozinha e segue para o envio com aviso de limite; o arquivo tem no máximo 1h59m50s (`screen-recording` 10).
-- [ ] Encerrar o compartilhamento pela barra do navegador equivale a "Parar" (`screen-recording` 11); sair ou fechar a página durante a gravação ou antes do envio pede confirmação (`screen-recording` 12).
+- [x] Mostra o tempo decorrido e o botão "Parar"; ao parar, encerra tela e microfone (`screen-recording` 8, 13).
+- [x] Aos 1h59m50s (relógio falso) a gravação para sozinha e segue para o envio com aviso de limite; o arquivo tem no máximo 1h59m50s (`screen-recording` 10).
+- [x] Encerrar o compartilhamento pela barra do navegador equivale a "Parar" (`screen-recording` 11); sair ou fechar a página durante a gravação ou antes do envio pede confirmação (`screen-recording` 12).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 28.3
 
@@ -1869,13 +1869,13 @@
 **Description:** Nome `gravacao-AAAA-MM-DD-HHhMM.webm` (hora local do início), campo de título, `expected_speakers`, envio por `POST /meetings` e "Tentar de novo".
 
 **Acceptance criteria:**
-- [ ] O nome do arquivo segue o padrão com data e hora locais do início; o título vem preenchido e editável; há campo opcional de participantes com a validação do upload (`screen-recording` 14, 15, 16).
-- [ ] O envio cria a Reunião com o título da tela e leva ao detalhe; a Reunião aparece como `pending` (`screen-recording` 17, 20); recusa do servidor aparece com a mensagem da API (`screen-recording` 18).
-- [ ] Em falha de rede, mostra o erro e "Tentar de novo", que reenvia a mesma gravação sem gravar de novo enquanto a página está aberta (`screen-recording` 19).
+- [x] O nome do arquivo segue o padrão com data e hora locais do início; o título vem preenchido e editável; há campo opcional de participantes com a validação do upload (`screen-recording` 14, 15, 16).
+- [x] O envio cria a Reunião com o título da tela e leva ao detalhe; a Reunião aparece como `pending` (`screen-recording` 17, 20); recusa do servidor aparece com a mensagem da API (`screen-recording` 18).
+- [x] Em falha de rede, mostra o erro e "Tentar de novo", que reenvia a mesma gravação sem gravar de novo enquanto a página está aberta (`screen-recording` 19).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording` (MSW).
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/screen-recording` (MSW).
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 29.1, 18.4
 
@@ -1892,13 +1892,13 @@
 **Description:** Painel flutuante de vidro, indicador com pulso (fixo com movimento reduzido), opção "Gravar reunião" ao lado de "enviar arquivo" e `ConsentNotice` reaproveitado.
 
 **Acceptance criteria:**
-- [ ] A área autenticada oferece duas entradas: enviar arquivo e "Gravar reunião" (`screen-recording` 1).
-- [ ] O aviso mostra exatamente `CONSENT_NOTICE_TEXT`, do mesmo `ConsentNotice` da Task 22.1, junto do botão "Gravar reunião", sem pedir confirmação nem bloquear (`screen-recording` 26; teste compara com a constante).
-- [ ] O pulso para com `prefers-reduced-motion`; o painel usa `GlassPanel` com fallback opaco e conta no máximo 3 vidros por tela (NFR-06).
+- [x] A área autenticada oferece duas entradas: enviar arquivo e "Gravar reunião" (`screen-recording` 1).
+- [x] O aviso mostra exatamente `CONSENT_NOTICE_TEXT`, do mesmo `ConsentNotice` da Task 22.1, junto do botão "Gravar reunião", sem pedir confirmação nem bloquear (`screen-recording` 26; teste compara com a constante).
+- [x] O pulso para com `prefers-reduced-motion`; o painel usa `GlassPanel` com fallback opaco e conta no máximo 3 vidros por tela (NFR-06).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 29.2, 5.2, 22.1
 
