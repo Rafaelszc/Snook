@@ -31,7 +31,7 @@ def test_file_without_audio_track(name: str) -> None:
 @requires_ffprobe
 def test_webm_without_header_duration_uses_last_packet() -> None:
     """ADR-0014, Q61: sem `format.duration`, lê o fim do último pacote de áudio."""
-    path = FIXTURES / "no_duration.webm"
+    path = FIXTURES / "recorder.webm"
     header = subprocess.run(  # noqa: S603
         ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)],  # noqa: S607
         capture_output=True,
@@ -40,7 +40,7 @@ def test_webm_without_header_duration_uses_last_packet() -> None:
     assert header.stdout.strip() == b"N/A"
     result = FfprobeProbe().probe(path)
     assert result.has_audio
-    assert result.duration_seconds == pytest.approx(1.0, abs=1.0)
+    assert result.duration_seconds == pytest.approx(3.0, abs=1.0)
 
 
 @requires_ffprobe

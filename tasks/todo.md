@@ -1915,13 +1915,13 @@
 **Description:** Fixture webm só de áudio, sem duração no cabeçalho, no formato produzido pela gravação (`audio/webm;codecs=opus`).
 
 **Acceptance criteria:**
-- [ ] A fixture é gerada a partir do gravador real (Chrome ou Edge) ou reproduz seu muxing, e `ffprobe` não acha `format.duration` no cabeçalho (`screen-recording` 25; Q61).
-- [ ] A fixture tem uma só trilha de áudio, nenhuma de vídeo, e é curta (poucos segundos), sem voz de terceiros nem dado pessoal.
-- [ ] Um script documentado registra como regenerá-la.
+- [x] A fixture é gerada a partir do gravador real (Chrome ou Edge) ou reproduz seu muxing, e `ffprobe` não acha `format.duration` no cabeçalho (`screen-recording` 25; Q61).
+- [x] A fixture tem uma só trilha de áudio, nenhuma de vídeo, e é curta (poucos segundos), sem voz de terceiros nem dado pessoal.
+- [x] Um script documentado registra como regenerá-la.
 
 **Verification:**
-- [ ] `ffprobe -v error -show_entries format=duration -of csv=p=0 backend/tests/fixtures/audio/recorder.webm` não imprime duração (ou imprime `N/A`).
-- [ ] `cd backend && uv run pytest tests/meetings/test_fixture_recorder_webm.py -q`.
+- [x] `ffprobe -v error -show_entries format=duration -of csv=p=0 backend/tests/fixtures/audio/recorder.webm` não imprime duração (ou imprime `N/A`).
+- [x] `cd backend && uv run pytest tests/meetings/test_fixture_recorder_webm.py -q`.
 
 **Dependencies:** Task 18.1
 
@@ -1935,13 +1935,13 @@
 **Description:** `media_probe.py` lê a duração pelo último pacote quando o webm não traz duração no cabeçalho.
 
 **Acceptance criteria:**
-- [ ] `POST /meetings` aceita o webm da fixture e `duration_seconds` recebe a duração real, com erro máximo de 1 s (`meetings` 47; `screen-recording` 25).
-- [ ] Um webm desse tipo com mais de 2 h é recusado como no critério 11, sem arquivo grande (leitura de duração atrás de interface) (`meetings` 48).
-- [ ] O comando de leitura segue sem shell e com caminho do servidor (SEC-11).
+- [x] `POST /meetings` aceita o webm da fixture e `duration_seconds` recebe a duração real, com erro máximo de 1 s (`meetings` 47; `screen-recording` 25).
+- [x] Um webm desse tipo com mais de 2 h é recusado como no critério 11, sem arquivo grande (leitura de duração atrás de interface) (`meetings` 48).
+- [x] O comando de leitura segue sem shell e com caminho do servidor (SEC-11).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/meetings/test_api_upload_webm.py -q`.
-- [ ] Gate backend. SEC-11, SEC-16.
+- [x] `cd backend && uv run pytest tests/meetings/test_api_upload_webm.py -q`.
+- [x] Gate backend. SEC-11, SEC-16.
 
 **Dependencies:** Tasks 30.1, 18.4
 
