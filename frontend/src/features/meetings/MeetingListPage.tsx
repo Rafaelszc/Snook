@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react"
+import { Mic, Plus } from "lucide-react"
 import { Link } from "react-router"
 
 import { StatusBadge } from "@/components/surfaces/StatusBadge"
@@ -83,12 +83,20 @@ export function MeetingListPage() {
             {MESSAGES.listDescription}
           </p>
         </div>
-        <Button asChild>
-          <Link to="/meetings/new">
-            <Plus aria-hidden="true" />
-            {MESSAGES.newMeeting}
-          </Link>
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button variant="outline" asChild>
+            <Link to="/meetings/record">
+              <Mic aria-hidden="true" />
+              {MESSAGES.recordMeeting}
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link to="/meetings/new">
+              <Plus aria-hidden="true" />
+              {MESSAGES.newMeeting}
+            </Link>
+          </Button>
+        </div>
       </header>
       <Body />
     </div>

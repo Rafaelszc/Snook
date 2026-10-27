@@ -1,4 +1,13 @@
 export const MESSAGES = {
+  // `screen-recording` 1, 2, 26.
+  record: "Gravar reunião",
+  recordTitle: "Gravar reunião",
+  recordDescription:
+    "Grava o som da aba da chamada e o seu microfone. Só o áudio fica guardado.",
+  recordHowTo:
+    "Ao começar, escolha a aba da reunião e marque o compartilhamento de áudio. Depois permita o microfone.",
+  keepOpen: "Mantenha esta página aberta até enviar a gravação.",
+  uploadInstead: "Enviar arquivo",
   // `screen-recording` 27; vence `unsupported`.
   insecure:
     "A gravação exige HTTPS ou localhost. O Operador pode ativar o perfil lan. O envio de arquivo continua disponível.",

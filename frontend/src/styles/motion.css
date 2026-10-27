@@ -50,7 +50,7 @@
 }
 
 .motion-pulse {
-  animation: motion-pulse 1600ms ease-in-out infinite;
+  animation: motion-pulse 1600ms var(--motion-ease) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

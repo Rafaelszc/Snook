@@ -15,7 +15,7 @@ export interface Recording {
 export type RecordingState =
   | { kind: "idle" }
   | { kind: "recording"; startedAt: number }
-  | { kind: "stopping" }
+  | { kind: "stopping"; startedAt: number }
   | { kind: "stopped"; recording: Recording }
   | { kind: "failed"; message: string }
 
@@ -42,7 +42,7 @@ export function useRecording({
       const current = active.current
       if (!current) return
       active.current = null
-      setState({ kind: "stopping" })
+      setState({ kind: "stopping", startedAt: current.startedAt })
       const blob = await recorder.stop()
       current.release()
       setState({

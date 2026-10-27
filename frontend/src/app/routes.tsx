@@ -7,6 +7,7 @@ import { SettingsPage } from "@/features/llm-providers/SettingsPage"
 import { MeetingDetailPage } from "@/features/meetings/MeetingDetailPage"
 import { MeetingListPage } from "@/features/meetings/MeetingListPage"
 import { UploadPage } from "@/features/meetings/UploadPage"
+import { RecordPage } from "@/features/screen-recording/RecordPage"
 
 import { AuthGuard } from "./AuthGuard"
 import { Layout } from "./Layout"
@@ -28,6 +29,7 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <MeetingListPage /> },
           { path: "meetings/new", element: <UploadPage /> },
+          { path: "meetings/record", element: <RecordPage /> },
           { path: "meetings/:id", element: <MeetingDetailPage /> },
           { path: "meetings/:id/transcript", element: <TranscriptPage /> },
           ...(import.meta.env.DEV

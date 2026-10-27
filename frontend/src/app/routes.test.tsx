@@ -108,3 +108,15 @@ it("o aviso de consentimento aparece no upload", async () => {
     CONSENT_NOTICE_TEXT
   )
 })
+
+// jsdom não tem MediaRecorder nem getDisplayMedia: a tela abre com o botão desabilitado.
+it("abre a gravação pela rota, sem quebrar em navegador sem as APIs (screen-recording 22)", async () => {
+  signedIn()
+  renderAt("/meetings/record")
+  expect(
+    await screen.findByRole("button", { name: "Gravar reunião" })
+  ).toBeDisabled()
+  expect(screen.getByTestId("consent-notice")).toHaveTextContent(
+    CONSENT_NOTICE_TEXT
+  )
+})
