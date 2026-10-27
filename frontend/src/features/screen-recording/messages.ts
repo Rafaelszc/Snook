@@ -19,4 +19,16 @@ export const MESSAGES = {
   cancel: "Cancelar",
   noSource:
     "Nenhuma fonte de áudio disponível. Compartilhe uma aba ou tela com áudio, ou permita o microfone.",
+  recordFailed:
+    "Não foi possível iniciar a gravação. Tente de novo ou envie um arquivo.",
+  // `screen-recording` 8, 10 a 12.
+  panel: "Gravação em andamento",
+  recording: "Gravando",
+  elapsed: "Tempo decorrido",
+  stop: "Parar",
+  stopping: "Parando…",
+  limitReached:
+    "A gravação parou sozinha em 1h59m50s, o limite. Envie o que foi gravado.",
+  leaveConfirm:
+    "A gravação ainda não foi enviada e será perdida. Sair mesmo assim?",
 } as const

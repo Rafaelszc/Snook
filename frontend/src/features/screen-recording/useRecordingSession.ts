@@ -17,7 +17,7 @@ export type SessionState =
   | { kind: "refused"; message: string }
   | { kind: "ready"; sources: Sources }
 
-function stopAll(...streams: (MediaStream | null | undefined)[]) {
+export function stopAll(...streams: (MediaStream | null | undefined)[]) {
   for (const stream of streams) {
     for (const track of stream?.getTracks() ?? []) track.stop()
   }
