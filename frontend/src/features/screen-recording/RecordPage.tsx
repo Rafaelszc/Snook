@@ -107,7 +107,9 @@ export function RecordPage({ deps = {} }: { deps?: Partial<RecordDeps> }) {
             {support.message}
           </p>
         ) : support.warning ? (
-          <p className="text-sm text-muted-foreground">{support.warning}</p>
+          <p id={supportId} className="text-sm text-muted-foreground">
+            {support.warning}
+          </p>
         ) : null}
         {refusal ? (
           <p
@@ -125,7 +127,9 @@ export function RecordPage({ deps = {} }: { deps?: Partial<RecordDeps> }) {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button
               disabled={busy}
-              aria-describedby={support.blocked ? supportId : undefined}
+              aria-describedby={
+                support.blocked || support.warning ? supportId : undefined
+              }
               onClick={() => void session.start()}
             >
               <Mic aria-hidden="true" />

@@ -11,7 +11,7 @@ import { useSendRecording } from "./useSendRecording"
 
 function formatBytes(bytes: number): string {
   const mb = bytes / 1024 / 1024
-  return `${mb.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} MB`
+  return `${mb.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}\u00a0MB`
 }
 
 // Envio da gravação parada; o arquivo fica na memória para "Tentar de novo" (`screen-recording` 14 a 20).
