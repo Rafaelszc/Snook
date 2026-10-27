@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
-import { ApiError, parseApiError } from "@/lib/api/errors"
+import type { ApiError } from "@/lib/api/errors"
+import { postForm } from "@/lib/api/upload"
 
 import { meetingsQueryKey, type MeetingSummary } from "./api"
 
@@ -11,7 +12,6 @@ export interface UploadInput {
   expectedSpeakers: string
 }
 
-// fetch não informa progresso de envio; XHR sim (`meetings` 35). Cookie vai por mesma origem.
 function send(
   { file, title, expectedSpeakers }: UploadInput,
   onProgress: (fraction: number) => void
@@ -21,28 +21,7 @@ function send(
   if (title.trim()) form.append("title", title.trim())
   if (expectedSpeakers.trim())
     form.append("expected_speakers", expectedSpeakers.trim())
-
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest()
-    xhr.open("POST", "/api/meetings")
-    xhr.setRequestHeader("Accept", "application/json")
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable && e.total > 0) onProgress(e.loaded / e.total)
-    }
-    xhr.onload = () => {
-      const response = new Response(xhr.responseText || null, {
-        status: xhr.status,
-      })
-      if (xhr.status === 201) {
-        resolve(JSON.parse(xhr.responseText) as MeetingSummary)
-        return
-      }
-      parseApiError(response).then(reject, reject)
-    }
-    xhr.onerror = () =>
-      reject(new ApiError(0, "network_error", "Sem conexão com o servidor."))
-    xhr.send(form)
-  })
+  return postForm<MeetingSummary>("/meetings", form, onProgress)
 }
 
 export function useUpload() {

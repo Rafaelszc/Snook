@@ -31,4 +31,18 @@ export const MESSAGES = {
     "A gravação parou sozinha em 1h59m50s, o limite. Envie o que foi gravado.",
   leaveConfirm:
     "A gravação ainda não foi enviada e será perdida. Sair mesmo assim?",
+  // `screen-recording` 14 a 20; rótulos iguais aos do upload.
+  sendTitle: "Enviar gravação",
+  sendDescription:
+    "Confira o título e envie. A transcrição roda neste servidor, em português.",
+  title: "Título",
+  titleHint: "Preenchido com o nome do arquivo. Pode mudar.",
+  speakers: "Número de participantes",
+  speakersHint: "Opcional, de 1 a 20. Ajuda a separar as vozes.",
+  send: "Enviar",
+  sending: "Enviando…",
+  progress: "Progresso do envio",
+  networkError:
+    "Sem conexão com o servidor. A gravação continua nesta página: tente de novo.",
+  retry: "Tentar de novo",
 } as const
