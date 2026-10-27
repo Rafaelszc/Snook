@@ -1954,12 +1954,12 @@
 ### Checkpoint: `screen-recording`
 
 - [ ] Critérios de `01-prd/screen-recording.md` cobertos por Vitest; checklist manual em Chrome e Edge no Windows e no Fedora
-- [ ] Critério 26: mesmo `ConsentNotice` e mesmo texto do `meetings` critério 52
+- [x] Critério 26: mesmo `ConsentNotice` e mesmo texto do `meetings` critério 52
 - [ ] Critérios 27 e 28: botão desabilitado fora de contexto seguro (Vitest); gravação em `https://` do perfil `lan` (checklist manual)
 - [ ] Critério transversal 22 (checagem manual): gravação de tela funciona num cliente da rede que confia na CA local, pelo perfil `lan` (`08-deployment.md`, "Perfil lan")
-- [ ] Critérios 47 e 48 de `meetings` passam
-- [ ] Checagem de UI (painel de vidro e indicador com movimento reduzido); `impeccable-design-polish` nas telas de gravação
-- [ ] `/security-review` sobre o diff
+- [x] Critérios 47 e 48 de `meetings` passam
+- [x] Checagem de UI (painel de vidro e indicador com movimento reduzido); `impeccable-design-polish` nas telas de gravação
+- [x] `/security-review` sobre o diff
 - [ ] Revisão humana antes de seguir
 
 ---

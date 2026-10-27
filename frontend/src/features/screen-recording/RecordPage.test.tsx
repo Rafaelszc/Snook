@@ -102,7 +102,7 @@ describe("RecordPage", () => {
 
   it("outro navegador avisa sem bloquear (screen-recording 23)", () => {
     renderRecord({ env: fakeBrowserEnv({ browser: "other" }) })
-    expect(screen.getByText(MESSAGES.unofficial)).toBeInTheDocument()
+    expect(recordButton()).toHaveAccessibleDescription(MESSAGES.unofficial)
     expect(recordButton()).toBeEnabled()
   })
 

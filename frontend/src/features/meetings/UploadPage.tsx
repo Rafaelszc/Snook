@@ -20,7 +20,7 @@ const ACCEPT = ACCEPTED_EXTENSIONS.map((ext) => `.${ext}`).join(",")
 
 function formatBytes(bytes: number): string {
   const mb = bytes / 1024 / 1024
-  return `${mb.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} MB`
+  return `${mb.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}\u00a0MB`
 }
 
 // Área de soltar com mouse-tracking (ADR-0022, "Mapa de superfícies").
