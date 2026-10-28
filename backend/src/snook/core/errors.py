@@ -31,6 +31,7 @@ class AppError(Exception):
         *,
         fields: dict[str, str] | None = None,
         headers: dict[str, str] | None = None,
+        details: Mapping[str, int | str] | None = None,
     ) -> None:
         super().__init__(code)
         self.code = code
@@ -38,6 +39,7 @@ class AppError(Exception):
         self.http_status = http_status
         self.fields = fields
         self.headers = headers
+        self.details = details
 
 
 def error_response(
@@ -47,8 +49,10 @@ def error_response(
     *,
     fields: dict[str, str] | None = None,
     headers: dict[str, str] | None = None,
+    details: Mapping[str, int | str] | None = None,
 ) -> JSONResponse:
-    error: dict[str, Any] = {"code": code, "message": message}
+    """`details`: campos extras ao lado de `code` (ex.: `part_index` em `part_too_large`)."""
+    error: dict[str, Any] = {**(details or {}), "code": code, "message": message}
     if fields is not None:
         error["fields"] = fields
     return JSONResponse({"error": error}, status_code=http_status, headers=headers)
@@ -72,7 +76,12 @@ def _field_message(error_type: str, message: str) -> str:
 async def _handle_app_error(_request: Request, exc: Exception) -> JSONResponse:
     err = cast(AppError, exc)
     return error_response(
-        err.code, err.message, err.http_status, fields=err.fields, headers=err.headers
+        err.code,
+        err.message,
+        err.http_status,
+        fields=err.fields,
+        headers=err.headers,
+        details=err.details,
     )
 
 

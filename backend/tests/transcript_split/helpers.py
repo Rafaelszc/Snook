@@ -55,16 +55,32 @@ def lines(uow: Callable[[], UnitOfWork], meeting_id: str) -> list[str]:
         return service.transcript_lines(unit, meeting_id)
 
 
+class LineEstimate:
+    """ "Estimar tokens" fake aditivo por linha, como a heurística real (ADR-0011): um token por
+    caractere, quebra de linha não conta. Parte = soma dos segmentos."""
+
+    def __call__(self, provider: str, model: str, text: str) -> int:
+        return line_tokens(text)
+
+
+def line_tokens(text: str) -> int:
+    return sum(len(line) for line in text.splitlines())
+
+
 def use_budget(
-    settings: Settings, uow: Callable[[], UnitOfWork], meeting_id: str, target: int
+    settings: Settings,
+    uow: Callable[[], UnitOfWork],
+    meeting_id: str,
+    target: int,
+    measure: Callable[[str], int] = len,
 ) -> int:
-    """Menor janela de Ana cujo orçamento (um token por caractere) chega a `target`. Devolve o
-    orçamento obtido: `target` ou pouco acima."""
+    """Menor janela de Ana cujo orçamento (`measure`, um token por caractere) chega a `target`.
+    Devolve o orçamento obtido: `target` ou pouco acima."""
     with uow() as unit:
         participants = service.participants_text(unit, meeting_id)
     reserve = {
-        "system_prompt_tokens": len(load_backlog_system_prompt()),
-        "participants_tokens": len(participants),
+        "system_prompt_tokens": measure(load_backlog_system_prompt()),
+        "participants_tokens": measure(participants),
     }
     window = 1
     while service.compute_budget(window, **reserve) < target:
@@ -76,3 +92,36 @@ def use_budget(
             (window,),
         )
     return service.compute_budget(window, **reserve)
+
+
+def split_url(meeting_id: str, action: str = "") -> str:
+    return f"/api/meetings/{meeting_id}/split{action}"
+
+
+def segment_ids(settings: Settings, meeting_id: str) -> list[int]:
+    with sqlite3.connect(settings.database_path) as conn:
+        query = "SELECT id FROM transcript_segments WHERE meeting_id = ? ORDER BY position"
+        return [row[0] for row in conn.execute(query, (meeting_id,))]
+
+
+def line_sizes(uow: Callable[[], UnitOfWork], meeting_id: str) -> list[int]:
+    """Estimativa de cada segmento com `LineEstimate`."""
+    return [line_tokens(line) for line in lines(uow, meeting_id)]
+
+
+def waiting_split(
+    client: TestClient,
+    settings: Settings,
+    uow: Callable[[], UnitOfWork],
+    target: Callable[[list[int]], int],
+    *,
+    split_reason: str = "too_long",
+) -> tuple[str, int]:
+    """Reunião confirmada em `needs_split`, orçamento de Ana em `target(estimativas)`. Devolve o
+    `id` e o orçamento obtido."""
+    meeting_id = confirmed(client, settings)
+    budget = use_budget(
+        settings, uow, meeting_id, target(line_sizes(uow, meeting_id)), measure=line_tokens
+    )
+    set_fields(settings.database_path, meeting_id, status="needs_split", split_reason=split_reason)
+    return meeting_id, budget

@@ -132,12 +132,16 @@ Frontend junta nomes com `GET /api/meetings/{id}/participants` (opção padrão 
 
 | Método e rota | Auth | Sucesso | Erros |
 |---|---|---|---|
-| `GET /api/meetings/{id}/split` | S+D | 200 estado da divisão (só leitura); inclui `segment_tokens` por segmento | 404; 409 |
-| `POST /api/meetings/{id}/split/refresh` | S+D | 200 mesmo corpo do `GET`, depois de aplicar "passou a caber" ([ADR-0019](adrs/0019-checagem-de-divisao-por-post.md)) | 404; 409 |
-| `PUT /api/meetings/{id}/split` `{cuts:[segment_id,...]}` | S+D | 202 | 404; 409; 422 (`cut_not_at_segment_end`, `cuts_not_ordered`, `part_too_large` com `part_index` e `estimated_tokens`) |
-| `POST /api/meetings/{id}/split/cancel` | S+D | 200 | 404; 409 |
+| `GET /api/meetings/{id}/split` | S+D | 200 estado da divisão (só leitura); `tokens` por segmento | 404; 409 (`split_not_available`) |
+| `POST /api/meetings/{id}/split/refresh` | S+D | 200 mesmo corpo do `GET`, depois de aplicar "passou a caber" ([ADR-0019](adrs/0019-checagem-de-divisao-por-post.md)) | 404; 409 (`split_not_available`) |
+| `PUT /api/meetings/{id}/split` `{cuts:[segment_id,...]}` | S+D | 202 `{status}` (`generating` ou `failed`) | 404; 409 (`split_not_available`); 422 (`cut_not_at_segment_end`, `cuts_not_ordered`, `part_too_large` com `part_index` e `estimated_tokens`) |
+| `POST /api/meetings/{id}/split/cancel` | S+D | 200 `{status:"done"}` | 404; 409 (`split_not_available`, `split_cancel_not_allowed`) |
 
-Corte = `id` do último segmento de uma Parte. Último segmento da Transcrição é implícito.
+Corte = `id` do último segmento de uma Parte. Último segmento da Transcrição é implícito; citado como corte, recebe `cut_not_at_segment_end`.
+
+Corpo do `GET` e do `refresh`: `status`, `split_reason`, `can_cancel`, `read_only` (`done` já dividida), `message` (sem provedor ativo), `provider`, `model`, `budget`, `total_tokens`, `segments` (`id`, `start_seconds`, `end_seconds`, `participant`, `text`, `tokens`), `cuts`, `parts` (`index`, `first_segment_id`, `last_segment_id`, `start_seconds`, `end_seconds`, `estimated_tokens`, `fits`). Sem provedor ativo: só `message`, listas vazias. Fora de `needs_split` depois do `refresh`: listas vazias.
+
+`part_too_large`: `part_index` e `estimated_tokens` dentro de `error`, ao lado de `code`.
 
 ### `backlog-review`
 
