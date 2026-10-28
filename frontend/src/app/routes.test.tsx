@@ -120,3 +120,11 @@ it("abre a gravação pela rota, sem quebrar em navegador sem as APIs (screen-re
     CONSENT_NOTICE_TEXT
   )
 })
+
+it("revisão do backlog tem rota própria, destino de cancelar divisão", async () => {
+  signedIn()
+  renderAt("/meetings/m1/backlog")
+  expect(
+    await screen.findByRole("heading", { name: "Revisão do backlog" })
+  ).toBeInTheDocument()
+})
