@@ -147,7 +147,7 @@ def test_upgrade_head_runs_over_llm_providers_database(tmp_path: Path) -> None:
             (NOW, NOW),
         )
     upgrade_database(path)
-    assert rows(path, "SELECT version_num FROM alembic_version") == [("0006",)]
+    assert rows(path, "SELECT version_num FROM alembic_version") == [("0007",)]
     assert rows(path, "SELECT provider FROM llm_configs") == [("ollama",)]
     with _connect(path) as conn:
         _insert_meeting(conn)

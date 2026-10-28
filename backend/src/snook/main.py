@@ -19,6 +19,7 @@ from snook.core.settings import Settings, load_settings
 from snook.core.uow import UnitOfWork
 from snook.modules.auth import api as auth_api
 from snook.modules.auth import service as auth_service
+from snook.modules.backlog_generation import service as generation_service
 from snook.modules.diarized_transcription import api as transcription_api
 from snook.modules.diarized_transcription import service as transcription_service
 from snook.modules.llm_providers import api as llm_api
@@ -95,6 +96,7 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
         cleanup: asyncio.Task[None] | None = None
         try:
             app.state.transcription.start(app.state.session_factory, app.state.event_bus.publish)
+            app.state.generation.start()
             _cleanup_sessions(app)  # 6
             cleanup = asyncio.create_task(_session_cleanup_loop(app))
             yield  # 7
@@ -102,6 +104,7 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
             if cleanup is not None:
                 cleanup.cancel()
             app.state.transcription.stop()
+            app.state.generation.stop()
             engine.dispose()
     finally:
         lock.release()
@@ -136,6 +139,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         now=lambda: app.state.clock.now(),
     )  # teste troca por no-op
     split_service.subscribe(app.state.event_bus, lambda event: app.state.prepare_generation(event))
+
+    def unit_of_work() -> UnitOfWork:
+        return UnitOfWork(app.state.session_factory, app.state.event_bus.publish)
+
+    def generate(**request: Any) -> str:
+        return llm_service.generate(
+            unit_of_work(), app.state.key_cipher, app.state.llm_adapters, **request
+        )
+
+    app.state.generate = generate  # teste troca por "Gerar" fake
+    app.state.generation = generation_service.GenerationRunner(
+        settings.generation_workers,
+        uow_factory=unit_of_work,
+        generate=lambda **request: app.state.generate(**request),
+        now=lambda: app.state.clock.now(),
+    )
+    app.state.generate_backlog = lambda event: app.state.generation.submit(event)  # teste: síncrono
+    generation_service.subscribe(
+        app.state.event_bus, lambda event: app.state.generate_backlog(event)
+    )
     register_error_handlers(app, server_error_headers=SECURITY_HEADERS)
     install_http_security(app, settings)
     app.add_middleware(RequestLogMiddleware)  # por fora: loga também as rejeições

@@ -122,7 +122,7 @@ def parse_backlog(raw: str, *, duration_seconds: float) -> BacklogResponse:
     return backlog
 
 
-class _Named(Protocol):
+class Named(Protocol):
     @property
     def id(self) -> int: ...
 
@@ -130,7 +130,7 @@ class _Named(Protocol):
     def name(self) -> str: ...
 
 
-def resolve_requester(requested_by: str | None, participants: Sequence[_Named]) -> int | None:
+def resolve_requester(requested_by: str | None, participants: Sequence[Named]) -> int | None:
     """`id` do Participante de mesmo nome, sem caixa e espaços nas pontas (critério 13).
 
     Só compara texto: o nome nunca vai a SQL, caminho ou comando (SEC-18).
