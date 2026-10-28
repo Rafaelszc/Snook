@@ -151,6 +151,32 @@ def test_needs_split_goes_to_done_only_with_backlog(
     assert _stored(settings, meeting_id) == ("done", None, None, old_run)
 
 
+@pytest.mark.parametrize("reason", ["too_long", "adjust"])
+def test_needs_split_saves_split_reason_shown_in_detail(
+    ana: TestClient, uow: Uow, settings: Settings, clock: FakeClock, meeting_id: str, reason: str
+) -> None:
+    """`transcript-split` 22: origem do `needs_split`, só para exibição."""
+    _put(settings, meeting_id, "done")
+
+    with uow() as unit:
+        service.update_status(unit, meeting_id, "needs_split", split_reason=reason, now=clock.now())
+
+    assert ana.get(f"{URL}/{meeting_id}").json()["split_reason"] == reason
+
+
+@pytest.mark.parametrize(("target", "reason"), [("generating", "adjust"), ("needs_split", "x")])
+def test_split_reason_outside_needs_split_is_refused(
+    uow: Uow, settings: Settings, clock: FakeClock, meeting_id: str, target: str, reason: str
+) -> None:
+    _put(settings, meeting_id, "transcribed")
+    before = _stored(settings, meeting_id)
+
+    with pytest.raises(service.InvalidStatusUpdate), uow() as unit:
+        service.update_status(unit, meeting_id, target, split_reason=reason, now=clock.now())
+
+    assert _stored(settings, meeting_id) == before
+
+
 @pytest.mark.parametrize(("source", "target", "stage"), REFUSED)
 def test_transition_outside_table_is_refused_and_status_kept(
     uow: Uow,

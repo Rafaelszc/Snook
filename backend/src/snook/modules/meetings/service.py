@@ -240,15 +240,19 @@ def update_status(
     *,
     failed_stage: str | None = None,
     message: str | None = None,
+    split_reason: str | None = None,
     now: datetime,
 ) -> str:
     """Interface "Atualizar status" (`meetings` 22, 23). Devolve o `run_id` atual, novo quando a
-    transição inicia trabalho (ADR-0007). Recusa com `InvalidStatusUpdate` sem mudar nada."""
+    transição inicia trabalho (ADR-0007). Recusa com `InvalidStatusUpdate` sem mudar nada.
+    `split_reason` só com `needs_split`, só para exibição; noutro status fica como estava."""
     meeting = _existing(uow, meeting_id)
-    state_machine.check(meeting, new_status, failed_stage, message)
+    state_machine.check(meeting, new_status, failed_stage, message, split_reason)
     if state_machine.starts_new_run(meeting.status, new_status):
         meeting.run_id = str(uuid.uuid4())
     meeting.status = new_status
+    if new_status == "needs_split":
+        meeting.split_reason = split_reason
     meeting.failed_stage = failed_stage
     meeting.error_message = message.strip() if message is not None else None
     meeting.updated_at = to_iso(now)

@@ -2223,13 +2223,13 @@
 **Description:** Tabela `transcript_parts` (migração `0006_transcript_split_parts`) e gravação que apaga as Partes anteriores e grava as novas numa só transação.
 
 **Acceptance criteria:**
-- [ ] Toda gravação (Parte única ou `PUT`) apaga todas as Partes anteriores e grava as novas numa transação; depois, "Partes" devolve só as novas (`transcript-split` 37).
-- [ ] Sem nova gravação, as Partes anteriores continuam; reaproveitamento não regrava (`transcript-split` 38).
-- [ ] As Partes guardam `start_seconds` e `end_seconds` absolutos iguais ao início do primeiro e ao fim do último segmento (`transcript-split` 18).
+- [x] Toda gravação (Parte única ou `PUT`) apaga todas as Partes anteriores e grava as novas numa transação; depois, "Partes" devolve só as novas (`transcript-split` 37).
+- [x] Sem nova gravação, as Partes anteriores continuam; reaproveitamento não regrava (`transcript-split` 38).
+- [x] As Partes guardam `start_seconds` e `end_seconds` absolutos iguais ao início do primeiro e ao fim do último segmento (`transcript-split` 18).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split/test_parts_storage.py -q`; `uv run alembic upgrade head`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/transcript_split/test_parts_storage.py -q`; `uv run alembic upgrade head`.
+- [x] Gate backend.
 
 **Dependencies:** Task 35.3
 
@@ -2244,13 +2244,13 @@
 **Description:** `prepare_generation(uow, meeting_id, "normal")` decide Parte única, `needs_split` ou `failed`.
 
 **Acceptance criteria:**
-- [ ] Transcrição inteira cabe: grava Parte única, leva a `generating`, novo `run_id` e emite `PartsReady` uma vez (`transcript-split` 1).
-- [ ] Não cabe: vai a `needs_split` com `split_reason` `too_long`, sem Parte gravada nem aviso (`transcript-split` 2); "Gerar" nunca é chamado (`transcript-split` 3).
-- [ ] Sem provedor ativo, vai a `failed` etapa `generation` com mensagem que aponta para a tela de configurações (`transcript-split` 5); segmento sozinho acima do orçamento vai a `failed` com mensagem pedindo modelo com janela maior (`transcript-split` 6); Participantes e Transcrição não mudam (`transcript-split` 24).
+- [x] Transcrição inteira cabe: grava Parte única, leva a `generating`, novo `run_id` e emite `PartsReady` uma vez (`transcript-split` 1).
+- [x] Não cabe: vai a `needs_split` com `split_reason` `too_long`, sem Parte gravada nem aviso (`transcript-split` 2); "Gerar" nunca é chamado (`transcript-split` 3).
+- [x] Sem provedor ativo, vai a `failed` etapa `generation` com mensagem que aponta para a tela de configurações (`transcript-split` 5); segmento sozinho acima do orçamento vai a `failed` com mensagem pedindo modelo com janela maior (`transcript-split` 6); Participantes e Transcrição não mudam (`transcript-split` 24).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split/test_prepare_generation.py -q`.
-- [ ] Gate backend. SEC-19.
+- [x] `cd backend && uv run pytest tests/transcript_split/test_prepare_generation.py -q`.
+- [x] Gate backend. SEC-19.
 
 **Dependencies:** Task 36.1
 
@@ -2265,13 +2265,13 @@
 **Description:** Reaproveita Partes anteriores que ainda cabem, segue com Parte única quando passa a caber e grava `split_reason` `adjust` no modo `reajustar`.
 
 **Acceptance criteria:**
-- [ ] Retry da geração com a Transcrição inteira cabendo grava Parte única e segue a `generating`, mesmo que antes estivesse dividida (`transcript-split` 19); não cabendo inteira mas com Partes anteriores que cabem, reaproveita sem regravar e segue (`transcript-split` 20); Partes anteriores que não cabem levam a `needs_split` (`transcript-split` 21).
-- [ ] Modo `reajustar` em `done` já dividida e que não cabe inteira leva a `needs_split` com `split_reason` `adjust` (`transcript-split` 22); se cabe inteira, segue com Parte única.
-- [ ] Modo `normal` em `done` segue as regras 19 a 21 (`transcript-split` 23).
+- [x] Retry da geração com a Transcrição inteira cabendo grava Parte única e segue a `generating`, mesmo que antes estivesse dividida (`transcript-split` 19); não cabendo inteira mas com Partes anteriores que cabem, reaproveita sem regravar e segue (`transcript-split` 20); Partes anteriores que não cabem levam a `needs_split` (`transcript-split` 21).
+- [x] Modo `reajustar` em `done` já dividida e que não cabe inteira leva a `needs_split` com `split_reason` `adjust` (`transcript-split` 22); se cabe inteira, segue com Parte única.
+- [x] Modo `normal` em `done` segue as regras 19 a 21 (`transcript-split` 23).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split/test_prepare_generation_modes.py -q`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/transcript_split/test_prepare_generation_modes.py -q`.
+- [x] Gate backend.
 
 **Dependencies:** Task 36.2
 
@@ -2286,13 +2286,13 @@
 **Description:** Consome `ParticipantsConfirmed` e `RetryRequested(generation)` e chama "Preparar geração" no modo `normal`.
 
 **Acceptance criteria:**
-- [ ] Aviso com a Reunião em `transcribed` dispara a checagem uma vez.
-- [ ] Aviso com a Reunião fora de `transcribed` é ignorado: nenhuma checagem, nenhuma Parte, nenhum aviso, status igual (`transcript-split` 46).
-- [ ] Aviso com `run_id` que não bate é ignorado (ADR-0007); exceção no consumidor leva a `failed` (SEC-19).
+- [x] Aviso com a Reunião em `transcribed` dispara a checagem uma vez.
+- [x] Aviso com a Reunião fora de `transcribed` é ignorado: nenhuma checagem, nenhuma Parte, nenhum aviso, status igual (`transcript-split` 46).
+- [x] Aviso com `run_id` que não bate é ignorado (ADR-0007); exceção no consumidor leva a `failed` (SEC-19).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split/test_consumers.py -q`.
-- [ ] Gate backend. SEC-19.
+- [x] `cd backend && uv run pytest tests/transcript_split/test_consumers.py -q`.
+- [x] Gate backend. SEC-19.
 
 **Dependencies:** Task 36.3, 32.3, 21.1
 
