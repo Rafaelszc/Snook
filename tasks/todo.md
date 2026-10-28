@@ -1077,7 +1077,7 @@
 **Description:** `generate(user_id, provider_snapshot, system_prompt, content, json_schema, max_output_tokens) -> str` sobre o adapter do provedor ativo.
 
 **Acceptance criteria:**
-- [ ] Para cada um dos quatro provedores, "Gerar" com o adapter ligado a respostas gravadas devolve o texto (`llm-providers` 29).
+- [x] Para cada um dos quatro provedores, "Gerar" com o adapter ligado a respostas gravadas devolve o texto (`llm-providers` 29).
 - [x] "Gerar" usa o provedor ativo e o modelo salvos do Usuário dono (`llm-providers` 31).
 - [x] Erros tipados do contrato sobem sem a chave (`llm-providers` 30, 27; SEC-17).
 
