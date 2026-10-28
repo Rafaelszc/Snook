@@ -13,6 +13,7 @@ def idle(ana: TestClient) -> TestClient:  # noqa: F811
     """Sem consumidor: a Reunião fica como o teste a deixar."""
     app: FastAPI = ana.app  # type: ignore[assignment]
     app.state.transcription.stop()
+    app.state.prepare_generation = lambda event: None
     return ana
 
 

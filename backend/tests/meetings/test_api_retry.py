@@ -29,8 +29,10 @@ def meeting_id(ana: TestClient, probe: FakeProbe, clock: FakeClock) -> str:
 
 @pytest.fixture
 def retries(client: TestClient) -> list[Event]:
+    """Avisos `RetryRequested` publicados; `transcript_split` não consome (status fica)."""
     received: list[Event] = []
     app: FastAPI = client.app  # type: ignore[assignment]
+    app.state.prepare_generation = lambda event: None
     app.state.event_bus.subscribe(RetryRequested, received.append)
     return received
 

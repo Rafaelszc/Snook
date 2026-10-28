@@ -9,23 +9,11 @@ from snook.core.uow import UnitOfWork
 from snook.modules.llm_providers.service import ActiveProvider
 from snook.modules.transcript_split import service
 from snook.shared.prompts import load_backlog_system_prompt
-from tests.transcript_split.helpers import confirmed
+from tests.transcript_split.helpers import FakeEstimate, confirmed
 
 pytestmark = pytest.mark.usefixtures("probe", "clock")
 
 Uow = Callable[[], UnitOfWork]
-Call = tuple[str, str, str]
-
-
-class FakeEstimate:
-    """ "Estimar tokens" fake: um token por caractere; registra cada chamada."""
-
-    def __init__(self) -> None:
-        self.calls: list[Call] = []
-
-    def __call__(self, provider: str, model: str, text: str) -> int:
-        self.calls.append((provider, model, text))
-        return len(text)
 
 
 def test_budget_is_window_minus_reserve() -> None:

@@ -7,6 +7,7 @@ STATUSES = ("pending", "processing", "transcribed", "needs_split", "generating",
 STATUS_PENDING = "pending"
 STATUS_FAILED = "failed"
 FAILED_STAGES = ("transcription", "generation")
+SPLIT_REASONS = ("too_long", "adjust")
 FILE_EXTENSIONS = ("mp3", "wav", "m4a", "ogg", "webm", "mp4")
 
 

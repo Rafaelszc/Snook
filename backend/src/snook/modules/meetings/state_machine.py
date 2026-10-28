@@ -1,4 +1,10 @@
-from snook.modules.meetings.models import FAILED_STAGES, STATUS_FAILED, STATUSES, Meeting
+from snook.modules.meetings.models import (
+    FAILED_STAGES,
+    SPLIT_REASONS,
+    STATUS_FAILED,
+    STATUSES,
+    Meeting,
+)
 
 # Tabela de transições de `01-prd/meetings.md`, "Contrato com outros módulos" (`meetings` 23).
 # Saída de `failed` depende da etapa; `failed` exige a etapa da origem.
@@ -23,7 +29,13 @@ class InvalidStatusUpdate(ValueError):
     """Status fora da lista, transição fora da tabela ou `failed` incompleto. Nada é gravado."""
 
 
-def check(meeting: Meeting, target: str, failed_stage: str | None, message: str | None) -> None:
+def check(
+    meeting: Meeting,
+    target: str,
+    failed_stage: str | None,
+    message: str | None,
+    split_reason: str | None = None,
+) -> None:
     source = meeting.status
     if target not in STATUSES:
         raise InvalidStatusUpdate(f"status desconhecido: {target!r}")
@@ -41,6 +53,8 @@ def check(meeting: Meeting, target: str, failed_stage: str | None, message: str 
             raise InvalidStatusUpdate("failed exige mensagem")
     elif failed_stage is not None or message is not None:
         raise InvalidStatusUpdate("etapa e mensagem só valem para failed")
+    if split_reason is not None and (target != "needs_split" or split_reason not in SPLIT_REASONS):
+        raise InvalidStatusUpdate(f"split_reason recusado para {target}: {split_reason!r}")
 
 
 def starts_new_run(source: str, target: str) -> bool:
