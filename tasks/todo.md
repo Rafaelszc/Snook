@@ -2076,13 +2076,13 @@
 **Description:** `rename(uow, meeting_id, participant_id, new_name, before_absorb=None) -> RenameResult` com união por nome igual (Q55).
 
 **Acceptance criteria:**
-- [ ] Nome novo que não coincide com outro mantém o mesmo `id` e os vínculos e não informa união (`participants` 17); nome igual ao de outro Participante une os dois: sobrevive o que já tinha o nome, os vínculos passam a ele, o renomeado deixa de existir e a interface informa o `id` absorvido (`participants` 18).
-- [ ] Nome vazio ou só de espaços, e Reunião sem Participantes confirmados, são recusados sem mudar nada (`participants` 19, 20); com confirmados, aceita em `transcribed`, `needs_split`, `done` e `failed` (etapa `generation`) e recusa em `generating` (`participants` 21, um teste por status).
-- [ ] Não chama `llm_providers`, não emite `ParticipantsConfirmed` e não muda o status (`participants` 22); chama `before_absorb(absorbed_id, survivor_id)` antes de apagar o absorvido.
+- [x] Nome novo que não coincide com outro mantém o mesmo `id` e os vínculos e não informa união (`participants` 17); nome igual ao de outro Participante une os dois: sobrevive o que já tinha o nome, os vínculos passam a ele, o renomeado deixa de existir e a interface informa o `id` absorvido (`participants` 18).
+- [x] Nome vazio ou só de espaços, e Reunião sem Participantes confirmados, são recusados sem mudar nada (`participants` 19, 20); com confirmados, aceita em `transcribed`, `needs_split`, `done` e `failed` (etapa `generation`) e recusa em `generating` (`participants` 21, um teste por status).
+- [x] Não chama `llm_providers`, não emite `ParticipantsConfirmed` e não muda o status (`participants` 22); chama `before_absorb(absorbed_id, survivor_id)` antes de apagar o absorvido.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/participants/test_rename.py -q`.
-- [ ] Gate backend. SEC-02, SEC-09.
+- [x] `cd backend && uv run pytest tests/participants/test_rename.py -q`.
+- [x] Gate backend. SEC-02, SEC-09.
 
 **Dependencies:** Task 32.3
 
@@ -2094,9 +2094,9 @@
 
 ### Checkpoint: `participants` API
 
-- [ ] Critérios 1 a 24 de `01-prd/participants.md` passam
-- [ ] Task 27.3 reconferida contra a rota real `GET /participants`
-- [ ] `/security-review` sobre o diff
+- [x] Critérios 1 a 24 de `01-prd/participants.md` passam
+- [x] Task 27.3 reconferida contra a rota real `GET /participants`
+- [x] `/security-review` sobre o diff
 
 ### Task 34.1: Tela de nomeação: speakers, amostra e campos
 

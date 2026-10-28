@@ -199,7 +199,7 @@ it("lista vazia de Participantes mostra o rótulo (26)", async () => {
 
 it("com Participante nomeado, mostra o nome atual no lugar do rótulo (26)", async () => {
   serve(done, ONE_SEGMENT, [
-    { id: "p1", name: "Ana", speaker_labels: ["SPEAKER_00"] },
+    { id: 1, name: "Ana", speaker_labels: ["SPEAKER_00"] },
   ])
   renderPage()
 
@@ -209,14 +209,14 @@ it("com Participante nomeado, mostra o nome atual no lugar do rótulo (26)", asy
 
 it("nome renomeado aparece ao reabrir a tela, sem passo extra (26)", async () => {
   serve(done, ONE_SEGMENT, [
-    { id: "p1", name: "Ana", speaker_labels: ["SPEAKER_00"] },
+    { id: 1, name: "Ana", speaker_labels: ["SPEAKER_00"] },
   ])
   const first = renderPage()
   expect(await screen.findByText("Ana")).toBeVisible()
   first.unmount()
 
   serve(done, ONE_SEGMENT, [
-    { id: "p1", name: "Ana Souza", speaker_labels: ["SPEAKER_00"] },
+    { id: 1, name: "Ana Souza", speaker_labels: ["SPEAKER_00"] },
   ])
   renderPage()
 

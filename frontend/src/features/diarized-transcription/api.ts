@@ -37,7 +37,7 @@ export function hasTranscript(meeting: MeetingStatus): boolean {
 
 // `GET /meetings/{id}/participants` (05-api.md, `participants`).
 export interface Participant {
-  id: string
+  id: number
   name: string
   speaker_labels: string[]
 }

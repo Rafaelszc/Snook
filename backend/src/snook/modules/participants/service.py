@@ -1,4 +1,6 @@
 import logging
+from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
@@ -10,7 +12,7 @@ from snook.modules.diarized_transcription import service as transcription
 from snook.modules.llm_providers import service as llm_providers
 from snook.modules.meetings import service as meetings
 from snook.modules.participants import messages, repository
-from snook.modules.participants.models import Participant
+from snook.modules.participants.models import NAME_MAX, Participant
 from snook.modules.participants.schemas import ParticipantOut, SpeakerOut
 
 logger = logging.getLogger("snook.participants")
@@ -134,6 +136,65 @@ def participant_for_speaker(
     participant = repository.participant_for_speaker(uow.session, meeting_id, speaker_label)
     if participant is None:
         return None
+    return _out(uow, meeting_id, participant)
+
+
+@dataclass(frozen=True)
+class RenameResult:
+    """Participante resultante; `absorbed_id` só quando houve união (`participants` 18)."""
+
+    participant: ParticipantOut
+    absorbed_id: int | None = None
+
+
+def rename(
+    uow: UnitOfWork,
+    meeting_id: str,
+    participant_id: int,
+    new_name: str,
+    before_absorb: Callable[[int, int], None] | None = None,
+) -> RenameResult:
+    """Interface "Renomear Participante" (Q55, `participants` 17 a 22). Entra na transação de
+    quem chama; dono já conferido por ele. Nome igual ao de outro Participante une os dois:
+    sobrevive o que já tinha o nome, e `before_absorb(absorbed_id, survivor_id)` roda antes de
+    apagar o absorvido. Não chama `llm_providers`, não emite aviso, não muda status."""
+    if not meetings.read_flags(uow, meeting_id).participants_confirmed:
+        raise AppError("not_confirmed", messages.NOT_CONFIRMED, 409)
+    if meetings.read_status(uow, meeting_id) == "generating":
+        raise AppError("invalid_status", messages.RENAME_WHILE_GENERATING, 409)
+    participant = repository.get_participant(uow.session, meeting_id, participant_id)
+    if participant is None:
+        raise AppError("participant_not_found", messages.PARTICIPANT_NOT_FOUND, 404)
+    name = new_name.strip()
+    if not name or len(name) > NAME_MAX:
+        message = messages.NAME_TOO_LONG if name else messages.NAME_REQUIRED
+        raise AppError("validation_error", message, 422, fields={"name": message})
+
+    norm = normalize(name)
+    survivor = repository.participant_by_name(uow.session, meeting_id, norm)
+    if survivor is None or survivor.id == participant.id:
+        participant.name = name
+        participant.name_norm = norm
+        uow.session.flush()
+        logger.info(
+            "participants.renamed",
+            extra={"meeting_id": meeting_id, "participant_id": participant.id},
+        )
+        return RenameResult(participant=_out(uow, meeting_id, participant))
+
+    repository.move_links(uow.session, meeting_id, participant.id, survivor.id)
+    if before_absorb is not None:
+        before_absorb(participant.id, survivor.id)
+    absorbed_id = participant.id
+    repository.delete_participant(uow.session, participant)
+    logger.info(
+        "participants.merged",
+        extra={"meeting_id": meeting_id, "participant_id": survivor.id, "absorbed_id": absorbed_id},
+    )
+    return RenameResult(participant=_out(uow, meeting_id, survivor), absorbed_id=absorbed_id)
+
+
+def _out(uow: UnitOfWork, meeting_id: str, participant: Participant) -> ParticipantOut:
     labels = [
         link.speaker_label
         for link in repository.list_links(uow.session, meeting_id)
