@@ -26,6 +26,7 @@ from snook.modules.llm_providers import service as llm_service
 from snook.modules.meetings import api as meetings_api
 from snook.modules.meetings import service as meetings_service
 from snook.modules.participants import api as participants_api
+from snook.modules.transcript_split import service as split_service
 
 logger = logging.getLogger("snook.main")
 
@@ -127,6 +128,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         settings, now=lambda: app.state.clock.now()
     )  # teste troca por dispatcher com engines falsas
     transcription_service.subscribe(app.state.event_bus, lambda: app.state.transcription)
+    app.state.prepare_generation = lambda event: split_service.on_generation_requested(
+        event,
+        lambda: UnitOfWork(app.state.session_factory, app.state.event_bus.publish),
+        now=lambda: app.state.clock.now(),
+    )  # teste troca por no-op
+    split_service.subscribe(app.state.event_bus, lambda event: app.state.prepare_generation(event))
     register_error_handlers(app, server_error_headers=SECURITY_HEADERS)
     install_http_security(app, settings)
     app.add_middleware(RequestLogMiddleware)  # por fora: loga também as rejeições

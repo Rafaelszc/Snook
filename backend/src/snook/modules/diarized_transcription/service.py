@@ -88,6 +88,11 @@ def list_segments(uow: UnitOfWork, meeting_id: str) -> list[Segment]:
     ]
 
 
+def segment_ids(uow: UnitOfWork, meeting_id: str) -> list[int]:
+    """Ids na ordem de "Segmentos": a posição na lista é a mesma."""
+    return [s.id for s in repository.list_segments(uow.session, meeting_id)]
+
+
 def list_speakers(uow: UnitOfWork, meeting_id: str) -> list[Speaker]:
     """Interface "Speakers": rótulos dos segmentos, com tempo total e maior segmento."""
     return speakers(list_segments(uow, meeting_id))

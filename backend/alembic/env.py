@@ -11,6 +11,7 @@ from snook.modules.diarized_transcription import models as _transcription_models
 from snook.modules.llm_providers import models as _llm_providers_models  # noqa: F401
 from snook.modules.meetings import models as _meetings_models  # noqa: F401
 from snook.modules.participants import models as _participants_models  # noqa: F401
+from snook.modules.transcript_split import models as _transcript_split_models  # noqa: F401
 
 config = context.config
 target_metadata = Base.metadata
