@@ -2997,10 +2997,10 @@
 
 ### Checkpoint: Renomear, regenerar, exportar
 
-- [ ] Critérios 23 a 29 e 31 a 36 passam
-- [ ] Critérios 30, 37 e 38 repetidos nas rotas novas das Tasks 46 a 48 (regra de status, 404 com `id` alheio, 401 sem sessão)
-- [ ] SEC-12 verificado no export
-- [ ] `/security-review` sobre o diff
+- [x] Critérios 23 a 29 e 31 a 36 passam
+- [x] Critérios 30, 37 e 38 repetidos nas rotas novas das Tasks 46 a 48 (regra de status, 404 com `id` alheio, 401 sem sessão)
+- [x] SEC-12 verificado no export
+- [x] `/security-review` sobre o diff
 
 ### Task 49.1: Tela de revisão: leitura agrupada por Epic
 
