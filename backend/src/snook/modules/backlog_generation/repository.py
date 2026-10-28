@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
@@ -88,6 +88,98 @@ class BacklogRepository:
     def delete_epic(self, epic: Epic) -> None:
         self._session.delete(epic)
         self._session.flush()
+
+    def story(self, meeting_id: str, story_id: int) -> UserStory | None:
+        """US `story_id` só se for da Reunião (SEC-02)."""
+        query = select(UserStory).where(
+            UserStory.meeting_id == meeting_id, UserStory.id == story_id
+        )
+        return self._session.scalar(query)
+
+    def add_story(
+        self,
+        epic: Epic,
+        fields: Mapping[str, object],
+        criteria: Sequence[tuple[str, str, str]],
+    ) -> UserStory:
+        """US no fim de `epic` com o próximo `us_number` e `criteria` (`given`, `when`, `then`)."""
+        story = UserStory(
+            meeting_id=epic.meeting_id,
+            epic_id=epic.id,
+            us_number=self.next_us_number(epic.meeting_id),
+            position=self._next_story_position(epic),
+            **fields,
+        )
+        self._session.add(story)
+        self._session.flush()
+        for given, when, then in criteria:
+            self.add_criterion(story, given, when, then)
+        return story
+
+    def update_story(self, story: UserStory, changes: Mapping[str, object]) -> None:
+        """Grava `changes` (colunas de `UserStory`); `us_number` e Epic não mudam aqui."""
+        for column, value in changes.items():
+            setattr(story, column, value)
+        self._session.flush()
+
+    def move_story(self, story: UserStory, epic: Epic) -> None:
+        """US para o fim de `epic`, mesmo `us_number` (`backlog-review` 16)."""
+        if story.epic_id == epic.id:
+            return
+        story.position = self._next_story_position(epic)
+        story.epic_id = epic.id
+        self._session.flush()
+
+    def delete_story(self, story: UserStory) -> None:
+        """Critérios saem em cascata; contador não desce (`backlog-review` 19)."""
+        self._session.delete(story)
+        self._session.flush()
+
+    def criterion(self, meeting_id: str, criterion_id: int) -> AcceptanceCriterion | None:
+        """Critério `criterion_id` só se a US for da Reunião (SEC-02)."""
+        query = (
+            select(AcceptanceCriterion)
+            .join(UserStory, UserStory.id == AcceptanceCriterion.user_story_id)
+            .where(UserStory.meeting_id == meeting_id, AcceptanceCriterion.id == criterion_id)
+        )
+        return self._session.scalar(query)
+
+    def add_criterion(
+        self, story: UserStory, given: str, when: str, then: str
+    ) -> AcceptanceCriterion:
+        """Critério no fim da US (`backlog-review` 20)."""
+        last = self._session.scalar(
+            select(func.max(AcceptanceCriterion.position)).where(
+                AcceptanceCriterion.user_story_id == story.id
+            )
+        )
+        criterion = AcceptanceCriterion(
+            user_story_id=story.id, given=given, when_=when, then_=then, position=(last or 0) + 1
+        )
+        self._session.add(criterion)
+        self._session.flush()
+        return criterion
+
+    def update_criterion(self, criterion: AcceptanceCriterion, changes: Mapping[str, str]) -> None:
+        """`changes` com `given`, `when`, `then`."""
+        columns = {"given": "given", "when": "when_", "then": "then_"}
+        for field, value in changes.items():
+            setattr(criterion, columns[field], value)
+        self._session.flush()
+
+    def criteria_count(self, user_story_id: int) -> int:
+        query = select(func.count()).where(AcceptanceCriterion.user_story_id == user_story_id)
+        return self._session.scalar(query) or 0
+
+    def delete_criterion(self, criterion: AcceptanceCriterion) -> None:
+        self._session.delete(criterion)
+        self._session.flush()
+
+    def _next_story_position(self, epic: Epic) -> int:
+        last = self._session.scalar(
+            select(func.max(UserStory.position)).where(UserStory.epic_id == epic.id)
+        )
+        return (last or 0) + 1
 
     def replace(self, meeting_id: str, epics: Sequence[NewEpic]) -> None:
         """Apaga as Epics (US e critérios em cascata), grava `epics` e põe o contador no maior
