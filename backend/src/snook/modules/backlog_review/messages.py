@@ -1,2 +1,6 @@
 NO_BACKLOG = "Esta reunião ainda não tem backlog."
 NOT_EDITABLE = "O backlog só pode ser alterado com a reunião concluída."
+EPIC_NOT_FOUND = "Epic não encontrada."
+EPIC_NOT_EMPTY = "Só é possível excluir uma Epic sem User Stories."
+EPIC_NAME_REQUIRED = "Informe o nome da Epic."
+EPIC_NAME_TOO_LONG = "O nome da Epic tem no máximo 200 caracteres."

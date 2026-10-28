@@ -40,6 +40,55 @@ class BacklogRepository:
         )
         return list(self._session.scalars(query))
 
+    def epic(self, meeting_id: str, epic_id: int) -> Epic | None:
+        """Epic `epic_id` só se for da Reunião (SEC-02)."""
+        query = select(Epic).where(Epic.meeting_id == meeting_id, Epic.id == epic_id)
+        return self._session.scalar(query)
+
+    def epic_named(self, meeting_id: str, name: str) -> Epic | None:
+        """Epic de mesmo nome pela regra de `normalize` (Q57)."""
+        query = select(Epic).where(Epic.meeting_id == meeting_id, Epic.name_norm == normalize(name))
+        return self._session.scalar(query)
+
+    def add_epic(self, meeting_id: str, name: str) -> Epic:
+        """Epic sem US no fim da lista."""
+        last = self._session.scalar(
+            select(func.max(Epic.position)).where(Epic.meeting_id == meeting_id)
+        )
+        epic = Epic(
+            meeting_id=meeting_id, name=name, name_norm=normalize(name), position=(last or 0) + 1
+        )
+        self._session.add(epic)
+        self._session.flush()
+        return epic
+
+    def rename_epic(self, epic: Epic, name: str) -> None:
+        epic.name = name
+        epic.name_norm = normalize(name)
+        self._session.flush()
+
+    def merge_epic(self, source: Epic, target: Epic) -> None:
+        """US de `source` vão para o fim de `target`, na ordem; `source` é apagada."""
+        last = self._session.scalar(
+            select(func.max(UserStory.position)).where(UserStory.epic_id == target.id)
+        )
+        moved = self._session.scalars(
+            select(UserStory).where(UserStory.epic_id == source.id).order_by(UserStory.position)
+        )
+        for offset, story in enumerate(moved, start=1):
+            story.epic_id = target.id
+            story.position = (last or 0) + offset
+        self._session.flush()
+        self.delete_epic(source)
+
+    def has_stories(self, epic: Epic) -> bool:
+        query = select(UserStory.id).where(UserStory.epic_id == epic.id).limit(1)
+        return self._session.scalar(query) is not None
+
+    def delete_epic(self, epic: Epic) -> None:
+        self._session.delete(epic)
+        self._session.flush()
+
     def replace(self, meeting_id: str, epics: Sequence[NewEpic]) -> None:
         """Apaga as Epics (US e critérios em cascata), grava `epics` e põe o contador no maior
         `us_number` gravado: regeneração recomeça em `US-01` (Q50)."""
