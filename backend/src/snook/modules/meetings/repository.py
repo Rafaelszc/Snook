@@ -26,6 +26,10 @@ def list_meetings(session: Session, user_id: str) -> list[Meeting]:
     return list(session.scalars(query))
 
 
+def list_meeting_ids(session: Session, user_id: str) -> list[str]:
+    return list(session.scalars(select(Meeting.id).where(Meeting.user_id == user_id)))
+
+
 def delete_meeting(session: Session, meeting: Meeting) -> None:
     """FKs `ON DELETE CASCADE` levam os dados derivados (04-data-model)."""
     session.delete(meeting)

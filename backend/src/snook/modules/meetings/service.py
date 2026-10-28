@@ -1,6 +1,7 @@
 import logging
 import re
 import uuid
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path, PurePosixPath
@@ -199,6 +200,20 @@ def delete_meeting(uow: UnitOfWork, *, user_id: str, meeting_id: str, audio_root
         files.remove_meeting_dir(audio_root, meeting_id)  # checagens de SEC-15
 
     uow.after_commit(remove_files)
+
+
+def list_meeting_ids_for_user(uow: UnitOfWork, user_id: str) -> list[str]:
+    """`id` das Reuniões do Usuário, para `delete-user` apagar os arquivos depois do commit."""
+    return repository.list_meeting_ids(uow.session, user_id)
+
+
+def remove_meeting_files(audio_root: Path, meeting_ids: Sequence[str]) -> None:
+    """Apaga `/audios/<id>` de cada Reunião. Checa todos antes (SEC-15): um `id` recusado
+    para o comando sem apagar nada."""
+    for meeting_id in meeting_ids:
+        files.meeting_dir(audio_root, meeting_id)
+    for meeting_id in meeting_ids:
+        files.remove_meeting_dir(audio_root, meeting_id)
 
 
 def retry_meeting(

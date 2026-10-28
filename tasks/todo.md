@@ -3111,13 +3111,13 @@
 **Description:** `auth.find_user_by_username` (por `username_norm`), `auth.delete_user(uow, user_id)`, `meetings.list_meeting_ids_for_user` e `meetings.remove_meeting_files(ids)`.
 
 **Acceptance criteria:**
-- [ ] `find_user_by_username` normaliza a entrada e acha o Usuário com caixa diferente da cadastrada (Q39; SEC-24).
-- [ ] `delete_user` num commit leva por `ON DELETE CASCADE` sessões, configurações de LLM, Reuniões e derivados (segmentos, Participantes, Partes, Epics, US, critérios) (SEC-24).
-- [ ] `remove_meeting_files` só age com as checagens de SEC-15 (UUID, `realpath` sob `/audios`, um nível abaixo, não `.tmp`).
+- [x] `find_user_by_username` normaliza a entrada e acha o Usuário com caixa diferente da cadastrada (Q39; SEC-24).
+- [x] `delete_user` num commit leva por `ON DELETE CASCADE` sessões, configurações de LLM, Reuniões e derivados (segmentos, Participantes, Partes, Epics, US, critérios) (SEC-24).
+- [x] `remove_meeting_files` só age com as checagens de SEC-15 (UUID, `realpath` sob `/audios`, um nível abaixo, não `.tmp`).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/auth/test_delete_user_service.py tests/meetings/test_remove_files.py -q`.
-- [ ] Gate backend. SEC-15, SEC-24.
+- [x] `cd backend && uv run pytest tests/auth/test_delete_user_service.py tests/meetings/test_remove_files.py -q`.
+- [x] Gate backend. SEC-15, SEC-24.
 
 **Dependencies:** Tasks 49.4, 19.2
 
@@ -3132,13 +3132,13 @@
 **Description:** `python -m snook.cli delete-user <username>` com trava, confirmação, `--yes`, cascata, remoção de `/audios` e log. Testado em `tests/cli/`.
 
 **Acceptance criteria:**
-- [ ] Apaga as linhas de todas as tabelas e os diretórios do Usuário; dados de outro Usuário não mudam; depois, login com aquele email ou nome responde 401 (transversal 21; US 25); nome inexistente sai com código 1 sem escrever (SEC-24).
-- [ ] Confirmação diferente do argumento sai sem apagar nada; `--yes` pula a confirmação (SEC-24; `08-deployment.md`, "CLI de escrita"); com a trava `/data/snook.lock` ocupada, o comando para com erro e nada é apagado (abuse case "delete-user com backend no ar").
-- [ ] Evento `operator.user_deleted` com `user_id` e `meetings_count`, sem email nem nome de usuário (SEC-20); o argumento passa pela validação do cadastro (`03-security.md`, superfícies).
+- [x] Apaga as linhas de todas as tabelas e os diretórios do Usuário; dados de outro Usuário não mudam; depois, login com aquele email ou nome responde 401 (transversal 21; US 25); nome inexistente sai com código 1 sem escrever (SEC-24).
+- [x] Confirmação diferente do argumento sai sem apagar nada; `--yes` pula a confirmação (SEC-24; `08-deployment.md`, "CLI de escrita"); com a trava `/data/snook.lock` ocupada, o comando para com erro e nada é apagado (abuse case "delete-user com backend no ar").
+- [x] Evento `operator.user_deleted` com `user_id` e `meetings_count`, sem email nem nome de usuário (SEC-20); o argumento passa pela validação do cadastro (`03-security.md`, superfícies).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/cli/test_delete_user.py -q` (dois Usuários com Reuniões e arquivos).
-- [ ] Gate backend. Não rodar em dados reais sem aprovação ("Perguntar antes"). SEC-15, SEC-20, SEC-24.
+- [x] `cd backend && uv run pytest tests/cli/test_delete_user.py -q` (dois Usuários com Reuniões e arquivos).
+- [x] Gate backend. Não rodar em dados reais sem aprovação ("Perguntar antes"). SEC-15, SEC-20, SEC-24.
 
 **Dependencies:** Task 50.1
 
@@ -3150,13 +3150,13 @@
 
 ### Checkpoint: `delete-user`
 
-- [ ] Critério transversal 21 e US 25 de `01-prd.md` cobertos em `tests/cli/`
-- [ ] SEC-24: apaga linhas de todas as tabelas e diretórios do Usuário; dados de outro Usuário não mudam; nome inexistente sai com código 1 sem escrever
-- [ ] SEC-24: confirmação errada (nome digitado diferente do argumento) sai sem apagar nada (`08-deployment.md`, "CLI de escrita")
-- [ ] Abuse case "delete-user com backend no ar": com a trava ocupada, o comando para com erro e nada é apagado
-- [ ] `find_user_by_username` compara por `username_norm` (Q39); teste com caixa diferente
-- [ ] Evento `operator.user_deleted` com `user_id` e `meetings_count`, sem email nem nome de usuário (SEC-20)
-- [ ] `/security-review` sobre o diff
+- [x] Critério transversal 21 e US 25 de `01-prd.md` cobertos em `tests/cli/`
+- [x] SEC-24: apaga linhas de todas as tabelas e diretórios do Usuário; dados de outro Usuário não mudam; nome inexistente sai com código 1 sem escrever
+- [x] SEC-24: confirmação errada (nome digitado diferente do argumento) sai sem apagar nada (`08-deployment.md`, "CLI de escrita")
+- [x] Abuse case "delete-user com backend no ar": com a trava ocupada, o comando para com erro e nada é apagado
+- [x] `find_user_by_username` compara por `username_norm` (Q39); teste com caixa diferente
+- [x] Evento `operator.user_deleted` com `user_id` e `meetings_count`, sem email nem nome de usuário (SEC-20)
+- [x] `/security-review` sobre o diff
 
 ### Task 51.1: README de release
 

@@ -30,6 +30,16 @@ def find_user_by_login(session: Session, identifier_norm: str) -> User | None:
     )
 
 
+def find_user_by_username(session: Session, username_norm: str) -> User | None:
+    return session.scalar(select(User).where(User.username_norm == username_norm))
+
+
+def delete_user(session: Session, user_id: str) -> None:
+    """DELETE no banco: FKs `ON DELETE CASCADE` levam o resto (04-data-model)."""
+    session.execute(delete(User).where(User.id == user_id))
+    session.expire_all()
+
+
 def add_session(session: Session, row: UserSession) -> None:
     session.add(row)
     session.flush()

@@ -18,6 +18,11 @@ def _invalid(message: str) -> PydanticCustomError:
     return PydanticCustomError(FIELD_MESSAGE_ERROR, message)
 
 
+def is_valid_username(value: str) -> bool:
+    """Regra do cadastro (Q39); `delete-user` usa a mesma no argumento."""
+    return _USERNAME.fullmatch(value) is not None
+
+
 class RegisterRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -37,7 +42,7 @@ class RegisterRequest(BaseModel):
     @classmethod
     def _check_username(cls, value: str) -> str:
         value = value.strip()
-        if not _USERNAME.fullmatch(value):
+        if not is_valid_username(value):
             raise _invalid(messages.USERNAME_INVALID)
         return value
 
