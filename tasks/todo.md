@@ -2094,8 +2094,8 @@
 
 ### Checkpoint: `participants` API
 
-- [ ] Critérios 1 a 24 de `01-prd/participants.md` passam
-- [ ] Task 27.3 reconferida contra a rota real `GET /participants`
+- [x] Critérios 1 a 24 de `01-prd/participants.md` passam
+- [x] Task 27.3 reconferida contra a rota real `GET /participants`
 - [ ] `/security-review` sobre o diff
 
 ### Task 34.1: Tela de nomeação: speakers, amostra e campos
