@@ -7,5 +7,7 @@ d1b613b4c8f7aca2263d8a249c92e1831d15ed5f:frontend/src/features/llm-providers/Pro
 # Commit fae3128 (Task 26): token HF falso dos testes antes da convenção `TesteToken`.
 fae3128af249d5b2f1818a3394508814f24596f9:backend/tests/cli/test_download_models.py:generic-api-key:13
 fae3128af249d5b2f1818a3394508814f24596f9:backend/tests/diarized_transcription/test_pyannote_settings.py:generic-api-key:36
-# Commit 18f8049 (Task 38): `total_tokens: SPLIT_2H_COUNT * SEGMENT_TOKENS` do fixture, falso positivo.
+# Commit 18f8049 (Task 38): soma de tokens do fixture split-2h, falso positivo.
 18f804994337a65f6b6bd5c2dc972fd46fdc3bab:frontend/src/features/transcript-split/fixtures/split-2h.ts:generic-api-key:20
+# Commit 0203b1e: comentário acima citava a linha do fixture, falso positivo.
+0203b1e60366235d2bdcf242fdf8d621a2425243:.gitleaksignore:generic-api-key:10
