@@ -2743,13 +2743,13 @@
 **Description:** `PATCH /api/meetings/{id}/epics/{epic_id}`.
 
 **Acceptance criteria:**
-- [ ] Nome novo é gravado sem espaços nas pontas (`backlog-review` 5); nome de outra Epic da mesma Reunião, sem diferenciar caixa e espaços nas pontas, junta as duas: sobrevive a que já tinha o nome e as US da renomeada passam para ela, depois das existentes; a resposta traz `merged_into` (`backlog-review` 6).
-- [ ] Nome vazio ou só de espaços recebe 422 (`backlog-review` 9); fora de `done` responde 409 sem mudar nada (`backlog-review` 30, um teste por status).
-- [ ] `epic_id` de outra Reunião ou Reunião de outro Usuário responde 404; sem sessão, 401 (`backlog-review` 37, 38; SEC-02).
+- [x] Nome novo é gravado sem espaços nas pontas (`backlog-review` 5); nome de outra Epic da mesma Reunião, sem diferenciar caixa e espaços nas pontas, junta as duas: sobrevive a que já tinha o nome e as US da renomeada passam para ela, depois das existentes; a resposta traz `merged_into` (`backlog-review` 6).
+- [x] Nome vazio ou só de espaços recebe 422 (`backlog-review` 9); fora de `done` responde 409 sem mudar nada (`backlog-review` 30, um teste por status).
+- [x] `epic_id` de outra Reunião ou Reunião de outro Usuário responde 404; sem sessão, 401 (`backlog-review` 37, 38; SEC-02).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_epic_rename.py -q`.
-- [ ] Gate backend. SEC-02, SEC-04, SEC-09.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_epic_rename.py -q`.
+- [x] Gate backend. SEC-02, SEC-04, SEC-09.
 
 **Dependencies:** Task 43
 
@@ -2764,13 +2764,13 @@
 **Description:** `POST /api/meetings/{id}/epics`.
 
 **Acceptance criteria:**
-- [ ] Nome não vazio que não existe na Reunião cria a Epic sem US no fim da lista e responde 201 (`backlog-review` 7).
-- [ ] Nome igual ao de uma Epic da mesma Reunião não cria segunda: responde 200 com a existente; Epic de mesmo nome em outra Reunião do mesmo Usuário não impede, resposta 201 (`backlog-review` 8).
-- [ ] Nome vazio recebe 422 (`backlog-review` 9); fora de `done` responde 409 (`backlog-review` 30); 404/401 conforme isolamento (`backlog-review` 37, 38).
+- [x] Nome não vazio que não existe na Reunião cria a Epic sem US no fim da lista e responde 201 (`backlog-review` 7).
+- [x] Nome igual ao de uma Epic da mesma Reunião não cria segunda: responde 200 com a existente; Epic de mesmo nome em outra Reunião do mesmo Usuário não impede, resposta 201 (`backlog-review` 8).
+- [x] Nome vazio recebe 422 (`backlog-review` 9); fora de `done` responde 409 (`backlog-review` 30); 404/401 conforme isolamento (`backlog-review` 37, 38).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_epic_create.py -q`.
-- [ ] Gate backend. SEC-02, SEC-04, SEC-09.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_epic_create.py -q`.
+- [x] Gate backend. SEC-02, SEC-04, SEC-09.
 
 **Dependencies:** Task 44.1
 
@@ -2785,13 +2785,13 @@
 **Description:** `DELETE /api/meetings/{id}/epics/{epic_id}`.
 
 **Acceptance criteria:**
-- [ ] Epic sem US é removida com 204 (`backlog-review` 10).
-- [ ] Epic com US recebe 409 `epic_not_empty` e nada muda (`backlog-review` 10).
-- [ ] Fora de `done` responde 409 (`backlog-review` 30); 404/401 conforme isolamento (`backlog-review` 37, 38).
+- [x] Epic sem US é removida com 204 (`backlog-review` 10).
+- [x] Epic com US recebe 409 `epic_not_empty` e nada muda (`backlog-review` 10).
+- [x] Fora de `done` responde 409 (`backlog-review` 30); 404/401 conforme isolamento (`backlog-review` 37, 38).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_epic_delete.py -q`.
-- [ ] Gate backend. SEC-02, SEC-04.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_epic_delete.py -q`.
+- [x] Gate backend. SEC-02, SEC-04.
 
 **Dependencies:** Task 44.2
 

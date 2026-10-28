@@ -34,11 +34,11 @@ def add_segments(
 
 
 def activate_provider(settings: Settings, username: str = "ana") -> None:
-    """ "Provedor ativo" fake: configuração ativa gravada direto, sem chave."""
+    """ "Provedor ativo" fake: configuração ativa gravada direto, sem chave. Idempotente."""
     with sqlite3.connect(settings.database_path) as conn:
         conn.execute(
-            "INSERT INTO llm_configs (user_id, provider, base_url, model, context_window, "
-            "key_status, is_active, created_at, updated_at) "
+            "INSERT OR IGNORE INTO llm_configs (user_id, provider, base_url, model, "
+            "context_window, key_status, is_active, created_at, updated_at) "
             "SELECT id, 'ollama', 'http://host.docker.internal:11434', 'llama3', 8192, 'ok', 1, "
             "'2026-10-28T12:00:00Z', '2026-10-28T12:00:00Z' FROM users WHERE username = ?",
             (username,),
