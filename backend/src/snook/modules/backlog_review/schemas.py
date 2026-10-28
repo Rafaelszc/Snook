@@ -14,6 +14,7 @@ from pydantic_core import PydanticCustomError
 
 from snook.core.errors import FIELD_MESSAGE_ERROR
 from snook.modules.backlog_review import messages
+from snook.modules.participants.schemas import ParticipantName, ParticipantOut
 
 # `05-api.md`, "Tamanhos máximos de entrada".
 EPIC_NAME_MAX = 200
@@ -226,3 +227,18 @@ class StoryPatch(_Patch):
     @classmethod
     def _required(cls, value: object) -> object:
         return cls._not_null(value)
+
+
+class ParticipantRename(BaseModel):
+    """Corpo de renomear Participante; mesma validação de `participants` 8 (SEC-09)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: ParticipantName
+
+
+class ParticipantRenamed(BaseModel):
+    """Participante que ficou; `absorbed_id` só quando houve união (`backlog-review` 24)."""
+
+    participant: ParticipantOut
+    absorbed_id: int | None

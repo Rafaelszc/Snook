@@ -2916,13 +2916,13 @@
 **Description:** `PATCH /api/meetings/{id}/participants/{participant_id}` chama `participants.rename` com `before_absorb` que troca `requested_by` nas US, tudo numa transação.
 
 **Acceptance criteria:**
-- [ ] Nome novo troca o nome e todas as US do solicitante mostram o nome novo (`backlog-review` 23); nome de outro Participante da Reunião une os dois e as US do absorvido passam ao sobrevivente, numa só transação (`backlog-review` 24).
-- [ ] Não chama a LLM e não muda texto das US nem Epics (`backlog-review` 25; transversal 17).
-- [ ] A regra de status segue `participants` 21: recusa só em `generating` e sem Participantes confirmados (`backlog-review` 30); `participant_id` de outra Reunião responde 404 (`backlog-review` 37); 401 sem sessão (`backlog-review` 38).
+- [x] Nome novo troca o nome e todas as US do solicitante mostram o nome novo (`backlog-review` 23); nome de outro Participante da Reunião une os dois e as US do absorvido passam ao sobrevivente, numa só transação (`backlog-review` 24).
+- [x] Não chama a LLM e não muda texto das US nem Epics (`backlog-review` 25; transversal 17).
+- [x] A regra de status segue `participants` 21: recusa só em `generating` e sem Participantes confirmados (`backlog-review` 30); `participant_id` de outra Reunião responde 404 (`backlog-review` 37); 401 sem sessão (`backlog-review` 38).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_rename_participant.py -q` (implementação real de `participants`).
-- [ ] Gate backend. SEC-02, SEC-04, SEC-09.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_rename_participant.py -q` (implementação real de `participants`).
+- [x] Gate backend. SEC-02, SEC-04, SEC-09.
 
 **Dependencies:** Tasks 45.5, 33
 

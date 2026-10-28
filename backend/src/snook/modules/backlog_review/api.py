@@ -14,6 +14,8 @@ from snook.modules.backlog_review.schemas import (
     EpicName,
     EpicRenamed,
     EpicSummary,
+    ParticipantRename,
+    ParticipantRenamed,
     StoryCreate,
     StoryPatch,
     UserStoryOut,
@@ -120,4 +122,19 @@ def delete_criterion(meeting_id: str, criterion_id: int, user: CurrentUser, uow:
     with uow:
         service.delete_criterion(
             uow, user_id=user.id, meeting_id=meeting_id, criterion_id=criterion_id
+        )
+
+
+@router.patch("/{meeting_id}/participants/{participant_id}")
+def rename_participant(
+    meeting_id: str, participant_id: int, body: ParticipantRename, user: CurrentUser, uow: Uow
+) -> ParticipantRenamed:
+    """`backlog-review` 23 a 25: um commit com a troca de solicitante."""
+    with uow:
+        return service.rename_participant(
+            uow,
+            user_id=user.id,
+            meeting_id=meeting_id,
+            participant_id=participant_id,
+            name=body.name,
         )
