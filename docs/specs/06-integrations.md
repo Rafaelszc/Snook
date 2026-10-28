@@ -54,7 +54,7 @@
 - `respx` intercepta `httpx`. Fixtures em `backend/tests/fixtures/llm/<provider>/<caso>.json` (status, headers sem auth, corpo).
 - Casos por provedor: sucesso, 401, 404 de modelo, contexto excedido, 429, timeout, 302 (todos), corpo de 6 MB.
 - Gravação das fixtures: manual, a partir da documentação oficial e de uma chamada real feita pelo desenvolvedor com chave própria. Chave e IDs de conta removidos antes do commit.
-- Suíte `llm_real` (opcional): chaves em `SNOOK_TEST_OPENAI_KEY`, `SNOOK_TEST_ANTHROPIC_KEY`, `SNOOK_TEST_DEEPSEEK_KEY`, `SNOOK_TEST_OLLAMA_URL`.
+- Suíte `llm_real` (opcional): chaves em `SNOOK_TEST_OPENAI_KEY`, `SNOOK_TEST_ANTHROPIC_KEY`, `SNOOK_TEST_DEEPSEEK_KEY`, `SNOOK_TEST_OLLAMA_URL`. Modelo opcional em `SNOOK_TEST_<PROVIDER>_MODEL` (padrão do ADR-0013).
 
 ## HuggingFace Hub
 

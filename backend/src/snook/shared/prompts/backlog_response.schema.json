@@ -37,7 +37,7 @@
                 "priority": { "type": "string", "enum": ["Low", "Medium", "High"] },
                 "story_points": { "type": "integer", "enum": [1, 2, 3, 5, 8, 13] },
                 "requested_by": { "type": ["string", "null"], "maxLength": 100 },
-                "requested_at": { "type": "string", "pattern": "^\\d{2}:[0-5]\\d:[0-5]\\d$" },
+                "requested_at": { "type": "string", "pattern": "^[0-9]{2}:[0-5][0-9]:[0-5][0-9]$" },
                 "acceptance_criteria": {
                   "type": "array",
                   "minItems": 1,

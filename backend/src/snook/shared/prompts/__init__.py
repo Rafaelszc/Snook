@@ -9,7 +9,8 @@ from functools import cache
 from importlib.resources import files
 from typing import Any
 
-# Sobe junto com o texto do prompt; o snapshot em `tests/shared/test_prompts.py` cobra.
+# Sobe junto com o texto do prompt; cobrado pelo snapshot em
+# `tests/backlog_generation/snapshots/system_prompt.md`.
 BACKLOG_PROMPT_VERSION = "1"
 
 

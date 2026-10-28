@@ -1077,7 +1077,7 @@
 **Description:** `generate(user_id, provider_snapshot, system_prompt, content, json_schema, max_output_tokens) -> str` sobre o adapter do provedor ativo.
 
 **Acceptance criteria:**
-- [x] Para cada um dos quatro provedores, "Gerar" com o adapter ligado a respostas gravadas devolve o texto (`llm-providers` 29).
+- [ ] Para cada um dos quatro provedores, "Gerar" com o adapter ligado a respostas gravadas devolve o texto (`llm-providers` 29).
 - [x] "Gerar" usa o provedor ativo e o modelo salvos do Usuário dono (`llm-providers` 31).
 - [x] Erros tipados do contrato sobem sem a chave (`llm-providers` 30, 27; SEC-17).
 
@@ -2671,13 +2671,13 @@
 **Description:** Teste de snapshot do texto do prompt, versionado no repo.
 
 **Acceptance criteria:**
-- [ ] O System Prompt fica num arquivo versionado e nenhuma rota o lê ou altera (`backlog-generation` 30).
-- [ ] O prompt pede pt-BR, o schema, prioridade em Low/Medium/High, story points na escala, solicitante entre os nomes fornecidos e instante absoluto em `hh:mm:ss` (`backlog-generation` 31).
-- [ ] O teste de snapshot falha quando o prompt muda sem o snapshot ser atualizado no mesmo commit (`backlog-generation` 31).
+- [x] O System Prompt fica num arquivo versionado e nenhuma rota o lê ou altera (`backlog-generation` 30).
+- [x] O prompt pede pt-BR, o schema, prioridade em Low/Medium/High, story points na escala, solicitante entre os nomes fornecidos e instante absoluto em `hh:mm:ss` (`backlog-generation` 31).
+- [x] O teste de snapshot falha quando o prompt muda sem o snapshot ser atualizado no mesmo commit (`backlog-generation` 31).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_prompt_snapshot.py -q`.
-- [ ] Gate backend. SEC-18.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_prompt_snapshot.py -q`.
+- [x] Gate backend. SEC-18.
 
 **Dependencies:** Task 41.3
 
@@ -2692,11 +2692,11 @@
 
 **Acceptance criteria:**
 - [ ] Para cada um dos quatro provedores, a resposta passa na validação de `backlog-generation` e o backlog sai no mesmo formato (transversal 3, RT-01).
-- [ ] `uv run pytest` padrão não coleta `llm_real` (transversal 18); sem chave real no repo (SEC-08).
+- [x] `uv run pytest` padrão não coleta `llm_real` (transversal 18); sem chave real no repo (SEC-08).
 - [ ] Resultado por provedor vai ao PR de release.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest` (sem `llm_real`).
+- [x] `cd backend && uv run pytest` (sem `llm_real`).
 - [ ] Manual: `cd backend && uv run pytest -m llm_real` com as chaves em variáveis de ambiente.
 
 **Dependencies:** Task 42.1
