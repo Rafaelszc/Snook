@@ -17,6 +17,7 @@ from snook.core.uow import UnitOfWork
 from snook.modules.auth import messages, repository
 from snook.modules.auth.models import User, UserSession
 from snook.modules.auth.schemas import PASSWORD_MAX_BYTES
+from snook.modules.auth.schemas import is_valid_username as is_valid_username
 
 SESSION_TOKEN_BYTES = 32
 
@@ -193,3 +194,15 @@ def delete_session(uow: UnitOfWork, token: str) -> None:
 def delete_expired_sessions(uow: UnitOfWork, *, now: datetime, idle_seconds: int) -> int:
     idle_cutoff = now - timedelta(seconds=idle_seconds)
     return repository.delete_expired_sessions(uow.session, to_iso(now), to_iso(idle_cutoff))
+
+
+def find_user_by_username(uow: UnitOfWork, username: str) -> AuthUser | None:
+    """Normaliza e compara por `username_norm` (Q39); email não acha (SEC-24)."""
+    user = repository.find_user_by_username(uow.session, normalize(username))
+    return _public(user) if user is not None else None
+
+
+def delete_user(uow: UnitOfWork, user_id: str) -> None:
+    """Apaga o Usuário; sessões, configurações de LLM, Reuniões e derivados vão junto no
+    mesmo commit (SEC-24). Arquivos em `/audios` ficam com `meetings.remove_meeting_files`."""
+    repository.delete_user(uow.session, user_id)
