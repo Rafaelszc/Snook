@@ -12,6 +12,9 @@ export const STAGE_LABELS = {
 export const MESSAGES = {
   openTranscript: "Ver transcrição",
   nameParticipants: "Nomear participantes",
+  splitMeeting: "Dividir reunião",
+  splitMeetingHint:
+    "A transcrição não cabe no modelo ativo. Divida a reunião em partes ou troque de modelo.",
   nameParticipantsHint:
     "A transcrição terminou. Dê um nome a cada voz para gerar o backlog.",
   listTitle: "Reuniões",

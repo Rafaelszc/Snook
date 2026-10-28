@@ -90,6 +90,21 @@ function NamingCall({ meeting }: { meeting: MeetingDetail }) {
   )
 }
 
+// Não cabe no modelo: o próximo passo é a tela de divisão (`transcript-split` 30).
+function SplitCall({ meeting }: { meeting: MeetingDetail }) {
+  if (meeting.status !== "needs_split") return null
+  return (
+    <section className="flex flex-col items-start gap-3 rounded-xl border border-border p-5">
+      <p className="text-sm text-muted-foreground">
+        {MESSAGES.splitMeetingHint}
+      </p>
+      <Link to={`/meetings/${meeting.id}/split`} className={buttonVariants()}>
+        {MESSAGES.splitMeeting}
+      </Link>
+    </section>
+  )
+}
+
 // Tamanhos de texto: sm, base, 2xl.
 export function MeetingDetailPage() {
   const { id = "" } = useParams()
@@ -135,6 +150,7 @@ export function MeetingDetailPage() {
           </header>
           <Failure meeting={meeting} />
           <NamingCall meeting={meeting} />
+          <SplitCall meeting={meeting} />
           <Facts meeting={meeting} />
           {hasTranscript ? (
             <Link

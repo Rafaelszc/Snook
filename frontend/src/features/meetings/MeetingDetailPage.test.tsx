@@ -197,6 +197,28 @@ it("em transcribed sem nomes, leva à tela de nomeação (participants 25)", asy
   expect(router.state.location.pathname).toBe(`${PATH}/participants`)
 })
 
+it("em needs_split, leva à tela de divisão (transcript-split 30)", async () => {
+  detailSequence(
+    detail({ status: "needs_split", participants_confirmed: true })
+  )
+  const { container, router } = renderMeetings(PATH)
+
+  const link = await screen.findByRole("link", { name: "Dividir reunião" })
+  expect(await axe(container)).toHaveNoViolations()
+  await userEvent.click(link)
+  expect(router.state.location.pathname).toBe(`${PATH}/split`)
+})
+
+it("fora de needs_split, não oferece divisão", async () => {
+  detailSequence(detail({ status: "done", participants_confirmed: true }))
+  renderMeetings(PATH)
+
+  expect(await screen.findByText("Concluída")).toBeVisible()
+  expect(
+    screen.queryByRole("link", { name: "Dividir reunião" })
+  ).not.toBeInTheDocument()
+})
+
 it("com nomes confirmados ou em outro status, não oferece nomeação", async () => {
   detailSequence(
     detail({ status: "transcribed", participants_confirmed: true })
