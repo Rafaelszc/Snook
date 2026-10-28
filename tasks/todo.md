@@ -2103,13 +2103,13 @@
 **Description:** Do detalhe em `transcribed` com `participants_confirmed` falso, vai à tela de nomeação; cada speaker traz botão de tocar amostra, tempo de fala e campo de nome.
 
 **Acceptance criteria:**
-- [ ] O detalhe de uma Reunião em `transcribed` com `participants_confirmed` falso leva à tela de nomeação (`participants` 25).
-- [ ] Cada speaker mostra botão para tocar a amostra, o tempo total de fala e um campo de nome (`participants` 26); o botão de confirmar fica desabilitado enquanto algum speaker está sem nome (`participants` 30).
-- [ ] `vitest-axe` sem violação; foco e teclado funcionam no botão de amostra.
+- [x] O detalhe de uma Reunião em `transcribed` com `participants_confirmed` falso leva à tela de nomeação (`participants` 25).
+- [x] Cada speaker mostra botão para tocar a amostra, o tempo total de fala e um campo de nome (`participants` 26); o botão de confirmar fica desabilitado enquanto algum speaker está sem nome (`participants` 30).
+- [x] `vitest-axe` sem violação; foco e teclado funcionam no botão de amostra.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/participants`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/participants`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 31.2, 22.3
 
@@ -2126,13 +2126,13 @@
 **Description:** Indicação de junção por nome igual, provedor e modelo ativos, bloqueio sem provedor e confirmação.
 
 **Acceptance criteria:**
-- [ ] Dois ou mais speakers com o mesmo nome mostram que serão juntados num só Participante (`participants` 27).
-- [ ] Mostra o provedor ativo e o modelo da geração (`participants` 28); sem provedor ativo, mostra mensagem com link para a tela de configurações e desabilita confirmar (`participants` 29).
-- [ ] Depois de confirmar, leva ao detalhe, onde o status é acompanhado (`participants` 31).
+- [x] Dois ou mais speakers com o mesmo nome mostram que serão juntados num só Participante (`participants` 27).
+- [x] Mostra o provedor ativo e o modelo da geração (`participants` 28); sem provedor ativo, mostra mensagem com link para a tela de configurações e desabilita confirmar (`participants` 29).
+- [x] Depois de confirmar, leva ao detalhe, onde o status é acompanhado (`participants` 31).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/participants`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/participants`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 34.1, 32.3, 17.1
 

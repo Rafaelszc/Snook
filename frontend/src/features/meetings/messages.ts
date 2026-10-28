@@ -11,6 +11,9 @@ export const STAGE_LABELS = {
 
 export const MESSAGES = {
   openTranscript: "Ver transcrição",
+  nameParticipants: "Nomear participantes",
+  nameParticipantsHint:
+    "A transcrição terminou. Dê um nome a cada voz para gerar o backlog.",
   listTitle: "Reuniões",
   listDescription: "Gravações enviadas e o andamento de cada uma.",
   newMeeting: "Nova reunião",
