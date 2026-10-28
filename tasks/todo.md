@@ -2476,13 +2476,13 @@
 **Description:** `validation.py`: JSON validado por Pydantic estrito com os tamanhos máximos de `05-api.md`.
 
 **Acceptance criteria:**
-- [ ] Prioridade aceita sem diferenciar caixa (`high`, `HIGH`) e gravada como `Low`, `Medium` ou `High`; outro valor invalida (`backlog-generation` 8); story points fora de 1, 2, 3, 5, 8, 13 invalidam (`backlog-generation` 9).
-- [ ] US sem critério, ou com `given`, `when` ou `then` vazio, invalida; nome de Epic, nome de US, `as_a`, `i_want` ou `so_that` vazio invalida (`backlog-generation` 10, 11).
-- [ ] `requested_at` em `hh:mm:ss` entre 0 e a duração do áudio vira segundos, fora disso ou em outro formato invalida (`backlog-generation` 12); resposta que não é JSON ou não segue o schema, e campo acima do tamanho máximo, são inválidas (`backlog-generation` 14; SEC-18).
+- [x] Prioridade aceita sem diferenciar caixa (`high`, `HIGH`) e gravada como `Low`, `Medium` ou `High`; outro valor invalida (`backlog-generation` 8); story points fora de 1, 2, 3, 5, 8, 13 invalidam (`backlog-generation` 9).
+- [x] US sem critério, ou com `given`, `when` ou `then` vazio, invalida; nome de Epic, nome de US, `as_a`, `i_want` ou `so_that` vazio invalida (`backlog-generation` 10, 11).
+- [x] `requested_at` em `hh:mm:ss` entre 0 e a duração do áudio vira segundos, fora disso ou em outro formato invalida (`backlog-generation` 12); resposta que não é JSON ou não segue o schema, e campo acima do tamanho máximo, são inválidas (`backlog-generation` 14; SEC-18).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_validation.py -q` (tabela de respostas fake, uma por regra).
-- [ ] Gate backend (adiciona `backlog_generation` ao grafo do `lint-imports`). SEC-18.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_validation.py -q` (tabela de respostas fake, uma por regra).
+- [x] Gate backend (adiciona `backlog_generation` ao grafo do `lint-imports`). SEC-18.
 
 **Dependencies:** Task 35.1
 
@@ -2497,13 +2497,13 @@
 **Description:** Liga `requested_by` ao Participante da Reunião, sem diferenciar caixa e espaços nas pontas.
 
 **Acceptance criteria:**
-- [ ] `requested_by` igual ao nome de um Participante liga a US a ele (`backlog-generation` 13).
-- [ ] Nome desconhecido, vazio ou ausente deixa o solicitante vazio, sem invalidar (`backlog-generation` 13).
-- [ ] Nome nunca vai a SQL, caminho ou comando; só compara texto (SEC-18).
+- [x] `requested_by` igual ao nome de um Participante liga a US a ele (`backlog-generation` 13).
+- [x] Nome desconhecido, vazio ou ausente deixa o solicitante vazio, sem invalidar (`backlog-generation` 13).
+- [x] Nome nunca vai a SQL, caminho ou comando; só compara texto (SEC-18).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_requester_mapping.py -q`.
-- [ ] Gate backend. SEC-18.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_requester_mapping.py -q`.
+- [x] Gate backend. SEC-18.
 
 **Dependencies:** Task 39.1, 32.2
 

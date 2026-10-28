@@ -135,4 +135,4 @@ forbidden_modules = ["snook.cli", "snook.main"]
 name = "módulos seguem a build order"
 type = "layers"
 containers = ["snook.modules"]
-layers = ["transcript_split", "participants", "diarized_transcription", "llm_providers | meetings", "auth"]
+layers = ["backlog_generation", "transcript_split", "participants", "diarized_transcription", "llm_providers | meetings", "auth"]
