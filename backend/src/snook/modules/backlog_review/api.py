@@ -1,8 +1,9 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Request, Response, status
 
-from snook.core.deps import get_uow
+from snook.core.clock import Clock
+from snook.core.deps import get_clock, get_uow
 from snook.core.uow import UnitOfWork
 from snook.modules.auth.deps import CurrentUser
 from snook.modules.backlog_review import service
@@ -16,14 +17,26 @@ from snook.modules.backlog_review.schemas import (
     EpicSummary,
     ParticipantRename,
     ParticipantRenamed,
+    RegenerateIn,
+    RegenerateOut,
     StoryCreate,
     StoryPatch,
     UserStoryOut,
 )
+from snook.modules.transcript_split import service as transcript_split
 
 router = APIRouter(prefix="/api/meetings")
 
+
+def get_estimate(request: Request) -> transcript_split.Estimate:
+    """ "Estimar tokens" de `llm-providers`; teste troca por fake em `app.state`."""
+    estimate: transcript_split.Estimate = request.app.state.estimate_tokens
+    return estimate
+
+
 Uow = Annotated[UnitOfWork, Depends(get_uow)]
+CurrentClock = Annotated[Clock, Depends(get_clock)]
+CurrentEstimate = Annotated[transcript_split.Estimate, Depends(get_estimate)]
 
 
 @router.get("/{meeting_id}/backlog")
@@ -138,3 +151,25 @@ def rename_participant(
             participant_id=participant_id,
             name=body.name,
         )
+
+
+@router.post("/{meeting_id}/regenerate", status_code=status.HTTP_202_ACCEPTED)
+def regenerate(
+    meeting_id: str,
+    body: RegenerateIn,
+    user: CurrentUser,
+    uow: Uow,
+    clock: CurrentClock,
+    estimate: CurrentEstimate,
+) -> RegenerateOut:
+    """`backlog-review` 26 a 29. "Partes prontas" sai depois do commit."""
+    with uow:
+        new_status = service.regenerate(
+            uow,
+            user_id=user.id,
+            meeting_id=meeting_id,
+            mode=body.mode,
+            now=clock.now(),
+            estimate=estimate,
+        )
+    return RegenerateOut(status=new_status)

@@ -1,3 +1,4 @@
+from datetime import datetime
 from itertools import groupby
 
 from snook.core.errors import AppError
@@ -14,6 +15,7 @@ from snook.modules.backlog_review.schemas import (
     EpicRenamed,
     EpicSummary,
     ParticipantRenamed,
+    RegenerateMode,
     RequesterOut,
     StoryCreate,
     StoryPatch,
@@ -272,3 +274,26 @@ def rename_participant(
 
     result = participants.rename(uow, meeting_id, participant_id, name, before_absorb)
     return ParticipantRenamed(participant=result.participant, absorbed_id=result.absorbed_id)
+
+
+def regenerate(
+    uow: UnitOfWork,
+    *,
+    user_id: str,
+    meeting_id: str,
+    mode: RegenerateMode,
+    now: datetime,
+    estimate: transcript_split.Estimate,
+) -> str:
+    """`backlog-review` 26 a 29: "Preparar geração" de `transcript-split`; o backlog anterior
+    fica até a nova geração terminar bem. Devolve o status novo."""
+    require_editable(uow, user_id, meeting_id)
+    if mode == "adjust_cuts":
+        if len(transcript_split.list_parts(uow, meeting_id)) < 2:
+            raise AppError("not_split", messages.NOT_SPLIT, 422)
+        return transcript_split.prepare_generation(
+            uow, meeting_id, "reajustar", now=now, estimate=estimate
+        )
+    return transcript_split.prepare_generation(
+        uow, meeting_id, "normal", now=now, estimate=estimate
+    )
