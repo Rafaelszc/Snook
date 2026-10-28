@@ -20,7 +20,7 @@ export const MESSAGES = {
   // `screen-recording` 4 a 7.
   missingTitle: "Falta uma fonte de áudio",
   missingDisplay:
-    "O som da tela não está disponível. Compartilhe uma aba ou tela com áudio, ou grave só com o microfone.",
+    "O som da tela não foi captado. Janela não traz som; no Linux e no macOS, tela inteira também não. Cancele e compartilhe a aba da reunião com \"Compartilhar áudio da aba\" marcado, ou grave só com o microfone.",
   missingMic:
     "O microfone não está disponível ou o acesso foi negado. Grave só com o som da tela ou cancele.",
   micOnly: "Gravar só com o microfone",
