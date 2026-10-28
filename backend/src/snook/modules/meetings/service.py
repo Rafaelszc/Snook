@@ -364,6 +364,11 @@ def read_status(uow: UnitOfWork, meeting_id: str) -> str:
     return _existing(uow, meeting_id).status
 
 
+def read_owner(uow: UnitOfWork, meeting_id: str) -> str:
+    """`user_id` do dono, para quem age por aviso sem sessão (`transcript-split` 4)."""
+    return _existing(uow, meeting_id).user_id
+
+
 def _flags(meeting: Meeting) -> MeetingFlags:
     return MeetingFlags(
         participants_confirmed=meeting.participants_confirmed_at is not None,

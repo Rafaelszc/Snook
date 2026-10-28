@@ -2149,7 +2149,7 @@
 - [x] Critérios 25 a 31 cobertos
 - [x] Checagem de UI; `impeccable-design-polish` na tela de nomeação
 - [x] `/security-review` sobre o diff
-- [ ] Revisão humana antes de seguir
+- [x] Revisão humana antes de seguir
 
 ---
 
@@ -2160,13 +2160,13 @@
 **Description:** `backlog_system_prompt.md`, `backlog_response.schema.json` e loader, importáveis por `transcript_split` e `backlog_generation` sem ciclo (ADR-0020).
 
 **Acceptance criteria:**
-- [ ] O prompt pede pt-BR, o schema da resposta, prioridade Low/Medium/High, story points 1/2/3/5/8/13, solicitante entre os nomes fornecidos e instante absoluto `hh:mm:ss` (`backlog-generation` 31).
-- [ ] O schema segue "Schema da resposta da LLM" com os tamanhos máximos de `05-api.md` (SEC-18).
-- [ ] `shared` não importa `modules` (`lint-imports`); nenhuma rota lê ou altera o prompt (`backlog-generation` 30).
+- [x] O prompt pede pt-BR, o schema da resposta, prioridade Low/Medium/High, story points 1/2/3/5/8/13, solicitante entre os nomes fornecidos e instante absoluto `hh:mm:ss` (`backlog-generation` 31).
+- [x] O schema segue "Schema da resposta da LLM" com os tamanhos máximos de `05-api.md` (SEC-18).
+- [x] `shared` não importa `modules` (`lint-imports`); nenhuma rota lê ou altera o prompt (`backlog-generation` 30).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/shared/test_prompts.py -q`.
-- [ ] Gate backend. SEC-18.
+- [x] `cd backend && uv run pytest tests/shared/test_prompts.py -q`.
+- [x] Gate backend. SEC-18.
 
 **Dependencies:** Task 2
 
@@ -2181,13 +2181,13 @@
 **Description:** `part_text.py`: uma linha por segmento, `[hh:mm:ss] Nome: texto`, instante absoluto, nome atual lido a cada montagem.
 
 **Acceptance criteria:**
-- [ ] Uma linha por segmento, na ordem, com instante absoluto de início, nome do Participante ligado ao speaker e texto (`transcript-split` 25).
-- [ ] Parte que começa no meio da gravação mostra instantes absolutos (`transcript-split` 26).
-- [ ] Depois de renomear um Participante, o texto usa o nome novo (`transcript-split` 27).
+- [x] Uma linha por segmento, na ordem, com instante absoluto de início, nome do Participante ligado ao speaker e texto (`transcript-split` 25).
+- [x] Parte que começa no meio da gravação mostra instantes absolutos (`transcript-split` 26).
+- [x] Depois de renomear um Participante, o texto usa o nome novo (`transcript-split` 27).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split/test_part_text.py -q`.
-- [ ] Gate backend (adiciona `transcript_split` ao grafo do `lint-imports`).
+- [x] `cd backend && uv run pytest tests/transcript_split/test_part_text.py -q`.
+- [x] Gate backend (adiciona `transcript_split` ao grafo do `lint-imports`).
 
 **Dependencies:** Tasks 33, 24
 
@@ -2202,13 +2202,13 @@
 **Description:** `budget.py`: janela menos reserva (System Prompt, Participantes, 1.000 tokens para nomes de Epics, resposta e margem de 5%) (ADR-0011).
 
 **Acceptance criteria:**
-- [ ] O orçamento = janela menos a reserva do ADR-0011; janela menor que a reserva dá orçamento zero ou negativo tratado sem erro.
-- [ ] A estimativa usa o texto de "Texto da Parte" e o modelo do provedor ativo do dono da Reunião (`transcript-split` 4).
-- [ ] Nenhuma Parte com estimativa acima do orçamento é considerada "cabe" (RT-10).
+- [x] O orçamento = janela menos a reserva do ADR-0011; janela menor que a reserva dá orçamento zero ou negativo tratado sem erro.
+- [x] A estimativa usa o texto de "Texto da Parte" e o modelo do provedor ativo do dono da Reunião (`transcript-split` 4).
+- [x] Nenhuma Parte com estimativa acima do orçamento é considerada "cabe" (RT-10).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split/test_budget.py -q` ("Estimar tokens" fake de um token por caractere).
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/transcript_split/test_budget.py -q` ("Estimar tokens" fake de um token por caractere).
+- [x] Gate backend.
 
 **Dependencies:** Tasks 35.1, 35.2, 16.2
 
