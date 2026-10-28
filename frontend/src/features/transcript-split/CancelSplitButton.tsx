@@ -19,7 +19,7 @@ export function CancelSplitButton({
   const navigate = useNavigate()
   const cancel = useCancelSplit(meetingId)
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col items-start gap-1 sm:items-end">
       <Button
         variant="outline"
         disabled={disabled || cancel.isPending}

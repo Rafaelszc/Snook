@@ -12,7 +12,7 @@ export function PartSummary({ parts }: { parts: ClientPart[] }) {
       {parts.map((part) => (
         <li
           key={part.index}
-          className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-border py-2 text-sm last:border-b-0"
+          className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-border py-2 text-sm last:border-b-0"
         >
           <span className="font-medium">{MESSAGES.partName(part.index)}</span>
           <span className="flex flex-wrap gap-x-3 font-mono text-muted-foreground tabular-nums">

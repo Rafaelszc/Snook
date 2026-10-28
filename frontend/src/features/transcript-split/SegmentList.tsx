@@ -58,7 +58,9 @@ export function SegmentList({
 
   function move(from: number, to: number) {
     if (!onMove(from, to)) return
-    virtualizer.scrollToIndex(to, { align: "auto" })
+    // Linha já no DOM: o foco basta para rolar; senão, o virtualizador a traz.
+    if (!scrollRef.current?.querySelector(`[data-cut="${to}"]`))
+      virtualizer.scrollToIndex(to, { align: "auto" })
     setFocusCut(to)
   }
 
@@ -86,7 +88,7 @@ export function SegmentList({
               className="absolute inset-x-0 top-0"
               style={{ transform: `translateY(${item.start}px)` }}
             >
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 px-4 pt-3 pb-1 text-sm">
+              <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 gap-y-1 px-4 pt-3 pb-1 text-sm">
                 <span className="font-mono text-muted-foreground tabular-nums">
                   {formatTimestamp(segment.start_seconds)}
                 </span>

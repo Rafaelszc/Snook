@@ -39,44 +39,40 @@ export function CutButton({
     onMove(position, position + step)
   }
 
+  // Alinha à coluna do texto da fala; o traço marca o fim da Parte.
   return (
-    <div className="flex items-center gap-3 px-4 py-1">
-      <span
-        aria-hidden="true"
-        className={cn(
-          "motion-fade h-px flex-1",
-          active ? "bg-highlight" : "bg-transparent"
-        )}
-      />
-      <button
-        type="button"
-        data-cut={position}
-        aria-pressed={active}
-        aria-describedby={CUTS_HINT_ID}
-        aria-keyshortcuts={active ? "ArrowUp ArrowDown" : undefined}
-        disabled={disabled}
-        onClick={() => onToggle(position)}
-        onKeyDown={onKeyDown}
-        className={cn(
-          "motion-press inline-flex min-h-8 items-center gap-1.5 rounded-md border px-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97] disabled:opacity-50",
-          active
-            ? "border-highlight bg-highlight text-highlight-foreground"
-            : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-        )}
-      >
-        <Scissors aria-hidden="true" className="size-3.5" />
-        {active ? MESSAGES.cutEnd(partIndex) : MESSAGES.cutHere}{" "}
-        <span className="sr-only">
-          {MESSAGES.cutAfter(formatTimestamp(endSeconds))}
-        </span>
-      </button>
-      <span
-        aria-hidden="true"
-        className={cn(
-          "motion-fade h-px flex-1",
-          active ? "bg-highlight" : "bg-transparent"
-        )}
-      />
+    <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 px-4 py-1">
+      <div className="col-start-2 flex items-center gap-3">
+        <button
+          type="button"
+          data-cut={position}
+          aria-pressed={active}
+          aria-describedby={CUTS_HINT_ID}
+          aria-keyshortcuts={active ? "ArrowUp ArrowDown" : undefined}
+          disabled={disabled}
+          onClick={() => onToggle(position)}
+          onKeyDown={onKeyDown}
+          className={cn(
+            "motion-press inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-md border px-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97] disabled:opacity-50",
+            active
+              ? "border-highlight bg-highlight text-highlight-foreground"
+              : "-ml-2.5 border-transparent text-muted-foreground hover:border-border hover:text-foreground"
+          )}
+        >
+          <Scissors aria-hidden="true" className="size-3.5" />
+          {active ? MESSAGES.cutEnd(partIndex) : MESSAGES.cutHere}{" "}
+          <span className="sr-only">
+            {MESSAGES.cutAfter(formatTimestamp(endSeconds))}
+          </span>
+        </button>
+        <span
+          aria-hidden="true"
+          className={cn(
+            "motion-fade h-px flex-1 bg-highlight",
+            active ? "opacity-100" : "opacity-0"
+          )}
+        />
+      </div>
     </div>
   )
 }
