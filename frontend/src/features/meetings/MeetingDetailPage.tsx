@@ -152,6 +152,14 @@ export function MeetingDetailPage() {
           <NamingCall meeting={meeting} />
           <SplitCall meeting={meeting} />
           <Facts meeting={meeting} />
+          {meeting.has_backlog ? (
+            <Link
+              to={`/meetings/${meeting.id}/backlog`}
+              className={`${buttonVariants()} self-start`}
+            >
+              {MESSAGES.openBacklog}
+            </Link>
+          ) : null}
           {hasTranscript ? (
             <Link
               to={`/meetings/${meeting.id}/transcript`}

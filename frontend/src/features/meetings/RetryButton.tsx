@@ -3,7 +3,7 @@ import { RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 import type { MeetingDetail } from "./api"
-import { ConfirmDialog } from "./ConfirmDialog"
+import { ConfirmDialog } from "@/components/surfaces/ConfirmDialog"
 import { MESSAGES } from "./messages"
 import { useRetryMeeting } from "./useMeetings"
 

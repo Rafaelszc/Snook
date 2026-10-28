@@ -11,6 +11,7 @@ export const STAGE_LABELS = {
 
 export const MESSAGES = {
   openTranscript: "Ver transcrição",
+  openBacklog: "Revisar backlog",
   nameParticipants: "Nomear participantes",
   splitMeeting: "Dividir reunião",
   splitMeetingHint:

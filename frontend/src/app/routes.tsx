@@ -2,6 +2,7 @@ import type { RouteObject } from "react-router"
 
 import { LoginPage } from "@/features/auth/LoginPage"
 import { RegisterPage } from "@/features/auth/RegisterPage"
+import { ReviewPage } from "@/features/backlog-review/ReviewPage"
 import { TranscriptPage } from "@/features/diarized-transcription/TranscriptPage"
 import { SettingsPage } from "@/features/llm-providers/SettingsPage"
 import { MeetingDetailPage } from "@/features/meetings/MeetingDetailPage"
@@ -36,11 +37,7 @@ export const routes: RouteObject[] = [
           { path: "meetings/:id/transcript", element: <TranscriptPage /> },
           { path: "meetings/:id/participants", element: <NamingPage /> },
           { path: "meetings/:id/split", element: <SplitPage /> },
-          // Destino de "Cancelar divisão"; a tela real entra na Task 49.1.
-          {
-            path: "meetings/:id/backlog",
-            element: <Placeholder title="Revisão do backlog" />,
-          },
+          { path: "meetings/:id/backlog", element: <ReviewPage /> },
           ...(import.meta.env.DEV
             ? [{ path: "dev/components", element: <SamplePage /> }]
             : []),
