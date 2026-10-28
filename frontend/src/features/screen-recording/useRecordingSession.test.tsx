@@ -123,6 +123,7 @@ describe("SourceWarningDialog", () => {
     render(
       <SourceWarningDialog
         missing={missing}
+        browser="chrome"
         onConfirm={() => calls.push("confirm")}
         onCancel={() => calls.push("cancel")}
       />
@@ -140,6 +141,7 @@ describe("SourceWarningDialog", () => {
     render(
       <SourceWarningDialog
         missing="mic"
+        browser="chrome"
         onConfirm={() => calls.push("confirm")}
         onCancel={() => calls.push("cancel")}
       />

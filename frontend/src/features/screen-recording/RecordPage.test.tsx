@@ -150,6 +150,21 @@ describe("RecordPage", () => {
     expect(sent).toContain("opus")
   })
 
+  it("Firefox sem som da tela: aviso indica Chrome ou Edge (screen-recording 4)", async () => {
+    renderRecord({
+      env: fakeBrowserEnv({ browser: "firefox" }),
+      display: fakeCapture(fakeStream({ audio: false, video: true })),
+    })
+    await userEvent.click(recordButton())
+
+    const dialog = await screen.findByRole("alertdialog")
+    expect(dialog).toHaveTextContent(MESSAGES.missingDisplayFirefox)
+    expect(MESSAGES.missingDisplayFirefox).toMatch(/Chrome ou Edge/)
+    expect(
+      within(dialog).getByRole("button", { name: MESSAGES.micOnly })
+    ).toBeInTheDocument()
+  })
+
   it("fonte ausente abre o aviso; confirmar grava só com o microfone (screen-recording 4)", async () => {
     const mic = fakeStream({ audio: true })
     renderRecord({

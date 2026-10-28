@@ -147,6 +147,7 @@ export function RecordPage({ deps = {} }: { deps?: Partial<RecordDeps> }) {
       {session.state.kind === "missing" ? (
         <SourceWarningDialog
           missing={session.state.missing}
+          browser={env.browser()}
           onConfirm={session.confirm}
           onCancel={session.cancel}
         />

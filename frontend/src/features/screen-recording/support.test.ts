@@ -40,6 +40,11 @@ describe("checkSupport", () => {
     expect(result).toEqual({ blocked: false, warning: MESSAGES.unofficial })
   })
 
+  it("Firefox e derivados recebem o mesmo aviso (screen-recording 23)", () => {
+    const result = checkSupport(fakeBrowserEnv({ browser: "firefox" }))
+    expect(result).toEqual({ blocked: false, warning: MESSAGES.unofficial })
+  })
+
   it("Edge não recebe aviso", () => {
     expect(checkSupport(fakeBrowserEnv({ browser: "edge" }))).toEqual({
       blocked: false,
@@ -57,7 +62,11 @@ describe("detectBrowser", () => {
     [`${CHROME} OPR/115.0.0.0`, "other"],
     [
       "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0",
-      "other",
+      "firefox",
+    ],
+    [
+      "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0 Zen/1.0",
+      "firefox",
     ],
   ])("pelo user agent: %s", (ua, expected) => {
     expect(detectBrowser({ userAgent: ua })).toBe(expected)

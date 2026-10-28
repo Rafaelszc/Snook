@@ -15,7 +15,7 @@ export function checkSupport(env: BrowserEnv): Support {
   if (!env.hasDisplayMedia() || !env.supportsWebm()) {
     return { blocked: true, message: MESSAGES.unsupported }
   }
-  if (env.browser() === "other") {
+  if (env.browser() === "other" || env.browser() === "firefox") {
     return { blocked: false, warning: MESSAGES.unofficial }
   }
   return { blocked: false }
@@ -34,6 +34,7 @@ export function detectBrowser(nav: NavigatorLike): Browser {
     return "other"
   }
   const ua = nav.userAgent
+  if (/\bFirefox\//.test(ua)) return "firefox"
   if (/\bEdg\//.test(ua)) return "edge"
   if (/\bChrome\//.test(ua) && !/\b(OPR|SamsungBrowser|YaBrowser)\//.test(ua)) {
     return "chrome"
