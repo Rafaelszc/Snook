@@ -2710,7 +2710,7 @@
 
 - [ ] Critérios 30 e 31 passam; suíte `llm_real` passa à mão nos quatro provedores (critério transversal 3)
 - [ ] Fluxo completo upload até `done` funciona com Docker
-- [ ] `/security-review` sobre o diff
+- [x] `/security-review` sobre o diff
 - [ ] Revisão humana antes de seguir
 
 ---
@@ -2722,13 +2722,13 @@
 **Description:** `GET /api/meetings/{id}/backlog` com `read_only` e `last_generation_failed`, e política de status que as rotas de escrita reutilizam.
 
 **Acceptance criteria:**
-- [ ] Em `done`, devolve as Epics em ordem, cada uma com US em ordem e todos os campos (US-id, nome, `as_a`, `i_want`, `so_that`, prioridade, story points, solicitante com `id` e nome ou vazio, quando em `hh:mm:ss` ou vazio, critérios), sem informação de Parte (`backlog-review` 1, 2).
-- [ ] Em `failed` etapa `generation` com backlog devolve o backlog e o indicador de última geração com falha; em `transcribed`, `generating` ou `needs_split` com backlog devolve o anterior com indicador de só leitura (`backlog-review` 3); sem backlog gravado responde 409 `no_backlog` (`backlog-review` 4).
-- [ ] Em `done` com geração sem nenhuma US, responde 200 com lista de Epics vazia (`backlog-review` 47); 404 para outro Usuário e 401 sem sessão (`backlog-review` 37, 38).
+- [x] Em `done`, devolve as Epics em ordem, cada uma com US em ordem e todos os campos (US-id, nome, `as_a`, `i_want`, `so_that`, prioridade, story points, solicitante com `id` e nome ou vazio, quando em `hh:mm:ss` ou vazio, critérios), sem informação de Parte (`backlog-review` 1, 2).
+- [x] Em `failed` etapa `generation` com backlog devolve o backlog e o indicador de última geração com falha; em `transcribed`, `generating` ou `needs_split` com backlog devolve o anterior com indicador de só leitura (`backlog-review` 3); sem backlog gravado responde 409 `no_backlog` (`backlog-review` 4).
+- [x] Em `done` com geração sem nenhuma US, responde 200 com lista de Epics vazia (`backlog-review` 47); 404 para outro Usuário e 401 sem sessão (`backlog-review` 37, 38).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_read.py -q`.
-- [ ] Gate backend (adiciona `backlog_review` ao grafo do `lint-imports`). SEC-01, SEC-02.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_read.py -q`.
+- [x] Gate backend (adiciona `backlog_review` ao grafo do `lint-imports`). SEC-01, SEC-02.
 
 **Dependencies:** Tasks 40.4, 33
 

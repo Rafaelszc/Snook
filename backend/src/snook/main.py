@@ -20,6 +20,7 @@ from snook.core.uow import UnitOfWork
 from snook.modules.auth import api as auth_api
 from snook.modules.auth import service as auth_service
 from snook.modules.backlog_generation import service as generation_service
+from snook.modules.backlog_review import api as review_api
 from snook.modules.diarized_transcription import api as transcription_api
 from snook.modules.diarized_transcription import service as transcription_service
 from snook.modules.llm_providers import api as llm_api
@@ -170,6 +171,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(transcription_api.router)
     app.include_router(participants_api.router)
     app.include_router(split_api.router)
+    app.include_router(review_api.router)
     return app
 
 
