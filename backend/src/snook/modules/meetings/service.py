@@ -337,12 +337,14 @@ class MeetingFlags:
     has_backlog: bool
 
 
-def mark_participants_confirmed(uow: UnitOfWork, meeting_id: str, *, now: datetime) -> None:
-    """`participants` chama na transação da confirmação. Marca nunca é apagada (ADR-0006)."""
+def mark_participants_confirmed(uow: UnitOfWork, meeting_id: str, *, now: datetime) -> str:
+    """`participants` chama na transação da confirmação. Marca nunca é apagada (ADR-0006).
+    Devolve o `run_id` atual, para o aviso `ParticipantsConfirmed`."""
     meeting = _existing(uow, meeting_id)
     if meeting.participants_confirmed_at is None:
         meeting.participants_confirmed_at = to_iso(now)
         uow.session.flush()
+    return meeting.run_id
 
 
 def mark_backlog_saved(uow: UnitOfWork, meeting_id: str, *, now: datetime) -> None:

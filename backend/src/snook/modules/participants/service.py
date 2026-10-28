@@ -1,11 +1,19 @@
+import logging
+from datetime import datetime
 from pathlib import Path
 
 from snook.core.errors import AppError
+from snook.core.events import ParticipantsConfirmed
+from snook.core.text import normalize
 from snook.core.uow import UnitOfWork
 from snook.modules.diarized_transcription import service as transcription
+from snook.modules.llm_providers import service as llm_providers
 from snook.modules.meetings import service as meetings
-from snook.modules.participants import messages
-from snook.modules.participants.schemas import SpeakerOut
+from snook.modules.participants import messages, repository
+from snook.modules.participants.models import Participant
+from snook.modules.participants.schemas import ParticipantOut, SpeakerOut
+
+logger = logging.getLogger("snook.participants")
 
 SAMPLE_MAX_SECONDS = 10.0
 
@@ -50,3 +58,85 @@ def speaker_sample(
         return transcription.treated_audio_clip(audio_root, meeting_id, start, end)
     except transcription.AudioClipError:
         raise AppError("sample_unavailable", messages.SAMPLE_UNAVAILABLE, 404) from None
+
+
+def confirm(
+    uow: UnitOfWork, *, user_id: str, meeting_id: str, names: dict[str, str], now: datetime
+) -> list[ParticipantOut]:
+    """Grava Participantes, vínculos e a marca de `meetings` num commit; aviso depois dele
+    (`participants` 6 a 13). `names` já aparados, na ordem informada."""
+    meeting = meetings.get_owned_meeting(uow, user_id, meeting_id)
+    if meeting.participants_confirmed:
+        raise AppError("already_confirmed", messages.ALREADY_CONFIRMED, 409)
+    if meeting.status != "transcribed":
+        raise AppError("invalid_status", messages.INVALID_STATUS, 409)
+    _check_labels(uow, meeting_id, names)
+    try:
+        llm_providers.get_active_provider(uow, user_id=user_id)
+    except llm_providers.NoActiveProvider:
+        raise AppError("no_active_provider", messages.NO_ACTIVE_PROVIDER, 409) from None
+
+    by_norm: dict[str, Participant] = {}
+    for label, name in names.items():
+        norm = normalize(name)
+        participant = by_norm.get(norm)
+        if participant is None:
+            # Primeiro nome informado vence a grafia (`participants` 7).
+            participant = repository.add_participant(uow.session, meeting_id, name, norm)
+            by_norm[norm] = participant
+        repository.link_speaker(uow.session, meeting_id, label, participant.id)
+    run_id = meetings.mark_participants_confirmed(uow, meeting_id, now=now)
+    uow.publish_after_commit(ParticipantsConfirmed(meeting_id=meeting_id, run_id=run_id))
+    logger.info(
+        "participants.confirmed",
+        extra={"meeting_id": meeting_id, "participants_count": len(by_norm)},
+    )
+    return list_participants(uow, meeting_id)
+
+
+def _check_labels(uow: UnitOfWork, meeting_id: str, names: dict[str, str]) -> None:
+    """Todo speaker da Transcrição com nome, e nenhum rótulo de fora (`participants` 8, 9)."""
+    labels = {s.speaker_label for s in transcription.list_speakers(uow, meeting_id)}
+    fields = {f"names.{label}": messages.NAME_REQUIRED for label in sorted(labels - names.keys())}
+    fields |= {
+        f"names.{label}": messages.SPEAKER_NOT_FOUND for label in sorted(names.keys() - labels)
+    }
+    if fields:
+        raise AppError("validation_error", messages.NAMES_INVALID, 422, fields=fields)
+
+
+def list_owned_participants(
+    uow: UnitOfWork, *, user_id: str, meeting_id: str
+) -> list[ParticipantOut]:
+    """`GET /participants` (`participants` 14). Antes da confirmação: lista vazia."""
+    meetings.get_owned_meeting(uow, user_id, meeting_id)
+    return list_participants(uow, meeting_id)
+
+
+# --- Interface para outros módulos (`02-architecture.md`, "Interfaces internas") ---
+
+
+def list_participants(uow: UnitOfWork, meeting_id: str) -> list[ParticipantOut]:
+    """Interface "Participantes": `id`, `name` e os `speaker_label` de cada um."""
+    labels: dict[int, list[str]] = {}
+    for link in repository.list_links(uow.session, meeting_id):
+        labels.setdefault(link.participant_id, []).append(link.speaker_label)
+    return [
+        ParticipantOut(id=p.id, name=p.name, speaker_labels=labels.get(p.id, []))
+        for p in repository.list_participants(uow.session, meeting_id)
+    ]
+
+
+def participant_for_speaker(
+    uow: UnitOfWork, meeting_id: str, speaker_label: str
+) -> ParticipantOut | None:
+    """Interface "Participante de um speaker" (`participants` 15). Sem vínculo: `None`."""
+    participant = repository.participant_for_speaker(uow.session, meeting_id, speaker_label)
+    if participant is None:
+        return None
+    labels = [
+        link.speaker_label
+        for link in repository.list_links(uow.session, meeting_id)
+        if link.participant_id == participant.id
+    ]
+    return ParticipantOut(id=participant.id, name=participant.name, speaker_labels=labels)

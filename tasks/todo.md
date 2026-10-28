@@ -2013,13 +2013,13 @@
 **Description:** Tabelas `participants` e `speaker_links` (migração `0005_participants`) com repositório.
 
 **Acceptance criteria:**
-- [ ] `participants` e `speaker_links` ficam ligados à Reunião com `ON DELETE CASCADE`; um `speaker_label` liga a um só Participante (`04-data-model.md`).
-- [ ] Nome limitado a 100 caracteres (`05-api.md`).
-- [ ] `alembic upgrade head` roda sobre as revisões anteriores.
+- [x] `participants` e `speaker_links` ficam ligados à Reunião com `ON DELETE CASCADE`; um `speaker_label` liga a um só Participante (`04-data-model.md`).
+- [x] Nome limitado a 100 caracteres (`05-api.md`).
+- [x] `alembic upgrade head` roda sobre as revisões anteriores.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/participants/test_storage.py -q`; `uv run alembic upgrade head`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/participants/test_storage.py -q`; `uv run alembic upgrade head`.
+- [x] Gate backend.
 
 **Dependencies:** Task 31.1
 
@@ -2034,13 +2034,13 @@
 **Description:** `PUT /meetings/{id}/participants` valida e grava Participantes e vínculos; `GET /meetings/{id}/participants` lista; interface "Participante de um speaker".
 
 **Acceptance criteria:**
-- [ ] Um nome por speaker grava Participantes e vínculos e responde com eles (`participants` 6); nomes iguais, sem diferenciar caixa e espaços nas pontas, ligam a um só Participante, e o nome gravado é o primeiro informado aparado (`participants` 7).
-- [ ] Speaker sem nome, vazio ou só de espaços, e `speaker_label` inexistente recebem 422 sem gravar nada (`participants` 8, 9); `PUT` fora de `transcribed` recebe 409 (`participants` 12); segundo `PUT` com Participantes confirmados recebe 409 e os nomes não mudam, inclusive depois do retry da geração (`participants` 13).
-- [ ] `GET` devolve `id`, `name` e os `speaker_label` de cada Participante (`participants` 14); "Participante de um speaker" devolve o mesmo Participante para dois speakers juntados (`participants` 15); 404/401 conforme isolamento (`participants` 23, 24).
+- [x] Um nome por speaker grava Participantes e vínculos e responde com eles (`participants` 6); nomes iguais, sem diferenciar caixa e espaços nas pontas, ligam a um só Participante, e o nome gravado é o primeiro informado aparado (`participants` 7).
+- [x] Speaker sem nome, vazio ou só de espaços, e `speaker_label` inexistente recebem 422 sem gravar nada (`participants` 8, 9); `PUT` fora de `transcribed` recebe 409 (`participants` 12); segundo `PUT` com Participantes confirmados recebe 409 e os nomes não mudam, inclusive depois do retry da geração (`participants` 13).
+- [x] `GET` devolve `id`, `name` e os `speaker_label` de cada Participante (`participants` 14); "Participante de um speaker" devolve o mesmo Participante para dois speakers juntados (`participants` 15); 404/401 conforme isolamento (`participants` 23, 24).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/participants/test_api_participants.py -q`.
-- [ ] Gate backend. SEC-02, SEC-09.
+- [x] `cd backend && uv run pytest tests/participants/test_api_participants.py -q`.
+- [x] Gate backend. SEC-02, SEC-09.
 
 **Dependencies:** Task 32.1
 
@@ -2055,13 +2055,13 @@
 **Description:** O `PUT` exige provedor ativo, grava nomes e chama `mark_participants_confirmed` no mesmo commit, e publica `ParticipantsConfirmed` só depois do commit.
 
 **Acceptance criteria:**
-- [ ] Depois da confirmação, o aviso sai uma única vez com o `id` e `read_flags` informa Participantes confirmados; se a gravação falha, a marca não é registrada e nenhum aviso sai (`participants` 10).
-- [ ] Sem provedor ativo, o pedido recebe 409 `no_active_provider` com mensagem que aponta para a tela de configurações; nada é gravado, nenhum aviso sai e a Reunião continua em `transcribed` (`participants` 11).
-- [ ] Depois de retry da geração e de regeneração, Participantes e vínculos continuam os mesmos (`participants` 16).
+- [x] Depois da confirmação, o aviso sai uma única vez com o `id` e `read_flags` informa Participantes confirmados; se a gravação falha, a marca não é registrada e nenhum aviso sai (`participants` 10).
+- [x] Sem provedor ativo, o pedido recebe 409 `no_active_provider` com mensagem que aponta para a tela de configurações; nada é gravado, nenhum aviso sai e a Reunião continua em `transcribed` (`participants` 11).
+- [x] Depois de retry da geração e de regeneração, Participantes e vínculos continuam os mesmos (`participants` 16).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/participants/test_api_confirm.py -q` (consumidor fake do aviso; "Provedor ativo" fake).
-- [ ] Gate backend. SEC-02, SEC-20.
+- [x] `cd backend && uv run pytest tests/participants/test_api_confirm.py -q` (consumidor fake do aviso; "Provedor ativo" fake).
+- [x] Gate backend. SEC-02, SEC-20.
 
 **Dependencies:** Tasks 32.2, 16.1, 20.2
 
