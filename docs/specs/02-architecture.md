@@ -167,12 +167,12 @@ cli e main importam qualquer módulo; nenhum módulo importa cli ou main
 | `meetings` | `create_meeting(uow, user, upload, title, expected_speakers)` | rota de upload |
 | `meetings` | `get_owned_meeting(uow, user_id, meeting_id)` (404 se não é dono) | todas as rotas aninhadas |
 | `meetings` | `update_status(uow, meeting_id, new_status, *, failed_stage=None, message=None)` | pipeline |
-| `meetings` | `mark_participants_confirmed(uow, id)`, `mark_backlog_saved(uow, id)`, `read_flags(uow, id)`, `read_status(uow, id)` | `participants`, `backlog_generation`, `transcript_split`, `backlog_review` |
+| `meetings` | `mark_participants_confirmed(uow, id)`, `mark_backlog_saved(uow, id)`, `read_flags(uow, id)`, `read_status(uow, id)`, `read_owner(uow, id)` | `participants`, `backlog_generation`, `transcript_split`, `backlog_review` |
 | `meetings` | `original_audio_path(meeting_id)`, `meeting_dir(meeting_id)` | `diarized_transcription` |
 | `meetings` | `list_meeting_ids_for_user(uow, user_id)`, `remove_meeting_files(meeting_ids)` | `cli.py` (`delete-user`) |
 | `diarized_transcription` | `list_segments`, `list_speakers`, `treated_audio_clip(meeting_id, start, end) -> bytes` | `participants`, `transcript_split` |
 | `participants` | `list_participants`, `participant_for_speaker`, `confirm(uow, ...)`, `rename(uow, meeting_id, participant_id, new_name, before_absorb=None) -> RenameResult` | `transcript_split`, `backlog_generation`, `backlog_review` |
-| `transcript_split` | `prepare_generation(uow, meeting_id, mode)`, `list_parts`, `part_text(meeting_id, part)`, `part_budget(provider_snapshot, meeting_id, part_index)` | `backlog_generation`, `backlog_review` |
+| `transcript_split` | `prepare_generation(uow, meeting_id, mode)`, `list_parts`, `part_text(uow, meeting_id, first, last)`, `participants_text(uow, meeting_id)`, `owner_provider(uow, meeting_id)`, `estimate_part(uow, snapshot, meeting_id, first, last)`, `part_budget(uow, snapshot, meeting_id)`, `fits(estimate, budget)` | `backlog_generation`, `backlog_review` |
 | `backlog_generation` | `BacklogRepository` (leitura e escrita de Epics, US, critérios), `next_us_number(uow, meeting_id)` | `backlog_review` |
 
 - Interfaces que escrevem recebem `uow`. Transação entre módulos = um commit ([ADR-0006](adrs/0006-persistencia-sqlalchemy-unidade-de-trabalho.md)).
