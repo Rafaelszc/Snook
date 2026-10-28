@@ -2662,9 +2662,9 @@
 
 ### Checkpoint: Geração
 
-- [ ] Critérios 1 a 29 e 32 a 34 de `01-prd/backlog-generation.md` passam
-- [ ] SEC-18 verificado
-- [ ] `/security-review` sobre o diff
+- [x] Critérios 1 a 29 e 32 a 34 de `01-prd/backlog-generation.md` passam
+- [x] SEC-18 verificado
+- [x] `/security-review` sobre o diff
 
 ### Task 42.1: Snapshot do System Prompt
 
