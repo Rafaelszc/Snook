@@ -1,6 +1,7 @@
 // Seams do navegador (ADR-0015). Testes trocam por fakes de `./fakes`.
 
-export type Browser = "chrome" | "edge" | "other"
+// `firefox` cobre derivados (Zen, LibreWolf): `getDisplayMedia` sem áudio.
+export type Browser = "chrome" | "edge" | "firefox" | "other"
 
 export interface DisplayCapture {
   // `getDisplayMedia` com áudio; precisa de gesto do usuário, vem antes do microfone.
