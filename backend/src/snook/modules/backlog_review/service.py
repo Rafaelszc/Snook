@@ -1,11 +1,12 @@
 from datetime import datetime
 from itertools import groupby
 
+from snook.core.clock import from_iso
 from snook.core.errors import AppError
 from snook.core.uow import UnitOfWork
 from snook.modules.backlog_generation import service as backlog_generation
 from snook.modules.backlog_generation.models import AcceptanceCriterion, Epic, UserStory
-from snook.modules.backlog_review import messages
+from snook.modules.backlog_review import export, messages
 from snook.modules.backlog_review.schemas import (
     BacklogOut,
     CriterionIn,
@@ -14,6 +15,7 @@ from snook.modules.backlog_review.schemas import (
     EpicOut,
     EpicRenamed,
     EpicSummary,
+    ExportFile,
     ParticipantRenamed,
     RegenerateMode,
     RequesterOut,
@@ -48,11 +50,34 @@ def require_editable(uow: UnitOfWork, user_id: str, meeting_id: str) -> MeetingD
 def read_backlog(uow: UnitOfWork, *, user_id: str, meeting_id: str) -> BacklogOut:
     """`backlog-review` 1 a 4, 47. Fora de `done`, backlog anterior só para leitura."""
     meeting = _with_backlog(uow, user_id, meeting_id)
+    failed = meeting.status == "failed" and meeting.failed_stage == "generation"
+    return BacklogOut(
+        read_only=meeting.status != "done",
+        last_generation_failed=failed,
+        epics=_epics(uow, meeting_id),
+    )
+
+
+def export_backlog(
+    uow: UnitOfWork, *, user_id: str, meeting_id: str, fmt: export.ExportFormat
+) -> ExportFile:
+    """`backlog-review` 31 a 36: qualquer status com backlog gravado; data = `created_at` (UTC)."""
+    meeting = _with_backlog(uow, user_id, meeting_id)
+    date = from_iso(meeting.created_at).date().isoformat()
+    return ExportFile(
+        filename=export.filename(meeting.title, fmt),
+        media_type=export.MEDIA_TYPES[fmt],
+        content=export.render(fmt, meeting.title, date, _epics(uow, meeting_id)),
+    )
+
+
+def _epics(uow: UnitOfWork, meeting_id: str) -> list[EpicOut]:
+    """Epics em ordem, cada uma com as US em ordem."""
     repo = backlog_generation.backlog(uow)
     names = _participant_names(uow, meeting_id)
     stories = sorted(repo.stories(meeting_id), key=lambda s: (s.epic_id, s.position))
     by_epic = {epic_id: list(group) for epic_id, group in groupby(stories, lambda s: s.epic_id)}
-    epics = [
+    return [
         EpicOut(
             id=epic.id,
             name=epic.name,
@@ -60,10 +85,6 @@ def read_backlog(uow: UnitOfWork, *, user_id: str, meeting_id: str) -> BacklogOu
         )
         for epic in repo.epics(meeting_id)
     ]
-    failed = meeting.status == "failed" and meeting.failed_stage == "generation"
-    return BacklogOut(
-        read_only=meeting.status != "done", last_generation_failed=failed, epics=epics
-    )
 
 
 def _criterion_out(criterion: AcceptanceCriterion) -> CriterionOut:

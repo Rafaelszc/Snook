@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 
 from snook.core.clock import Clock
 from snook.core.deps import get_clock, get_uow
 from snook.core.uow import UnitOfWork
 from snook.modules.auth.deps import CurrentUser
 from snook.modules.backlog_review import service
+from snook.modules.backlog_review.export import ExportFormat, content_disposition
 from snook.modules.backlog_review.schemas import (
     BacklogOut,
     CriterionIn,
@@ -173,3 +174,23 @@ def regenerate(
             estimate=estimate,
         )
     return RegenerateOut(status=new_status)
+
+
+@router.get("/{meeting_id}/export")
+def export_backlog(
+    meeting_id: str,
+    user: CurrentUser,
+    uow: Uow,
+    fmt: Annotated[ExportFormat, Query(alias="format")],
+) -> Response:
+    """`backlog-review` 31 a 36. Anexo com nome sanitizado e `nosniff` (SEC-12)."""
+    with uow:
+        exported = service.export_backlog(uow, user_id=user.id, meeting_id=meeting_id, fmt=fmt)
+    return Response(
+        content=exported.content,
+        media_type=exported.media_type,
+        headers={
+            "Content-Disposition": content_disposition(exported.filename),
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
