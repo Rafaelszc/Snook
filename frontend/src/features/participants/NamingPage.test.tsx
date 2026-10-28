@@ -273,6 +273,7 @@ it("mostra o erro da API e fica na tela", async () => {
   expect(
     screen.getByLabelText("Nome de SPEAKER_01")
   ).toHaveAccessibleDescription("Dê um nome a esta voz.")
+  expect(screen.getByLabelText("Nome de SPEAKER_01")).toHaveFocus()
   expect(router.state.location.pathname).toBe(`/meetings/${ID}/participants`)
 })
 
