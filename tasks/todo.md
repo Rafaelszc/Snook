@@ -2307,13 +2307,13 @@
 **Description:** `cuts.py`: cortes no fim de segmento, Partes contíguas, regra gulosa, com estimativa por segmento.
 
 **Acceptance criteria:**
-- [ ] Cada corte cai no fim de um segmento; as Partes são contíguas, sem sobreposição, cobrem todos os segmentos e cabem no orçamento (`transcript-split` 8).
-- [ ] A regra gulosa dá o menor número de Partes possível com cortes no fim de segmento (`transcript-split` 9).
-- [ ] Para cada Parte: intervalo de tempo, estimativa e se cabe (`transcript-split` 10).
+- [x] Cada corte cai no fim de um segmento; as Partes são contíguas, sem sobreposição, cobrem todos os segmentos e cabem no orçamento (`transcript-split` 8).
+- [x] A regra gulosa dá o menor número de Partes possível com cortes no fim de segmento (`transcript-split` 9).
+- [x] Para cada Parte: intervalo de tempo, estimativa e se cabe (`transcript-split` 10).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split/test_cuts.py -q`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/transcript_split/test_cuts.py -q`.
+- [x] Gate backend.
 
 **Dependencies:** Task 36.1
 
@@ -2328,13 +2328,13 @@
 **Description:** `GET` só lê; `refresh` aplica "passou a caber" (ADR-0019).
 
 **Acceptance criteria:**
-- [ ] `GET` em `needs_split` devolve orçamento, provedor e modelo, estimativa total, segmentos com instante, Participante e texto, cortes sugeridos, se permite "Cancelar divisão" e `split_reason` (`transcript-split` 7); fora de `needs_split` responde 409, exceto `done` já dividida, só leitura; `refresh` fora de `needs_split` responde 409 sem mudar nada (`transcript-split` 11).
-- [ ] Se a Transcrição passou a caber, `refresh` grava Parte única, vai a `generating`, emite `PartsReady` uma vez e responde como o `GET` com o novo status e sem cortes; se não cabe, não grava, não muda e responde como o `GET` (`transcript-split` 43).
-- [ ] `GET` não grava Parte, não muda status e não emite aviso, mesmo cabendo (o banco não muda) (`transcript-split` 43); sem provedor ativo, `GET` e `refresh` respondem a mensagem que aponta para a configuração, sem orçamento nem cortes, e a Reunião segue em `needs_split` (`transcript-split` 44).
+- [x] `GET` em `needs_split` devolve orçamento, provedor e modelo, estimativa total, segmentos com instante, Participante e texto, cortes sugeridos, se permite "Cancelar divisão" e `split_reason` (`transcript-split` 7); fora de `needs_split` responde 409, exceto `done` já dividida, só leitura; `refresh` fora de `needs_split` responde 409 sem mudar nada (`transcript-split` 11).
+- [x] Se a Transcrição passou a caber, `refresh` grava Parte única, vai a `generating`, emite `PartsReady` uma vez e responde como o `GET` com o novo status e sem cortes; se não cabe, não grava, não muda e responde como o `GET` (`transcript-split` 43).
+- [x] `GET` não grava Parte, não muda status e não emite aviso, mesmo cabendo (o banco não muda) (`transcript-split` 43); sem provedor ativo, `GET` e `refresh` respondem a mensagem que aponta para a configuração, sem orçamento nem cortes, e a Reunião segue em `needs_split` (`transcript-split` 44).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split/test_api_split_read.py -q`.
-- [ ] Gate backend. SEC-02, SEC-04 (`refresh` é `POST`), nenhum `GET` muda estado.
+- [x] `cd backend && uv run pytest tests/transcript_split/test_api_split_read.py -q`.
+- [x] Gate backend. SEC-02, SEC-04 (`refresh` é `POST`), nenhum `GET` muda estado.
 
 **Dependencies:** Tasks 37.1, 36.3
 
@@ -2349,13 +2349,13 @@
 **Description:** Confirma cortes, revalida com o provedor ativo do momento e grava as Partes.
 
 **Acceptance criteria:**
-- [ ] Cortes válidos em `needs_split` gravam as Partes em ordem, vão a `generating` e emitem `PartsReady` uma vez (`transcript-split` 12).
-- [ ] Corte fora do fim de segmento, repetido ou fora de ordem recebe 422 sem gravar (`transcript-split` 13, 14); Parte que não cabe, com todos os segmentos cabendo sozinhos, recebe 422 `part_too_large` com `part_index` e `estimated_tokens` e a Reunião segue em `needs_split` (`transcript-split` 15); a validação usa o provedor ativo do momento do `PUT` (`transcript-split` 16).
-- [ ] `PUT` fora de `needs_split` recebe 409 (`transcript-split` 17); sem provedor ativo ou com segmento acima do orçamento, vai a `failed` etapa `generation` sem gravar nem avisar (`transcript-split` 41, 42); se passou a caber, grava Parte única e ignora os cortes enviados (`transcript-split` 43). Máximo de 500 cortes (SEC-09).
+- [x] Cortes válidos em `needs_split` gravam as Partes em ordem, vão a `generating` e emitem `PartsReady` uma vez (`transcript-split` 12).
+- [x] Corte fora do fim de segmento, repetido ou fora de ordem recebe 422 sem gravar (`transcript-split` 13, 14); Parte que não cabe, com todos os segmentos cabendo sozinhos, recebe 422 `part_too_large` com `part_index` e `estimated_tokens` e a Reunião segue em `needs_split` (`transcript-split` 15); a validação usa o provedor ativo do momento do `PUT` (`transcript-split` 16).
+- [x] `PUT` fora de `needs_split` recebe 409 (`transcript-split` 17); sem provedor ativo ou com segmento acima do orçamento, vai a `failed` etapa `generation` sem gravar nem avisar (`transcript-split` 41, 42); se passou a caber, grava Parte única e ignora os cortes enviados (`transcript-split` 43). Máximo de 500 cortes (SEC-09).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split/test_api_split_put.py -q`.
-- [ ] Gate backend. SEC-02, SEC-04, SEC-09.
+- [x] `cd backend && uv run pytest tests/transcript_split/test_api_split_put.py -q`.
+- [x] Gate backend. SEC-02, SEC-04, SEC-09.
 
 **Dependencies:** Task 37.2
 
@@ -2370,13 +2370,13 @@
 **Description:** "Cancelar divisão" e a bateria de 401/404 de todas as rotas do módulo.
 
 **Acceptance criteria:**
-- [ ] Cancelar em `needs_split` com backlog gravado leva a `done` qualquer que seja o `split_reason`, sem mudar backlog nem Partes e sem aviso (`transcript-split` 39); fora de `needs_split`, ou sem backlog gravado, responde 409 sem mudar nada (`transcript-split` 40).
-- [ ] `GET`, `PUT`, `refresh` e `cancel` com `id` de outro Usuário respondem 404 e nada muda (`transcript-split` 28).
-- [ ] Sem sessão, as quatro rotas respondem 401 (`transcript-split` 29).
+- [x] Cancelar em `needs_split` com backlog gravado leva a `done` qualquer que seja o `split_reason`, sem mudar backlog nem Partes e sem aviso (`transcript-split` 39); fora de `needs_split`, ou sem backlog gravado, responde 409 sem mudar nada (`transcript-split` 40).
+- [x] `GET`, `PUT`, `refresh` e `cancel` com `id` de outro Usuário respondem 404 e nada muda (`transcript-split` 28).
+- [x] Sem sessão, as quatro rotas respondem 401 (`transcript-split` 29).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/transcript_split -q`.
-- [ ] Gate backend. SEC-01, SEC-02, SEC-04.
+- [x] `cd backend && uv run pytest tests/transcript_split -q`.
+- [x] Gate backend. SEC-01, SEC-02, SEC-04.
 
 **Dependencies:** Task 37.3
 
@@ -2388,8 +2388,8 @@
 
 ### Checkpoint: `transcript-split` API
 
-- [ ] Critérios 1 a 29, 37 a 44 e 46 de `01-prd/transcript-split.md` passam
-- [ ] `/security-review` sobre o diff
+- [x] Critérios 1 a 29, 37 a 44 e 46 de `01-prd/transcript-split.md` passam
+- [x] `/security-review` sobre o diff
 
 ### Task 38.1: Tela de divisão: abertura e lista virtualizada
 

@@ -9,7 +9,7 @@ from snook.core.uow import UnitOfWork
 from snook.modules.transcript_split import service
 from tests.meetings.conftest import ana, clock, probe, uow, users  # noqa: F401
 from tests.participants.conftest import idle  # noqa: F401
-from tests.transcript_split.helpers import FakeEstimate
+from tests.transcript_split.helpers import FakeEstimate, LineEstimate
 
 Prepare = Callable[..., str]
 
@@ -35,3 +35,11 @@ def prepare(idle: TestClient) -> Prepare:  # noqa: F811
             )
 
     return run
+
+
+@pytest.fixture
+def split(idle: TestClient) -> TestClient:  # noqa: F811
+    """Rotas de divisão com "Estimar tokens" fake aditivo por linha."""
+    app: FastAPI = idle.app  # type: ignore[assignment]
+    app.state.estimate_tokens = LineEstimate()
+    return idle

@@ -26,6 +26,7 @@ from snook.modules.llm_providers import service as llm_service
 from snook.modules.meetings import api as meetings_api
 from snook.modules.meetings import service as meetings_service
 from snook.modules.participants import api as participants_api
+from snook.modules.transcript_split import api as split_api
 from snook.modules.transcript_split import service as split_service
 
 logger = logging.getLogger("snook.main")
@@ -123,6 +124,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.key_cipher = llm_service.build_cipher(settings)
     app.state.llm_adapters = llm_service.build_adapters(settings)  # teste troca por fakes
     app.state.llm_test_limiter = llm_service.build_test_limiter(settings)
+    app.state.estimate_tokens = llm_service.estimate_tokens  # teste troca por fake
     app.state.media_probe = meetings_service.FfprobeProbe()  # teste troca por fake
     app.state.transcription = transcription_service.build_dispatcher(
         settings, now=lambda: app.state.clock.now()
@@ -143,6 +145,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(meetings_api.router)
     app.include_router(transcription_api.router)
     app.include_router(participants_api.router)
+    app.include_router(split_api.router)
     return app
 
 
