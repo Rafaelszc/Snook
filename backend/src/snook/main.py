@@ -25,6 +25,7 @@ from snook.modules.llm_providers import api as llm_api
 from snook.modules.llm_providers import service as llm_service
 from snook.modules.meetings import api as meetings_api
 from snook.modules.meetings import service as meetings_service
+from snook.modules.participants import api as participants_api
 
 logger = logging.getLogger("snook.main")
 
@@ -134,6 +135,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(llm_api.router)
     app.include_router(meetings_api.router)
     app.include_router(transcription_api.router)
+    app.include_router(participants_api.router)
     return app
 
 

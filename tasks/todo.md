@@ -1971,13 +1971,13 @@
 **Description:** Lista de speakers com tempo total de fala.
 
 **Acceptance criteria:**
-- [ ] Em `transcribed`, devolve cada `speaker_label` uma vez, com o tempo total de fala (`participants` 1).
-- [ ] Reunião de outro Usuário responde 404; sem sessão, 401 (`participants` 23, 24; SEC-02).
-- [ ] Fora de `transcribed` e posteriores responde 409 (`05-api.md`).
+- [x] Em `transcribed`, devolve cada `speaker_label` uma vez, com o tempo total de fala (`participants` 1).
+- [x] Reunião de outro Usuário responde 404; sem sessão, 401 (`participants` 23, 24; SEC-02).
+- [x] Fora de `transcribed` e posteriores responde 409 (`05-api.md`).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/participants/test_api_speakers.py -q`.
-- [ ] Gate backend (adiciona `participants` ao grafo do `lint-imports`). SEC-02.
+- [x] `cd backend && uv run pytest tests/participants/test_api_speakers.py -q`.
+- [x] Gate backend (adiciona `participants` ao grafo do `lint-imports`). SEC-02.
 
 **Dependencies:** Tasks 24, 19.1
 
@@ -1992,13 +1992,13 @@
 **Description:** `GET /meetings/{id}/speakers/{speaker_label}/sample`: `audio/wav` de até 10 s, a partir do maior segmento, sob demanda e sem cache.
 
 **Acceptance criteria:**
-- [ ] A amostra tem no máximo 10 s e vem do maior segmento do speaker, a partir do áudio tratado (`participants` 2); começa no início do maior segmento, e em empate vale o que começa antes (`participants` 3).
-- [ ] Segmento menor que 10 s gera amostra com a duração dele (`participants` 4).
-- [ ] Speaker inexistente responde 404 (`participants` 5); `speaker_label` é validado e nenhum caminho interno vaza (SEC-09, `03-security.md` "Never").
+- [x] A amostra tem no máximo 10 s e vem do maior segmento do speaker, a partir do áudio tratado (`participants` 2); começa no início do maior segmento, e em empate vale o que começa antes (`participants` 3).
+- [x] Segmento menor que 10 s gera amostra com a duração dele (`participants` 4).
+- [x] Speaker inexistente responde 404 (`participants` 5); `speaker_label` é validado e nenhum caminho interno vaza (SEC-09, `03-security.md` "Never").
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/participants/test_api_sample.py -q` (fake de áudio tratado; confere o intervalo pedido e a duração).
-- [ ] Gate backend. SEC-02, SEC-09.
+- [x] `cd backend && uv run pytest tests/participants/test_api_sample.py -q` (fake de áudio tratado; confere o intervalo pedido e a duração).
+- [x] Gate backend. SEC-02, SEC-09.
 
 **Dependencies:** Tasks 31.1, 25.2
 
