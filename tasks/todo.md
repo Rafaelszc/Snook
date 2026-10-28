@@ -2806,13 +2806,13 @@
 **Description:** `PATCH /api/meetings/{id}/user-stories/{story_id}` para nome, `as_a`, `i_want`, `so_that`, prioridade e story points.
 
 **Acceptance criteria:**
-- [ ] Grava os campos enviados e não muda o `US-id` (`backlog-review` 11).
-- [ ] Prioridade fora de Low/Medium/High e story points fora de 1, 2, 3, 5, 8, 13 recebem 422 (`backlog-review` 12); nome, `as_a`, `i_want` ou `so_that` vazio recebe 422 (`backlog-review` 13); campos acima do máximo recebem 422 (SEC-09).
-- [ ] Fora de `done` responde 409 (`backlog-review` 30); `story_id` de outra Reunião responde 404 (`backlog-review` 37; SEC-02).
+- [x] Grava os campos enviados e não muda o `US-id` (`backlog-review` 11).
+- [x] Prioridade fora de Low/Medium/High e story points fora de 1, 2, 3, 5, 8, 13 recebem 422 (`backlog-review` 12); nome, `as_a`, `i_want` ou `so_that` vazio recebe 422 (`backlog-review` 13); campos acima do máximo recebem 422 (SEC-09).
+- [x] Fora de `done` responde 409 (`backlog-review` 30); `story_id` de outra Reunião responde 404 (`backlog-review` 37; SEC-02).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_story_fields.py -q`.
-- [ ] Gate backend. SEC-02, SEC-04, SEC-09.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_story_fields.py -q`.
+- [x] Gate backend. SEC-02, SEC-04, SEC-09.
 
 **Dependencies:** Task 44.3
 
@@ -2827,13 +2827,13 @@
 **Description:** O mesmo `PATCH` aceita solicitante, instante e `epic_id`.
 
 **Acceptance criteria:**
-- [ ] Troca o solicitante por outro Participante da mesma Reunião ou o deixa vazio; Participante de outra Reunião recebe 422 (`backlog-review` 14).
-- [ ] Troca o instante em `hh:mm:ss` entre 0 e a duração; fora disso recebe 422 (`backlog-review` 15).
-- [ ] `epic_id` de outra Epic da mesma Reunião move a US para o fim dela sem mudar o `US-id`, e a origem pode ficar vazia (`backlog-review` 16); `epic_id` de outra Reunião responde 404 (`backlog-review` 37; SEC-02).
+- [x] Troca o solicitante por outro Participante da mesma Reunião ou o deixa vazio; Participante de outra Reunião recebe 422 (`backlog-review` 14).
+- [x] Troca o instante em `hh:mm:ss` entre 0 e a duração; fora disso recebe 422 (`backlog-review` 15).
+- [x] `epic_id` de outra Epic da mesma Reunião move a US para o fim dela sem mudar o `US-id`, e a origem pode ficar vazia (`backlog-review` 16); `epic_id` de outra Reunião responde 404 (`backlog-review` 37; SEC-02).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_story_move.py -q`.
-- [ ] Gate backend. SEC-02, SEC-09.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_story_move.py -q`.
+- [x] Gate backend. SEC-02, SEC-09.
 
 **Dependencies:** Task 45.1
 
@@ -2848,13 +2848,13 @@
 **Description:** `POST /api/meetings/{id}/epics/{epic_id}/user-stories`.
 
 **Acceptance criteria:**
-- [ ] Cria a US numa Epic com todos os campos obrigatórios e ao menos um critério, com o próximo `US-id` depois do maior existente na Reunião (`backlog-review` 17).
-- [ ] Solicitante e instante são opcionais numa US criada à mão (`backlog-review` 18).
-- [ ] Fora de `done` responde 409 (`backlog-review` 30); 422 para campo faltando, vazio ou acima do máximo; 404/401 conforme isolamento (`backlog-review` 37, 38; SEC-09).
+- [x] Cria a US numa Epic com todos os campos obrigatórios e ao menos um critério, com o próximo `US-id` depois do maior existente na Reunião (`backlog-review` 17).
+- [x] Solicitante e instante são opcionais numa US criada à mão (`backlog-review` 18).
+- [x] Fora de `done` responde 409 (`backlog-review` 30); 422 para campo faltando, vazio ou acima do máximo; 404/401 conforme isolamento (`backlog-review` 37, 38; SEC-09).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_story_create.py -q`.
-- [ ] Gate backend. SEC-02, SEC-04, SEC-09.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_story_create.py -q`.
+- [x] Gate backend. SEC-02, SEC-04, SEC-09.
 
 **Dependencies:** Task 45.2
 
@@ -2869,13 +2869,13 @@
 **Description:** `DELETE /api/meetings/{id}/user-stories/{story_id}`.
 
 **Acceptance criteria:**
-- [ ] Remove a US com seus critérios e os outros `US-id` não mudam (`backlog-review` 19).
-- [ ] Uma US criada depois não reusa o número excluído, se ele era o maior (`backlog-review` 19).
-- [ ] Fora de `done` responde 409 (`backlog-review` 30); 404/401 conforme isolamento (`backlog-review` 37, 38).
+- [x] Remove a US com seus critérios e os outros `US-id` não mudam (`backlog-review` 19).
+- [x] Uma US criada depois não reusa o número excluído, se ele era o maior (`backlog-review` 19).
+- [x] Fora de `done` responde 409 (`backlog-review` 30); 404/401 conforme isolamento (`backlog-review` 37, 38).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_story_delete.py -q`.
-- [ ] Gate backend. SEC-02, SEC-04.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_story_delete.py -q`.
+- [x] Gate backend. SEC-02, SEC-04.
 
 **Dependencies:** Task 45.3
 
@@ -2890,13 +2890,13 @@
 **Description:** `POST .../user-stories/{story_id}/criteria`, `PATCH` e `DELETE /criteria/{criterion_id}`.
 
 **Acceptance criteria:**
-- [ ] `POST` com `given`, `when` e `then` não vazios adiciona o critério no fim da US (`backlog-review` 20); `PATCH` grava os campos enviados e campo vazio recebe 422 (`backlog-review` 21).
-- [ ] `DELETE` do último critério da US recebe 409 `last_criterion` (`backlog-review` 22).
-- [ ] Fora de `done` responde 409 (`backlog-review` 30); `criterion_id` de outra Reunião responde 404; sem sessão, 401 (`backlog-review` 37, 38; SEC-02, SEC-09).
+- [x] `POST` com `given`, `when` e `then` não vazios adiciona o critério no fim da US (`backlog-review` 20); `PATCH` grava os campos enviados e campo vazio recebe 422 (`backlog-review` 21).
+- [x] `DELETE` do último critério da US recebe 409 `last_criterion` (`backlog-review` 22).
+- [x] Fora de `done` responde 409 (`backlog-review` 30); `criterion_id` de outra Reunião responde 404; sem sessão, 401 (`backlog-review` 37, 38; SEC-02, SEC-09).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_criteria.py -q`.
-- [ ] Gate backend. SEC-02, SEC-04, SEC-09.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_criteria.py -q`.
+- [x] Gate backend. SEC-02, SEC-04, SEC-09.
 
 **Dependencies:** Task 45.4
 

@@ -6,7 +6,18 @@ from snook.core.deps import get_uow
 from snook.core.uow import UnitOfWork
 from snook.modules.auth.deps import CurrentUser
 from snook.modules.backlog_review import service
-from snook.modules.backlog_review.schemas import BacklogOut, EpicName, EpicRenamed, EpicSummary
+from snook.modules.backlog_review.schemas import (
+    BacklogOut,
+    CriterionIn,
+    CriterionOut,
+    CriterionPatch,
+    EpicName,
+    EpicRenamed,
+    EpicSummary,
+    StoryCreate,
+    StoryPatch,
+    UserStoryOut,
+)
 
 router = APIRouter(prefix="/api/meetings")
 
@@ -50,3 +61,63 @@ def delete_epic(meeting_id: str, epic_id: int, user: CurrentUser, uow: Uow) -> N
     """`backlog-review` 10."""
     with uow:
         service.delete_epic(uow, user_id=user.id, meeting_id=meeting_id, epic_id=epic_id)
+
+
+@router.post("/{meeting_id}/epics/{epic_id}/user-stories", status_code=status.HTTP_201_CREATED)
+def create_story(
+    meeting_id: str, epic_id: int, body: StoryCreate, user: CurrentUser, uow: Uow
+) -> UserStoryOut:
+    """`backlog-review` 17, 18."""
+    with uow:
+        return service.create_story(
+            uow, user_id=user.id, meeting_id=meeting_id, epic_id=epic_id, body=body
+        )
+
+
+@router.patch("/{meeting_id}/user-stories/{story_id}")
+def update_story(
+    meeting_id: str, story_id: int, body: StoryPatch, user: CurrentUser, uow: Uow
+) -> UserStoryOut:
+    """`backlog-review` 11 a 16."""
+    with uow:
+        return service.update_story(
+            uow, user_id=user.id, meeting_id=meeting_id, story_id=story_id, body=body
+        )
+
+
+@router.delete("/{meeting_id}/user-stories/{story_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_story(meeting_id: str, story_id: int, user: CurrentUser, uow: Uow) -> None:
+    """`backlog-review` 19."""
+    with uow:
+        service.delete_story(uow, user_id=user.id, meeting_id=meeting_id, story_id=story_id)
+
+
+@router.post("/{meeting_id}/user-stories/{story_id}/criteria", status_code=status.HTTP_201_CREATED)
+def add_criterion(
+    meeting_id: str, story_id: int, body: CriterionIn, user: CurrentUser, uow: Uow
+) -> CriterionOut:
+    """`backlog-review` 20."""
+    with uow:
+        return service.add_criterion(
+            uow, user_id=user.id, meeting_id=meeting_id, story_id=story_id, body=body
+        )
+
+
+@router.patch("/{meeting_id}/criteria/{criterion_id}")
+def update_criterion(
+    meeting_id: str, criterion_id: int, body: CriterionPatch, user: CurrentUser, uow: Uow
+) -> CriterionOut:
+    """`backlog-review` 21."""
+    with uow:
+        return service.update_criterion(
+            uow, user_id=user.id, meeting_id=meeting_id, criterion_id=criterion_id, body=body
+        )
+
+
+@router.delete("/{meeting_id}/criteria/{criterion_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_criterion(meeting_id: str, criterion_id: int, user: CurrentUser, uow: Uow) -> None:
+    """`backlog-review` 22."""
+    with uow:
+        service.delete_criterion(
+            uow, user_id=user.id, meeting_id=meeting_id, criterion_id=criterion_id
+        )
