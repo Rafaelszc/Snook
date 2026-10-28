@@ -2,6 +2,7 @@ import { ArrowLeft, CircleAlert } from "lucide-react"
 import { Link, useParams } from "react-router"
 
 import { StatusBadge } from "@/components/surfaces/StatusBadge"
+import { buttonVariants } from "@/components/ui/button"
 
 import type { MeetingDetail } from "./api"
 import { DeleteMeetingDialog } from "./DeleteMeetingDialog"
@@ -70,6 +71,25 @@ function Failure({ meeting }: { meeting: MeetingDetail }) {
   )
 }
 
+// Transcrita sem nomes: o próximo passo é a tela de nomeação (`participants` 25).
+function NamingCall({ meeting }: { meeting: MeetingDetail }) {
+  if (meeting.status !== "transcribed" || meeting.participants_confirmed)
+    return null
+  return (
+    <section className="flex flex-col items-start gap-3 rounded-xl border border-border p-5">
+      <p className="text-sm text-muted-foreground">
+        {MESSAGES.nameParticipantsHint}
+      </p>
+      <Link
+        to={`/meetings/${meeting.id}/participants`}
+        className={buttonVariants()}
+      >
+        {MESSAGES.nameParticipants}
+      </Link>
+    </section>
+  )
+}
+
 // Tamanhos de texto: sm, base, 2xl.
 export function MeetingDetailPage() {
   const { id = "" } = useParams()
@@ -114,6 +134,7 @@ export function MeetingDetailPage() {
             <StatusBadge status={meeting.status} className="self-start" />
           </header>
           <Failure meeting={meeting} />
+          <NamingCall meeting={meeting} />
           <Facts meeting={meeting} />
           {hasTranscript ? (
             <Link

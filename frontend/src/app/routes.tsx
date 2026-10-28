@@ -7,6 +7,7 @@ import { SettingsPage } from "@/features/llm-providers/SettingsPage"
 import { MeetingDetailPage } from "@/features/meetings/MeetingDetailPage"
 import { MeetingListPage } from "@/features/meetings/MeetingListPage"
 import { UploadPage } from "@/features/meetings/UploadPage"
+import { NamingPage } from "@/features/participants/NamingPage"
 import { RecordPage } from "@/features/screen-recording/RecordPage"
 
 import { AuthGuard } from "./AuthGuard"
@@ -32,6 +33,7 @@ export const routes: RouteObject[] = [
           { path: "meetings/record", element: <RecordPage /> },
           { path: "meetings/:id", element: <MeetingDetailPage /> },
           { path: "meetings/:id/transcript", element: <TranscriptPage /> },
+          { path: "meetings/:id/participants", element: <NamingPage /> },
           ...(import.meta.env.DEV
             ? [{ path: "dev/components", element: <SamplePage /> }]
             : []),

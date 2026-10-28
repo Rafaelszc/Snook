@@ -184,3 +184,27 @@ it("id inexistente ou de outro usuário mostra não encontrada", async () => {
     "Reunião não encontrada."
   )
 })
+
+it("em transcribed sem nomes, leva à tela de nomeação (participants 25)", async () => {
+  detailSequence(detail({ status: "transcribed" }))
+  const { container, router } = renderMeetings(PATH)
+
+  const link = await screen.findByRole("link", {
+    name: "Nomear participantes",
+  })
+  expect(await axe(container)).toHaveNoViolations()
+  await userEvent.click(link)
+  expect(router.state.location.pathname).toBe(`${PATH}/participants`)
+})
+
+it("com nomes confirmados ou em outro status, não oferece nomeação", async () => {
+  detailSequence(
+    detail({ status: "transcribed", participants_confirmed: true })
+  )
+  renderMeetings(PATH)
+
+  expect(await screen.findByText("Transcrita")).toBeVisible()
+  expect(
+    screen.queryByRole("link", { name: "Nomear participantes" })
+  ).not.toBeInTheDocument()
+})
