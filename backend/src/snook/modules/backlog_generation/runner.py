@@ -1,6 +1,7 @@
 """`GenerationRunner`: consome "Partes prontas" e gera o backlog Parte a Parte (ADR-0007)."""
 
 import logging
+import threading
 from collections.abc import Callable, Sequence
 from concurrent.futures import Executor, ThreadPoolExecutor
 from dataclasses import dataclass
@@ -53,6 +54,11 @@ class _Job:
     participants: list[ParticipantOut]
     participants_text: str
     parts: list[transcript_split.Part]
+    budget: int
+
+
+class _PartTooLarge(Exception):
+    """Parte não cabe no orçamento do modelo lido no início (`backlog-generation` 32)."""
 
 
 def build_content(participants_text: str, part_text: str, epics: Sequence[str]) -> str:
@@ -65,6 +71,23 @@ def build_content(participants_text: str, part_text: str, epics: Sequence[str]) 
     return "\n\n".join(sections)
 
 
+def _provider_message(error: llm_providers.LLMError, index: int) -> str:
+    """Mensagem pt-BR própria do tipo (`backlog-generation` 26)."""
+    if isinstance(error, llm_providers.CredentialRejected):
+        if error.reason == "unreadable_key":
+            return messages.KEY_UNREADABLE
+        return messages.CREDENTIAL_REJECTED
+    if isinstance(error, llm_providers.ProviderUnreachable):
+        return messages.PROVIDER_UNREACHABLE
+    if isinstance(error, llm_providers.ModelNotFound):
+        return messages.MODEL_NOT_FOUND
+    if isinstance(error, llm_providers.ContextLimitExceeded):
+        return messages.CONTEXT_LIMIT_EXCEEDED.format(index=index)
+    if isinstance(error, llm_providers.ProviderRateLimited):
+        return messages.PROVIDER_RATE_LIMITED
+    return messages.GENERATION_FAILED
+
+
 class GenerationRunner:
     """Pool de threads (`GENERATION_WORKERS`); cada geração chama "Gerar" em sequência."""
 
@@ -74,13 +97,17 @@ class GenerationRunner:
         *,
         uow_factory: Callable[[], UnitOfWork],
         generate: Generate,
+        estimate: transcript_split.Estimate,
         now: Callable[[], datetime],
     ) -> None:
         self._workers = workers
         self._uow = uow_factory
         self._generate = generate
+        self._estimate = estimate
         self._now = now
         self._executor: Executor | None = None
+        self._running: set[tuple[str, str]] = set()
+        self._lock = threading.Lock()
 
     def start(self) -> None:
         self._executor = ThreadPoolExecutor(self._workers, thread_name_prefix="generation")
@@ -97,8 +124,21 @@ class GenerationRunner:
         self._executor.submit(self.run, event)
 
     def run(self, event: Event) -> None:
-        """Uma geração inteira. Só com a Reunião em `generating` e o `run_id` do aviso. Qualquer
-        falha leva a `failed` etapa `generation` sem gravar nada (22; SEC-19)."""
+        """Uma geração por aviso. Aviso repetido com a mesma geração em curso é ignorado (33)."""
+        key = (event.meeting_id, event.run_id)
+        with self._lock:
+            if key in self._running:
+                return
+            self._running.add(key)
+        try:
+            self._run(event)
+        finally:
+            with self._lock:
+                self._running.discard(key)
+
+    def _run(self, event: Event) -> None:
+        """Só com a Reunião em `generating` e o `run_id` do aviso. Qualquer falha leva a
+        `failed` etapa `generation` sem gravar nada (22; SEC-19)."""
         index = 0
         try:
             job = self._load(event)
@@ -109,6 +149,8 @@ class GenerationRunner:
                 index = part.index
                 responses.append(self._generate_part(job, part, responses))
             self._save(event, job, responses)
+        except _PartTooLarge:
+            self._fail(event, messages.PART_TOO_LARGE.format(index=index))
         except llm_providers.NoActiveProvider:
             self._fail(event, messages.NO_ACTIVE_PROVIDER)
         except InvalidBacklogResponse as error:
@@ -118,7 +160,7 @@ class GenerationRunner:
                 "generation.provider_error",
                 extra={"meeting_id": event.meeting_id, "reason": error.reason},
             )
-            self._fail(event, messages.GENERATION_FAILED)
+            self._fail(event, _provider_message(error, index))
         except Exception:
             logger.exception("generation.failed", extra={"meeting_id": event.meeting_id})
             self._fail(event, messages.UNEXPECTED)
@@ -129,20 +171,28 @@ class GenerationRunner:
             if not meetings.is_current_run(uow, meeting_id, event.run_id, status="generating"):
                 return None
             user_id = meetings.read_owner(uow, meeting_id)
+            snapshot = transcript_split.owner_provider(uow, meeting_id)
             return _Job(
                 user_id=user_id,
-                snapshot=transcript_split.owner_provider(uow, meeting_id),
+                snapshot=snapshot,
                 duration_seconds=meetings.get_owned_meeting(
                     uow, user_id, meeting_id
                 ).duration_seconds,
                 participants=participants.list_participants(uow, meeting_id),
                 participants_text=transcript_split.participants_text(uow, meeting_id),
                 parts=transcript_split.list_parts(uow, meeting_id),
+                budget=transcript_split.part_budget(
+                    uow, snapshot, meeting_id, estimate=self._estimate
+                ),
             )
 
     def _generate_part(
         self, job: _Job, part: transcript_split.Part, previous: Sequence[BacklogResponse]
     ) -> BacklogResponse:
+        """Reestima a Parte antes de chamar (32; RT-10)."""
+        tokens = self._estimate(job.snapshot.provider, job.snapshot.model, part.text)
+        if not transcript_split.fits(tokens, job.budget):
+            raise _PartTooLarge
         raw = self._generate(
             user_id=job.user_id,
             provider_snapshot=job.snapshot,

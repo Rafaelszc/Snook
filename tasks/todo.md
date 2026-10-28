@@ -2602,13 +2602,13 @@
 **Description:** Cada erro tipado de "Gerar" e cada resposta inválida levam a Reunião a `failed` etapa `generation` com mensagem pt-BR própria.
 
 **Acceptance criteria:**
-- [ ] Credencial recusada, provedor inacessível, modelo inexistente, limite de contexto excedido e limite de uso levam a `failed` com mensagem pt-BR própria do tipo; a de credencial recusada aponta para a tela de configurações (`backlog-generation` 26).
-- [ ] Resposta inválida em qualquer Parte leva a `failed` com mensagem que cita a Parte e o motivo; nada é gravado e não há nova chamada automática (`backlog-generation` 15).
-- [ ] Nenhuma mensagem, log ou registro gravado contém a chave do provedor (`backlog-generation` 27; SEC-07, SEC-20).
+- [x] Credencial recusada, provedor inacessível, modelo inexistente, limite de contexto excedido e limite de uso levam a `failed` com mensagem pt-BR própria do tipo; a de credencial recusada aponta para a tela de configurações (`backlog-generation` 26).
+- [x] Resposta inválida em qualquer Parte leva a `failed` com mensagem que cita a Parte e o motivo; nada é gravado e não há nova chamada automática (`backlog-generation` 15).
+- [x] Nenhuma mensagem, log ou registro gravado contém a chave do provedor (`backlog-generation` 27; SEC-07, SEC-20).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_errors.py -q`.
-- [ ] Gate backend. SEC-07, SEC-18, SEC-19, SEC-20.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_errors.py -q`.
+- [x] Gate backend. SEC-07, SEC-18, SEC-19, SEC-20.
 
 **Dependencies:** Task 40.4
 
@@ -2623,13 +2623,13 @@
 **Description:** Antes de cada "Gerar", reestima a Parte com o modelo lido no início; e a gravação final falha se a Reunião foi excluída.
 
 **Acceptance criteria:**
-- [ ] Antes de cada chamada, reestima e compara com "Orçamento da Parte"; Parte que não cabe leva a `failed` com mensagem que cita a Parte e pede dividir de novo ou trocar de modelo; essa Parte e as seguintes não são chamadas e nada é gravado (`backlog-generation` 32; RT-10).
-- [ ] Reunião excluída durante a geração: nada é gravado depois da exclusão (`backlog-generation` 28).
-- [ ] A exceção na gravação final não deixa status preso (SEC-19).
+- [x] Antes de cada chamada, reestima e compara com "Orçamento da Parte"; Parte que não cabe leva a `failed` com mensagem que cita a Parte e pede dividir de novo ou trocar de modelo; essa Parte e as seguintes não são chamadas e nada é gravado (`backlog-generation` 32; RT-10).
+- [x] Reunião excluída durante a geração: nada é gravado depois da exclusão (`backlog-generation` 28).
+- [x] A exceção na gravação final não deixa status preso (SEC-19).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_reestimate_delete.py -q`.
-- [ ] Gate backend. SEC-19.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_reestimate_delete.py -q`.
+- [x] Gate backend. SEC-19.
 
 **Dependencies:** Task 41.1
 
@@ -2644,13 +2644,13 @@
 **Description:** `PartsReady` fora de `generating` ou repetido é ignorado; retry da geração chega a `done` com a mesma Transcrição.
 
 **Acceptance criteria:**
-- [ ] `PartsReady` com a Reunião fora de `generating` é ignorado: nenhuma chamada, nada gravado, status igual; um segundo aviso da mesma geração também (`backlog-generation` 33).
-- [ ] Depois de "Tentar novamente" da etapa `generation`, uma nova geração bem-sucedida leva a `done` com a mesma Transcrição e os mesmos Participantes (`backlog-generation` 29; transversal 16).
-- [ ] `run_id` velho é ignorado (ADR-0007).
+- [x] `PartsReady` com a Reunião fora de `generating` é ignorado: nenhuma chamada, nada gravado, status igual; um segundo aviso da mesma geração também (`backlog-generation` 33).
+- [x] Depois de "Tentar novamente" da etapa `generation`, uma nova geração bem-sucedida leva a `done` com a mesma Transcrição e os mesmos Participantes (`backlog-generation` 29; transversal 16).
+- [x] `run_id` velho é ignorado (ADR-0007).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_idempotency_retry.py -q`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_idempotency_retry.py -q`.
+- [x] Gate backend.
 
 **Dependencies:** Task 41.2
 

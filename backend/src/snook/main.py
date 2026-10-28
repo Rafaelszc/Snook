@@ -153,6 +153,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         settings.generation_workers,
         uow_factory=unit_of_work,
         generate=lambda **request: app.state.generate(**request),
+        estimate=lambda *args: app.state.estimate_tokens(*args),
         now=lambda: app.state.clock.now(),
     )
     app.state.generate_backlog = lambda event: app.state.generation.submit(event)  # teste: síncrono
