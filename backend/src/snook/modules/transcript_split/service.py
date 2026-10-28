@@ -26,6 +26,7 @@ from snook.modules.transcript_split.cuts import (
 )
 from snook.modules.transcript_split.models import TranscriptPart
 from snook.modules.transcript_split.part_text import format_line as format_line
+from snook.modules.transcript_split.part_text import format_timestamp as format_timestamp
 from snook.modules.transcript_split.schemas import SplitOut, SplitPartOut, SplitSegmentOut
 from snook.shared.prompts import load_backlog_system_prompt
 

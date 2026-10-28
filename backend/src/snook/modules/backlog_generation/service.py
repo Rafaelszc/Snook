@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 from snook.core.events import Event, EventBus, PartsReady
 from snook.core.uow import UnitOfWork
+from snook.modules.backlog_generation.merge import us_id as us_id
 from snook.modules.backlog_generation.repository import BacklogRepository as BacklogRepository
 from snook.modules.backlog_generation.runner import Generate as Generate
 from snook.modules.backlog_generation.runner import GenerationRunner as GenerationRunner
