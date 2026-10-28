@@ -1,6 +1,6 @@
 from collections.abc import Mapping, Sequence
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
 from snook.core.text import normalize
@@ -134,6 +134,15 @@ class BacklogRepository:
         """Critérios saem em cascata; contador não desce (`backlog-review` 19)."""
         self._session.delete(story)
         self._session.flush()
+
+    def reassign_requester(self, meeting_id: str, old_id: int, new_id: int) -> None:
+        """US da Reunião com solicitante `old_id` passam a `new_id` (`backlog-review` 24)."""
+        query = (
+            update(UserStory)
+            .where(UserStory.meeting_id == meeting_id, UserStory.requested_by == old_id)
+            .values(requested_by=new_id)
+        )
+        self._session.execute(query)
 
     def criterion(self, meeting_id: str, criterion_id: int) -> AcceptanceCriterion | None:
         """Critério `criterion_id` só se a US for da Reunião (SEC-02)."""

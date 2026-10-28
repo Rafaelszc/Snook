@@ -13,6 +13,7 @@ from snook.modules.backlog_review.schemas import (
     EpicOut,
     EpicRenamed,
     EpicSummary,
+    ParticipantRenamed,
     RequesterOut,
     StoryCreate,
     StoryPatch,
@@ -256,3 +257,18 @@ def delete_criterion(uow: UnitOfWork, *, user_id: str, meeting_id: str, criterio
     if repo.criteria_count(criterion.user_story_id) <= 1:
         raise AppError("last_criterion", messages.LAST_CRITERION, 409)
     repo.delete_criterion(criterion)
+
+
+def rename_participant(
+    uow: UnitOfWork, *, user_id: str, meeting_id: str, participant_id: int, name: str
+) -> ParticipantRenamed:
+    """`backlog-review` 23 a 25, 30. Regra de status de `participants` 21, não a de `done`.
+    Na união, US do absorvido passam ao sobrevivente na mesma transação. Sem LLM."""
+    meetings.get_owned_meeting(uow, user_id, meeting_id)
+    repo = backlog_generation.backlog(uow)
+
+    def before_absorb(absorbed_id: int, survivor_id: int) -> None:
+        repo.reassign_requester(meeting_id, absorbed_id, survivor_id)
+
+    result = participants.rename(uow, meeting_id, participant_id, name, before_absorb)
+    return ParticipantRenamed(participant=result.participant, absorbed_id=result.absorbed_id)
