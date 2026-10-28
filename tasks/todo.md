@@ -3007,13 +3007,13 @@
 **Description:** Backlog agrupado por Epic com todos os campos, solicitante, instante, banner de só leitura e de última geração com falha.
 
 **Acceptance criteria:**
-- [ ] Mostra as US agrupadas por Epic com todos os campos do formato, solicitante e instante (`backlog-review` 39); texto de US renderiza escapado, inclusive `<script>` (SEC-12).
-- [ ] Em `failed` com backlog, mostra só leitura, aviso de que a última geração falhou, o motivo e "Tentar novamente" que repete o aviso de perda das edições; em `transcribed`, `generating` e `needs_split` com backlog, só leitura com o status atual (`backlog-review` 46).
+- [x] Mostra as US agrupadas por Epic com todos os campos do formato, solicitante e instante (`backlog-review` 39); texto de US renderiza escapado, inclusive `<script>` (SEC-12).
+- [x] Em `failed` com backlog, mostra só leitura, aviso de que a última geração falhou, o motivo e "Tentar novamente" que repete o aviso de perda das edições; em `transcribed`, `generating` e `needs_split` com backlog, só leitura com o status atual (`backlog-review` 46).
 - [ ] Com backlog de fixture de 30 Epics e 200 US, INP até 200 ms (NFR-04, medição manual no checkpoint); abrir e fechar Epic anima só `transform` e `opacity`.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] Gate frontend. SEC-12.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] Gate frontend. SEC-12.
 
 **Dependencies:** Tasks 43, 22.3
 
@@ -3030,13 +3030,13 @@
 **Description:** Cada campo editável na própria tela, com erros da API junto ao campo.
 
 **Acceptance criteria:**
-- [ ] Cada campo de Epic, US e critério pode ser editado na tela, incluindo prioridade, story points, solicitante e instante (`backlog-review` 40).
-- [ ] Erros 422 da API aparecem junto ao campo (`backlog-review` 40).
-- [ ] Teclado em tudo, foco visível e `vitest-axe` sem violação.
+- [x] Cada campo de Epic, US e critério pode ser editado na tela, incluindo prioridade, story points, solicitante e instante (`backlog-review` 40).
+- [x] Erros 422 da API aparecem junto ao campo (`backlog-review` 40).
+- [x] Teclado em tudo, foco visível e `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 49.1, 45.5
 
@@ -3053,13 +3053,13 @@
 **Description:** Criar Epic e US, aviso de junção por nome igual, mover US e excluir com confirmação.
 
 **Acceptance criteria:**
-- [ ] Renomear ou criar uma Epic, ou renomear um Participante, com nome que já existe na Reunião mostra, antes de salvar, que os dois serão juntados (`backlog-review` 41).
-- [ ] Excluir US, Epic ou critério pede confirmação; o botão de excluir Epic fica desabilitado enquanto ela tiver US (`backlog-review` 42).
-- [ ] Mover uma US abre a escolha da Epic de destino entre as da Reunião (`backlog-review` 43).
+- [x] Renomear ou criar uma Epic, ou renomear um Participante, com nome que já existe na Reunião mostra, antes de salvar, que os dois serão juntados (`backlog-review` 41).
+- [x] Excluir US, Epic ou critério pede confirmação; o botão de excluir Epic fica desabilitado enquanto ela tiver US (`backlog-review` 42).
+- [x] Mover uma US abre a escolha da Epic de destino entre as da Reunião (`backlog-review` 43).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 49.2, 44.3, 45.2
 
@@ -3076,13 +3076,13 @@
 **Description:** "Regenerar" com aviso, opções para Reunião dividida, botões de exportar e "Renomear participante".
 
 **Acceptance criteria:**
-- [ ] "Regenerar" avisa que todas as edições serão perdidas antes de confirmar; em Reunião dividida, oferece "mesmos cortes" e "reajustar cortes" (`backlog-review` 44).
-- [ ] "Exportar Markdown" e "Exportar JSON" baixam o arquivo (`backlog-review` 45).
-- [ ] "Renomear participante" aparece também com o backlog só para leitura, nas situações em que a regra por status permite (`backlog-review` 48); diálogos usam `GlassPanel` (máximo de 3 vidros por tela, NFR-06).
+- [x] "Regenerar" avisa que todas as edições serão perdidas antes de confirmar; em Reunião dividida, oferece "mesmos cortes" e "reajustar cortes" (`backlog-review` 44).
+- [x] "Exportar Markdown" e "Exportar JSON" baixam o arquivo (`backlog-review` 45).
+- [x] "Renomear participante" aparece também com o backlog só para leitura, nas situações em que a regra por status permite (`backlog-review` 48); diálogos usam `GlassPanel` (máximo de 3 vidros por tela, NFR-06).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 49.3, 48.2, 47, 46
 

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router"
 
 import { Button } from "@/components/ui/button"
 
-import { ConfirmDialog } from "./ConfirmDialog"
+import { ConfirmDialog } from "@/components/surfaces/ConfirmDialog"
 import { MESSAGES } from "./messages"
 import { useDeleteMeeting } from "./useMeetings"
 

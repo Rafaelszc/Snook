@@ -16,3 +16,5 @@ export const STATUS_LABELS: Record<Status, string> = {
   done: "Concluída",
   failed: "Falhou",
 }
+
+export const CONFIRM_CANCEL = "Cancelar"

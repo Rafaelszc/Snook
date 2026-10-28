@@ -1,17 +1,21 @@
 import type { ReactNode } from "react"
 import { AlertDialog } from "radix-ui"
 
-import { GlassPanel } from "@/components/surfaces/GlassPanel"
 import { Button } from "@/components/ui/button"
 
-import { MESSAGES } from "./messages"
+import { GlassPanel } from "./GlassPanel"
+import { CONFIRM_CANCEL } from "./messages"
 
 interface ConfirmDialogProps {
-  trigger: ReactNode
+  trigger?: ReactNode
   title: string
   description: string
   confirm: string
   destructive?: boolean
+  // Sem `trigger`: diálogo controlado por `open`/`onOpenChange`.
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  children?: ReactNode
   onConfirm: () => void
 }
 
@@ -22,11 +26,16 @@ export function ConfirmDialog({
   description,
   confirm,
   destructive,
+  open,
+  onOpenChange,
+  children,
   onConfirm,
 }: ConfirmDialogProps) {
   return (
-    <AlertDialog.Root>
-      <AlertDialog.Trigger asChild>{trigger}</AlertDialog.Trigger>
+    <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
+      {trigger ? (
+        <AlertDialog.Trigger asChild>{trigger}</AlertDialog.Trigger>
+      ) : null}
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="motion-fade-in fixed inset-0 z-50 bg-black/40" />
         <AlertDialog.Content asChild>
@@ -37,9 +46,10 @@ export function ConfirmDialog({
             <AlertDialog.Description className="text-sm text-muted-foreground">
               {description}
             </AlertDialog.Description>
+            {children}
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <AlertDialog.Cancel asChild>
-                <Button variant="outline">{MESSAGES.cancel}</Button>
+                <Button variant="outline">{CONFIRM_CANCEL}</Button>
               </AlertDialog.Cancel>
               <AlertDialog.Action asChild>
                 <Button
