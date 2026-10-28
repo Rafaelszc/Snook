@@ -1,5 +1,5 @@
 import re
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from pydantic import (
     AfterValidator,
@@ -242,3 +242,20 @@ class ParticipantRenamed(BaseModel):
 
     participant: ParticipantOut
     absorbed_id: int | None
+
+
+RegenerateMode = Literal["same_cuts", "adjust_cuts"]
+
+
+class RegenerateIn(BaseModel):
+    """Corpo de `POST /regenerate` (`backlog-review` 26, 27; SEC-09)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    mode: RegenerateMode
+
+
+class RegenerateOut(BaseModel):
+    """Status da Reunião depois de "Preparar geração"."""
+
+    status: str

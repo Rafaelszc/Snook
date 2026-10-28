@@ -2937,13 +2937,13 @@
 **Description:** `POST /api/meetings/{id}/regenerate` com `mode` `same_cuts` ou `adjust_cuts`.
 
 **Acceptance criteria:**
-- [ ] `same_cuts` em `done` chama "Preparar geração" no modo `normal` (`backlog-review` 26); `adjust_cuts` em Reunião já dividida chama o modo `reajustar`, e em Reunião não dividida recebe 422 (`backlog-review` 27).
-- [ ] Regenerar fora de `done` recebe 409 sem mudar nada (`backlog-review` 28, 30); o backlog anterior só é substituído quando a nova geração termina bem (`backlog-review` 29; `backlog-generation` 24).
-- [ ] 404 com `id` de outro Usuário e 401 sem sessão (`backlog-review` 37, 38; SEC-02, SEC-04).
+- [x] `same_cuts` em `done` chama "Preparar geração" no modo `normal` (`backlog-review` 26); `adjust_cuts` em Reunião já dividida chama o modo `reajustar`, e em Reunião não dividida recebe 422 (`backlog-review` 27).
+- [x] Regenerar fora de `done` recebe 409 sem mudar nada (`backlog-review` 28, 30); o backlog anterior só é substituído quando a nova geração termina bem (`backlog-review` 29; `backlog-generation` 24).
+- [x] 404 com `id` de outro Usuário e 401 sem sessão (`backlog-review` 37, 38; SEC-02, SEC-04).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_regenerate.py -q` ("Preparar geração" fake registra o modo).
-- [ ] Gate backend. SEC-02, SEC-04, SEC-09.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_regenerate.py -q` ("Preparar geração" fake registra o modo).
+- [x] Gate backend. SEC-02, SEC-04, SEC-09.
 
 **Dependencies:** Task 46
 
