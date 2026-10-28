@@ -2388,8 +2388,8 @@
 
 ### Checkpoint: `transcript-split` API
 
-- [ ] Critérios 1 a 29, 37 a 44 e 46 de `01-prd/transcript-split.md` passam
-- [ ] `/security-review` sobre o diff
+- [x] Critérios 1 a 29, 37 a 44 e 46 de `01-prd/transcript-split.md` passam
+- [x] `/security-review` sobre o diff
 
 ### Task 38.1: Tela de divisão: abertura e lista virtualizada
 
