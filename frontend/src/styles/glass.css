@@ -11,7 +11,11 @@
 @supports (backdrop-filter: blur(1px)) {
   @media (prefers-reduced-transparency: no-preference) and (forced-colors: none) {
     .glass:not(.glass-opaque) {
-      background: color-mix(in srgb, var(--card) var(--glass-alpha), transparent);
+      background: color-mix(
+        in srgb,
+        var(--card) var(--glass-alpha),
+        transparent
+      );
       backdrop-filter: blur(12px) saturate(140%);
     }
   }

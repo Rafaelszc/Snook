@@ -92,6 +92,13 @@ function NamingForm({
     audioRef.current?.pause()
     confirm.mutate(names, {
       onSuccess: () => navigate(`/meetings/${meetingId}`),
+      // Foco no primeiro campo recusado pela API.
+      onError: (error) => {
+        const label = speakers.find(
+          (s) => error.fields[`names.${s.speaker_label}`]
+        )?.speaker_label
+        if (label) document.getElementById(`name-${label}`)?.focus()
+      },
     })
   }
 
@@ -101,6 +108,10 @@ function NamingForm({
         ref={audioRef}
         preload="none"
         onEnded={() => setPlaying(null)}
+        onError={() => {
+          setPlaying(null)
+          setSampleError(true)
+        }}
         className="hidden"
       />
       <ul aria-label={MESSAGES.speakersLabel} className="flex flex-col">
@@ -112,7 +123,7 @@ function NamingForm({
             playing={playing === speaker.speaker_label}
             mergedWith={merged.get(speaker.speaker_label)}
             error={fields[`names.${speaker.speaker_label}`]}
-            disabled={confirm.isPending}
+            readOnly={confirm.isPending}
             onTogglePlay={() => togglePlay(speaker.speaker_label)}
             onNameChange={(name) =>
               setNames((prev) => ({ ...prev, [speaker.speaker_label]: name }))

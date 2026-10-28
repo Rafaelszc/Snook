@@ -13,7 +13,7 @@ interface SpeakerRowProps {
   playing: boolean
   mergedWith: string[] | undefined
   error: string | undefined
-  disabled: boolean
+  readOnly: boolean
   onTogglePlay: () => void
   onNameChange: (name: string) => void
 }
@@ -24,7 +24,7 @@ export function SpeakerRow({
   playing,
   mergedWith,
   error,
-  disabled,
+  readOnly,
   onTogglePlay,
   onNameChange,
 }: SpeakerRowProps) {
@@ -37,19 +37,21 @@ export function SpeakerRow({
     <li className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-2 border-b border-border py-4 last:border-b-0">
       <Button
         type="button"
-        variant="outline"
+        variant={playing ? "default" : "outline"}
         size="icon-lg"
         aria-label={playing ? MESSAGES.pause(label) : MESSAGES.play(label)}
         aria-pressed={playing}
         onClick={onTogglePlay}
-        className="row-span-2 mt-6"
+        className="row-start-2 size-10"
       >
         {playing ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
       </Button>
-      <div className="flex items-baseline justify-between gap-3 text-sm">
+      <div className="col-start-2 flex items-baseline justify-between gap-3 text-sm">
         <label htmlFor={inputId} className="font-medium">
           <span className="sr-only">{MESSAGES.namePrefix}</span>
-          <span className="font-mono">{label}</span>
+          <span translate="no" className="font-mono">
+            {label}
+          </span>
         </label>
         <span className="text-muted-foreground">
           <span className="sr-only">{MESSAGES.speechTime}: </span>
@@ -58,13 +60,15 @@ export function SpeakerRow({
           </span>
         </span>
       </div>
-      <div className="col-start-2 flex flex-col gap-1.5">
+      <div className="col-start-2 row-start-2 flex flex-col gap-1.5">
         <Input
           id={inputId}
+          name={`names.${label}`}
           value={name}
           maxLength={100}
           autoComplete="off"
-          disabled={disabled}
+          spellCheck={false}
+          readOnly={readOnly}
           aria-invalid={error ? true : undefined}
           aria-describedby={note ? noteId : undefined}
           onChange={(event) => onNameChange(event.target.value)}

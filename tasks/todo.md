@@ -2146,9 +2146,9 @@
 
 ### Checkpoint: `participants`
 
-- [ ] Critérios 25 a 31 cobertos
-- [ ] Checagem de UI; `impeccable-design-polish` na tela de nomeação
-- [ ] `/security-review` sobre o diff
+- [x] Critérios 25 a 31 cobertos
+- [x] Checagem de UI; `impeccable-design-polish` na tela de nomeação
+- [x] `/security-review` sobre o diff
 - [ ] Revisão humana antes de seguir
 
 ---
