@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from snook.core.settings import Settings
 from snook.core.uow import UnitOfWork
-from tests.backlog_generation.helpers import FakeGenerate, backlog, generating, parts_ready
+from tests.backlog_generation.helpers import FakeGenerate, backlog, generating, parts_ready, story
 from tests.diarized_transcription.helpers import state
 from tests.meetings.helpers import set_fields
 
@@ -92,3 +92,35 @@ def new_story(**overrides: Any) -> dict[str, Any]:
         "acceptance_criteria": [{"given": "pedido pago", "when": "emito", "then": "nota sai"}],
         **overrides,
     }
+
+
+def export_url(meeting_id: str, fmt: str) -> str:
+    return f"/api/meetings/{meeting_id}/export?format={fmt}"
+
+
+def fixture_backlog(
+    client: TestClient, settings: Settings, uow: Callable[[], UnitOfWork], generate: FakeGenerate
+) -> str:
+    """Backlog dos snapshots de exportação: 2 Epics, 3 US, uma sem solicitante."""
+    meeting_id = with_backlog(
+        client,
+        settings,
+        uow,
+        generate,
+        (
+            "Cadastro",
+            [story("Cadastrar cliente", criteria=2), story("Buscar cliente", requested_by=None)],
+        ),
+        ("Relatórios", [story("Exportar vendas", requested_by="Bia", requested_at="01:02:03")]),
+    )
+    set_fields(settings.database_path, meeting_id, title="Planejamento de Vendas")
+    return meeting_id
+
+
+def empty_backlog(
+    client: TestClient, settings: Settings, uow: Callable[[], UnitOfWork], generate: FakeGenerate
+) -> str:
+    """Reunião em `done` cuja geração não produziu US (`backlog-review` 36, 47)."""
+    meeting_id = with_backlog(client, settings, uow, generate)
+    set_fields(settings.database_path, meeting_id, title="Planejamento de Vendas")
+    return meeting_id

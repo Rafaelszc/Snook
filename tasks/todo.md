@@ -2958,13 +2958,13 @@
 **Description:** `GET /api/meetings/{id}/export?format=md` como anexo, nome `<slug-do-titulo>-backlog.md`.
 
 **Acceptance criteria:**
-- [ ] Cada Epic sai como `Epic: <nome>` e cada US no formato da Q11, na ordem `US-id: nome`, "Como", "Eu quero", "Para", "Prioridade", "Story Points" e "Critérios de aceitação" com "Dado / Quando / Então" (`backlog-review` 32); o arquivo começa com título e data da Reunião, e cada US traz "Solicitante" e "Quando" depois de "Para", omitidos se vazios (`backlog-review` 33).
-- [ ] Sem informação de Parte nem identificador interno além do `US-id`; backlog vazio devolve só o cabeçalho (`backlog-review` 35, 36).
-- [ ] Resposta com `Content-Disposition: attachment` e nome sanitizado (slug ASCII até 60 caracteres, vazio vira `reuniao`) e `X-Content-Type-Options: nosniff` (SEC-12); sem backlog gravado responde 409 `no_backlog` (`backlog-review` 31).
+- [x] Cada Epic sai como `Epic: <nome>` e cada US no formato da Q11, na ordem `US-id: nome`, "Como", "Eu quero", "Para", "Prioridade", "Story Points" e "Critérios de aceitação" com "Dado / Quando / Então" (`backlog-review` 32); o arquivo começa com título e data da Reunião, e cada US traz "Solicitante" e "Quando" depois de "Para", omitidos se vazios (`backlog-review` 33).
+- [x] Sem informação de Parte nem identificador interno além do `US-id`; backlog vazio devolve só o cabeçalho (`backlog-review` 35, 36).
+- [x] Resposta com `Content-Disposition: attachment` e nome sanitizado (slug ASCII até 60 caracteres, vazio vira `reuniao`) e `X-Content-Type-Options: nosniff` (SEC-12); sem backlog gravado responde 409 `no_backlog` (`backlog-review` 31).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_export_md.py -q` (snapshot do Markdown de fixture).
-- [ ] Gate backend. SEC-02, SEC-12.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_export_md.py -q` (snapshot do Markdown de fixture).
+- [x] Gate backend. SEC-02, SEC-12.
 
 **Dependencies:** Task 47
 
@@ -2979,13 +2979,13 @@
 **Description:** `GET /api/meetings/{id}/export?format=json`.
 
 **Acceptance criteria:**
-- [ ] Devolve Epics com US e critérios, incluindo `US-id`, solicitante (nome), quando (`hh:mm:ss`), título e data da Reunião (`backlog-review` 34); sem Parte nem identificador interno além do `US-id` (`backlog-review` 35).
-- [ ] Backlog vazio devolve só o cabeçalho; funciona em `done`, `transcribed`, `generating`, `needs_split` e `failed` com backlog gravado, e responde 409 sem backlog (`backlog-review` 31, 36).
-- [ ] Formato desconhecido recebe 422; `id` de outro Usuário, 404; sem sessão, 401 (`backlog-review` 37, 38); texto com `<script>` sai como dado, anexo e `nosniff` (SEC-12).
+- [x] Devolve Epics com US e critérios, incluindo `US-id`, solicitante (nome), quando (`hh:mm:ss`), título e data da Reunião (`backlog-review` 34); sem Parte nem identificador interno além do `US-id` (`backlog-review` 35).
+- [x] Backlog vazio devolve só o cabeçalho; funciona em `done`, `transcribed`, `generating`, `needs_split` e `failed` com backlog gravado, e responde 409 sem backlog (`backlog-review` 31, 36).
+- [x] Formato desconhecido recebe 422; `id` de outro Usuário, 404; sem sessão, 401 (`backlog-review` 37, 38); texto com `<script>` sai como dado, anexo e `nosniff` (SEC-12).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_review/test_api_export_json.py -q` (snapshot).
-- [ ] Gate backend. SEC-02, SEC-12.
+- [x] `cd backend && uv run pytest tests/backlog_review/test_api_export_json.py -q` (snapshot).
+- [x] Gate backend. SEC-02, SEC-12.
 
 **Dependencies:** Task 48.1
 
@@ -2997,10 +2997,10 @@
 
 ### Checkpoint: Renomear, regenerar, exportar
 
-- [ ] Critérios 23 a 29 e 31 a 36 passam
-- [ ] Critérios 30, 37 e 38 repetidos nas rotas novas das Tasks 46 a 48 (regra de status, 404 com `id` alheio, 401 sem sessão)
-- [ ] SEC-12 verificado no export
-- [ ] `/security-review` sobre o diff
+- [x] Critérios 23 a 29 e 31 a 36 passam
+- [x] Critérios 30, 37 e 38 repetidos nas rotas novas das Tasks 46 a 48 (regra de status, 404 com `id` alheio, 401 sem sessão)
+- [x] SEC-12 verificado no export
+- [x] `/security-review` sobre o diff
 
 ### Task 49.1: Tela de revisão: leitura agrupada por Epic
 

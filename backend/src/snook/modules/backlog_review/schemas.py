@@ -259,3 +259,11 @@ class RegenerateOut(BaseModel):
     """Status da Reunião depois de "Preparar geração"."""
 
     status: str
+
+
+class ExportFile(BaseModel):
+    """Arquivo exportado; `filename` já sanitizado (SEC-12)."""
+
+    filename: str
+    media_type: str
+    content: str
