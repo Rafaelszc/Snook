@@ -3163,13 +3163,13 @@
 **Description:** README com primeira execução, `HF_TOKEN` e aceite dos termos do Pyannote, URL do Ollama alcançável de dentro do container, perfil `lan` e CA, aviso de backup, `mkdir -p audios` e medidas do spike.
 
 **Acceptance criteria:**
-- [ ] Segue `08-deployment.md`, "Primeira execução" e "Perfil lan", e inclui `docker compose stop backend backend-gpu` e o comando por perfil do `delete-user`.
-- [ ] Avisa que dado apagado pode seguir no último `snook.db.bak-*` até a próxima migração e mostra como apagá-lo (`03-security.md`, "Backups").
+- [x] Segue `08-deployment.md`, "Primeira execução" e "Perfil lan", e inclui `docker compose stop backend backend-gpu` e o comando por perfil do `delete-user`.
+- [x] Avisa que dado apagado pode seguir no último `snook.db.bak-*` até a próxima migração e mostra como apagá-lo (`03-security.md`, "Backups").
 - [ ] Explica a URL padrão do Ollama `http://host.docker.internal:11434` e a tabela de desempenho medido (Task 1).
 
 **Verification:**
 - [ ] Manual: seguir o README num clone limpo até `http://localhost:8080` (transversal 1).
-- [ ] `git grep -nE "hf_[A-Za-z0-9]{10,}|sk-[A-Za-z0-9]{10,}" README.md` sem achado (SEC-08).
+- [x] `git grep -nE "hf_[A-Za-z0-9]{10,}|sk-[A-Za-z0-9]{10,}" README.md` sem achado (SEC-08).
 
 **Dependencies:** Task 50.2
 
