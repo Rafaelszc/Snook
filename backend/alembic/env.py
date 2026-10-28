@@ -7,6 +7,7 @@ from snook.core.settings import load_settings
 
 # Cada tarefa que cria tabela importa aqui o `models` do módulo dono, para o autogenerate ver.
 from snook.modules.auth import models as _auth_models  # noqa: F401
+from snook.modules.backlog_generation import models as _backlog_generation_models  # noqa: F401
 from snook.modules.diarized_transcription import models as _transcription_models  # noqa: F401
 from snook.modules.llm_providers import models as _llm_providers_models  # noqa: F401
 from snook.modules.meetings import models as _meetings_models  # noqa: F401

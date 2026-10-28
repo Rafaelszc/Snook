@@ -2518,13 +2518,13 @@
 **Description:** Tabelas `epics`, `user_stories`, `acceptance_criteria` e `backlog_counters` (migração `0007_backlog_generation_backlog`) e `BacklogRepository`.
 
 **Acceptance criteria:**
-- [ ] `ON DELETE CASCADE` a partir da Reunião; `requested_by` com `SET NULL` só como rede de segurança (`04-data-model.md`).
-- [ ] `next_us_number(uow, meeting_id)` devolve o número depois do maior existente e não reusa o excluído se era o maior (`backlog-generation` interfaces; `backlog-review` 19).
-- [ ] `alembic upgrade head` roda sobre as revisões anteriores; nenhuma consulta monta SQL com dado de entrada (SEC-10).
+- [x] `ON DELETE CASCADE` a partir da Reunião; `requested_by` com `SET NULL` só como rede de segurança (`04-data-model.md`).
+- [x] `next_us_number(uow, meeting_id)` devolve o número depois do maior existente e não reusa o excluído se era o maior (`backlog-generation` interfaces; `backlog-review` 19).
+- [x] `alembic upgrade head` roda sobre as revisões anteriores; nenhuma consulta monta SQL com dado de entrada (SEC-10).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_backlog_storage.py -q`; `uv run alembic upgrade head`.
-- [ ] Gate backend (inclui regra `S608`). SEC-10.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_backlog_storage.py -q`; `uv run alembic upgrade head`.
+- [x] Gate backend (inclui regra `S608`). SEC-10.
 
 **Dependencies:** Tasks 39.2, 19.2
 
@@ -2539,13 +2539,13 @@
 **Description:** `runner.py` consome `PartsReady`, lê o provedor ativo uma vez e chama "Gerar" Parte a Parte, em sequência.
 
 **Acceptance criteria:**
-- [ ] Parte única com resposta válida: exatamente uma chamada a "Gerar", grava e leva a `done`; com 3 Partes, 3 chamadas na ordem, cada uma só depois da anterior (`backlog-generation` 1, 2).
-- [ ] Cada chamada leva o System Prompt, os nomes dos Participantes e o texto devolvido por "Texto da Parte" sem alteração; a primeira não leva nomes de Epics, as seguintes levam os das Epics criadas antes na mesma geração (`backlog-generation` 3, 4).
-- [ ] Provedor e modelo lidos uma vez, mesmo que o ativo mude durante a geração (`backlog-generation` 5); usa a configuração do Usuário dono (`backlog-generation` 6; SEC-26).
+- [x] Parte única com resposta válida: exatamente uma chamada a "Gerar", grava e leva a `done`; com 3 Partes, 3 chamadas na ordem, cada uma só depois da anterior (`backlog-generation` 1, 2).
+- [x] Cada chamada leva o System Prompt, os nomes dos Participantes e o texto devolvido por "Texto da Parte" sem alteração; a primeira não leva nomes de Epics, as seguintes levam os das Epics criadas antes na mesma geração (`backlog-generation` 3, 4).
+- [x] Provedor e modelo lidos uma vez, mesmo que o ativo mude durante a geração (`backlog-generation` 5); usa a configuração do Usuário dono (`backlog-generation` 6; SEC-26).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_runner_flow.py -q` ("Gerar" fake registra cada chamada).
-- [ ] Gate backend. SEC-26.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_runner_flow.py -q` ("Gerar" fake registra cada chamada).
+- [x] Gate backend. SEC-26.
 
 **Dependencies:** Tasks 40.1, 36.4, 16.3
 
@@ -2560,13 +2560,13 @@
 **Description:** `merge.py`: junta Epics de mesmo nome na Reunião e numera `US-01...` em ordem das Partes e da LLM.
 
 **Acceptance criteria:**
-- [ ] Epics com o mesmo nome, sem diferenciar caixa e espaços nas pontas, viram uma só dentro de uma Parte e entre Partes; vale o nome da primeira ocorrência; Epics de outras Reuniões não são afetadas; as US ficam na Epic resultante na ordem de chegada (`backlog-generation` 16, 17).
-- [ ] `US-id` vai de `US-01`, sem lacunas, em ordem das Partes e da resposta; sem repetição; a partir da centésima, três dígitos (`US-100`) (`backlog-generation` 18, 19).
-- [ ] Epic sem US não é gravada; geração válida sem nenhuma US vai a `done` com backlog gravado e vazio (`backlog-generation` 20, 21).
+- [x] Epics com o mesmo nome, sem diferenciar caixa e espaços nas pontas, viram uma só dentro de uma Parte e entre Partes; vale o nome da primeira ocorrência; Epics de outras Reuniões não são afetadas; as US ficam na Epic resultante na ordem de chegada (`backlog-generation` 16, 17).
+- [x] `US-id` vai de `US-01`, sem lacunas, em ordem das Partes e da resposta; sem repetição; a partir da centésima, três dígitos (`US-100`) (`backlog-generation` 18, 19).
+- [x] Epic sem US não é gravada; geração válida sem nenhuma US vai a `done` com backlog gravado e vazio (`backlog-generation` 20, 21).
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_merge_numbering.py -q`.
-- [ ] Gate backend.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_merge_numbering.py -q`.
+- [x] Gate backend.
 
 **Dependencies:** Task 40.2
 
@@ -2581,13 +2581,13 @@
 **Description:** Uma transação apaga o backlog anterior, grava o novo, chama `mark_backlog_saved` e leva a Reunião a `done`.
 
 **Acceptance criteria:**
-- [ ] Resposta válida grava campo a campo: nome da Epic e da US, `as_a`, `i_want`, `so_that`, prioridade, story points, critérios na ordem, solicitante e instante (`backlog-generation` 7); toda gravação bem-sucedida, inclusive vazia, registra a marca na mesma transação (`backlog-generation` 34).
-- [ ] Com 3 Partes, falha na Parte 2 não grava nada das Partes 1 e 2, não chama a 3 e leva a `failed` etapa `generation` (`backlog-generation` 22); erro no meio da gravação não deixa backlog parcial (`backlog-generation` 25).
-- [ ] Regeneração bem-sucedida substitui o backlog com as edições e recomeça em `US-01` (`backlog-generation` 23); regeneração que falha mantém o anterior intacto e vai a `failed` (`backlog-generation` 24); geração que falha não registra a marca.
+- [x] Resposta válida grava campo a campo: nome da Epic e da US, `as_a`, `i_want`, `so_that`, prioridade, story points, critérios na ordem, solicitante e instante (`backlog-generation` 7); toda gravação bem-sucedida, inclusive vazia, registra a marca na mesma transação (`backlog-generation` 34).
+- [x] Com 3 Partes, falha na Parte 2 não grava nada das Partes 1 e 2, não chama a 3 e leva a `failed` etapa `generation` (`backlog-generation` 22); erro no meio da gravação não deixa backlog parcial (`backlog-generation` 25).
+- [x] Regeneração bem-sucedida substitui o backlog com as edições e recomeça em `US-01` (`backlog-generation` 23); regeneração que falha mantém o anterior intacto e vai a `failed` (`backlog-generation` 24); geração que falha não registra a marca.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest tests/backlog_generation/test_save_all_or_nothing.py -q`.
-- [ ] Gate backend. SEC-18, SEC-19.
+- [x] `cd backend && uv run pytest tests/backlog_generation/test_save_all_or_nothing.py -q`.
+- [x] Gate backend. SEC-18, SEC-19.
 
 **Dependencies:** Task 40.3
 

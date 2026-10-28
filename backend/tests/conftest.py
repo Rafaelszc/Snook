@@ -87,6 +87,7 @@ class InertTranscription:
 def app(settings: Settings) -> FastAPI:
     created = create_app(settings)
     created.state.transcription = InertTranscription()
+    created.state.generate_backlog = lambda event: None  # `tests/backlog_generation` liga
     return created
 
 
