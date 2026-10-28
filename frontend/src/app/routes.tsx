@@ -9,6 +9,7 @@ import { MeetingListPage } from "@/features/meetings/MeetingListPage"
 import { UploadPage } from "@/features/meetings/UploadPage"
 import { NamingPage } from "@/features/participants/NamingPage"
 import { RecordPage } from "@/features/screen-recording/RecordPage"
+import { SplitPage } from "@/features/transcript-split/SplitPage"
 
 import { AuthGuard } from "./AuthGuard"
 import { Layout } from "./Layout"
@@ -34,6 +35,12 @@ export const routes: RouteObject[] = [
           { path: "meetings/:id", element: <MeetingDetailPage /> },
           { path: "meetings/:id/transcript", element: <TranscriptPage /> },
           { path: "meetings/:id/participants", element: <NamingPage /> },
+          { path: "meetings/:id/split", element: <SplitPage /> },
+          // Destino de "Cancelar divisão"; a tela real entra na Task 49.1.
+          {
+            path: "meetings/:id/backlog",
+            element: <Placeholder title="Revisão do backlog" />,
+          },
           ...(import.meta.env.DEV
             ? [{ path: "dev/components", element: <SamplePage /> }]
             : []),

@@ -2396,13 +2396,13 @@
 **Description:** Detalhe em `needs_split` leva à divisão; a tela chama `POST /split/refresh` ao abrir, redireciona se virou `generating`, explica a divisão e lista segmentos virtualizados com cortes sugeridos.
 
 **Acceptance criteria:**
-- [ ] O detalhe de uma Reunião em `needs_split` leva à tela de divisão (`transcript-split` 30); ao abrir, chama `POST /meetings/{id}/split/refresh` antes de mostrar os cortes, e se a resposta traz `generating` leva ao detalhe sem mostrar a tela (`transcript-split` 47).
-- [ ] Explica a divisão com estimativa, orçamento, provedor, modelo e link para a configuração (`transcript-split` 31); mostra os segmentos em ordem, com instante e nome, e os cortes sugeridos marcados (`transcript-split` 32).
-- [ ] Com Transcrição de 2 h de fixture, só os segmentos perto da área visível ficam no DOM (NFR-07).
+- [x] O detalhe de uma Reunião em `needs_split` leva à tela de divisão (`transcript-split` 30); ao abrir, chama `POST /meetings/{id}/split/refresh` antes de mostrar os cortes, e se a resposta traz `generating` leva ao detalhe sem mostrar a tela (`transcript-split` 47).
+- [x] Explica a divisão com estimativa, orçamento, provedor, modelo e link para a configuração (`transcript-split` 31); mostra os segmentos em ordem, com instante e nome, e os cortes sugeridos marcados (`transcript-split` 32).
+- [x] Com Transcrição de 2 h de fixture, só os segmentos perto da área visível ficam no DOM (NFR-07).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 37.2, 27.2
 
@@ -2419,13 +2419,13 @@
 **Description:** Mover, adicionar e remover cortes (mouse e teclado), estimativa por Parte somada no cliente, e "Confirmar".
 
 **Acceptance criteria:**
-- [ ] O usuário move um corte para o fim de outro segmento, adiciona um corte no fim de qualquer segmento e remove um corte; a tela não oferece corte no meio de um segmento; tudo funciona por teclado (`transcript-split` 33).
-- [ ] A cada mudança, mostra para cada Parte o intervalo, a estimativa e se cabe (`transcript-split` 34); "Confirmar" fica desabilitado enquanto alguma Parte não couber (`transcript-split` 35).
-- [ ] Depois de confirmar, leva ao detalhe (`transcript-split` 36); INP até 200 ms com Transcrição de 2 h (NFR-04, medição manual no checkpoint); `vitest-axe` sem violação.
+- [x] O usuário move um corte para o fim de outro segmento, adiciona um corte no fim de qualquer segmento e remove um corte; a tela não oferece corte no meio de um segmento; tudo funciona por teclado (`transcript-split` 33).
+- [x] A cada mudança, mostra para cada Parte o intervalo, a estimativa e se cabe (`transcript-split` 34); "Confirmar" fica desabilitado enquanto alguma Parte não couber (`transcript-split` 35).
+- [x] Depois de confirmar, leva ao detalhe (`transcript-split` 36); INP até 200 ms com Transcrição de 2 h (NFR-04, medição manual no checkpoint); `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 38.1, 37.3
 
@@ -2442,13 +2442,13 @@
 **Description:** Botão "Cancelar divisão" condicional e mensagem de falta de provedor.
 
 **Acceptance criteria:**
-- [ ] O botão aparece só quando a resposta do `GET` indica backlog gravado; depois de cancelar, volta à revisão do backlog (`transcript-split` 45).
-- [ ] Sem provedor ativo, a tela mostra só a mensagem que aponta para a configuração (`transcript-split` 44; Q67).
-- [ ] `vitest-axe` sem violação.
+- [x] O botão aparece só quando a resposta do `GET` indica backlog gravado; depois de cancelar, volta à revisão do backlog (`transcript-split` 45).
+- [x] Sem provedor ativo, a tela mostra só a mensagem que aponta para a configuração (`transcript-split` 44; Q67).
+- [x] `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 38.2, 37.4
 
