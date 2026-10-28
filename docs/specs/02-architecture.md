@@ -167,7 +167,7 @@ cli e main importam qualquer módulo; nenhum módulo importa cli ou main
 | `meetings` | `create_meeting(uow, user, upload, title, expected_speakers)` | rota de upload |
 | `meetings` | `get_owned_meeting(uow, user_id, meeting_id)` (404 se não é dono) | todas as rotas aninhadas |
 | `meetings` | `update_status(uow, meeting_id, new_status, *, failed_stage=None, message=None)` | pipeline |
-| `meetings` | `mark_participants_confirmed(uow, id)`, `mark_backlog_saved(uow, id)`, `read_flags(uow, id)` | `participants`, `backlog_generation`, `transcript_split`, `backlog_review` |
+| `meetings` | `mark_participants_confirmed(uow, id)`, `mark_backlog_saved(uow, id)`, `read_flags(uow, id)`, `read_status(uow, id)` | `participants`, `backlog_generation`, `transcript_split`, `backlog_review` |
 | `meetings` | `original_audio_path(meeting_id)`, `meeting_dir(meeting_id)` | `diarized_transcription` |
 | `meetings` | `list_meeting_ids_for_user(uow, user_id)`, `remove_meeting_files(meeting_ids)` | `cli.py` (`delete-user`) |
 | `diarized_transcription` | `list_segments`, `list_speakers`, `treated_audio_clip(meeting_id, start, end) -> bytes` | `participants`, `transcript_split` |

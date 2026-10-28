@@ -9,3 +9,6 @@ ALREADY_CONFIRMED = (
     "Os nomes desta reunião já foram confirmados. Use Renomear participante na revisão do backlog."
 )
 NO_ACTIVE_PROVIDER = "Nenhum provedor de LLM ativo. Ative um em Configurações para continuar."
+PARTICIPANT_NOT_FOUND = "Participante não encontrado nesta reunião."
+NOT_CONFIRMED = "Confirme os nomes das vozes antes de renomear um participante."
+RENAME_WHILE_GENERATING = "Aguarde a geração do backlog terminar para renomear um participante."

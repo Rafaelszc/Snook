@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from snook.modules.participants.models import Participant, SpeakerLink
@@ -45,3 +45,30 @@ def participant_for_speaker(
         .where(SpeakerLink.meeting_id == meeting_id, SpeakerLink.speaker_label == speaker_label)
     )
     return session.scalars(query).one_or_none()
+
+
+def get_participant(session: Session, meeting_id: str, participant_id: int) -> Participant | None:
+    query = select(Participant).where(
+        Participant.meeting_id == meeting_id, Participant.id == participant_id
+    )
+    return session.scalars(query).one_or_none()
+
+
+def participant_by_name(session: Session, meeting_id: str, name_norm: str) -> Participant | None:
+    query = select(Participant).where(
+        Participant.meeting_id == meeting_id, Participant.name_norm == name_norm
+    )
+    return session.scalars(query).one_or_none()
+
+
+def move_links(session: Session, meeting_id: str, from_id: int, to_id: int) -> None:
+    query = update(SpeakerLink).where(
+        SpeakerLink.meeting_id == meeting_id, SpeakerLink.participant_id == from_id
+    )
+    session.execute(query.values(participant_id=to_id))
+    session.flush()
+
+
+def delete_participant(session: Session, participant: Participant) -> None:
+    session.delete(participant)
+    session.flush()

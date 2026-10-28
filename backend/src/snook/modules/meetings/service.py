@@ -359,6 +359,11 @@ def read_flags(uow: UnitOfWork, meeting_id: str) -> MeetingFlags:
     return _flags(_existing(uow, meeting_id))
 
 
+def read_status(uow: UnitOfWork, meeting_id: str) -> str:
+    """Status atual, sem checar dono: quem chama já conferiu (`get_owned_meeting`)."""
+    return _existing(uow, meeting_id).status
+
+
 def _flags(meeting: Meeting) -> MeetingFlags:
     return MeetingFlags(
         participants_confirmed=meeting.participants_confirmed_at is not None,
