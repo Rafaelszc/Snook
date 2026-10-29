@@ -30,4 +30,21 @@ export default defineConfig([
       ],
     },
   },
+  {
+    // components/ não importa features/ (AGENTS.md, "Regras de código"; ADR-0024).
+    files: ['src/components/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/features/*', '@/features/**', '**/features/**'],
+              message: 'components/ não importa features/ (ADR-0024).',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ])

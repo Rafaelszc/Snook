@@ -11,7 +11,7 @@ import { useLlmConfigs } from "./useLlmConfigs"
 const STATE_VISUAL: Record<ConfigState, { icon: LucideIcon; color: string }> = {
   not_configured: { icon: Circle, color: "text-muted-foreground" },
   configured: { icon: CircleDot, color: "text-foreground" },
-  active: { icon: CircleCheck, color: "text-status-done" },
+  active: { icon: CircleCheck, color: "text-done" },
 }
 
 function StateLabel({ state }: { state: ConfigState }) {

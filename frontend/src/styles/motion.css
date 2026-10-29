@@ -1,4 +1,4 @@
-/* ADR-0022: só transform e opacity, 120 a 240 ms (tokens em tokens.css). */
+/* ADR-0022 e ADR-0024: só transform e opacity, 120 a 240 ms (tokens em tokens.css). */
 
 .motion-fade {
   transition: opacity var(--motion-base) var(--motion-ease);
@@ -53,6 +53,17 @@
   animation: motion-pulse 1600ms var(--motion-ease) infinite;
 }
 
+/* Respiração do skeleton: indicador de progresso, laço lento, só opacidade (ADR-0024). */
+@keyframes motion-breathe {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.motion-breathe {
+  animation: motion-breathe 2000ms var(--motion-ease) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .motion-fade,
   .motion-rise,
@@ -62,7 +73,8 @@
 
   .motion-enter,
   .motion-fade-in,
-  .motion-pulse {
+  .motion-pulse,
+  .motion-breathe {
     animation: none;
   }
 }

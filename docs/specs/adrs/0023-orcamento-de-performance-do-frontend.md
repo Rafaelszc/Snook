@@ -1,8 +1,8 @@
 # ADR-0023: Orçamento de performance do frontend
 
 - Status: Aceita
-- Data: 2026-10-22 (proposta e aceite)
-- Fonte: decisão do usuário em 2026-10-22, Q17 da rodada de decisões do planner: orçamento de performance aprovado, junto com a dependência `@tanstack/react-virtual`. Recomendação aceita sem mudança. Rota do LCP (NFR-03) fixada pela Q73 (2026-10-22); fixture do NFR-04 na tela de revisão fixada no `01-prd.md`.
+- Data: 2026-10-22 (proposta e aceite); fontes atualizadas em 2026-10-28
+- Fonte: decisão do usuário em 2026-10-22, Q17 da rodada de decisões do planner: orçamento de performance aprovado, junto com a dependência `@tanstack/react-virtual`. Recomendação aceita sem mudança. Rota do LCP (NFR-03) fixada pela Q73 (2026-10-22); fixture do NFR-04 na tela de revisão fixada no `01-prd.md`. Item de fontes substituído pelo [ADR-0024](0024-direcao-visual-ata.md) (Q74 de `00-overview.md`, 2026-10-28; Q6 da rodada do planner aceita em 2026-10-28).
 
 ## Contexto
 
@@ -42,11 +42,19 @@ Fonte única das metas e da forma de medir: `01-prd.md`, NFR-01 a NFR-08. A tabe
 
 - Listas da Transcrição e da divisão virtualizadas com `@tanstack/react-virtual` (NFR-07).
 - Rotas carregadas sob demanda (`React.lazy`) por módulo.
-- Fonte variável única, subset latino, `font-display: swap`.
+- Fontes (ADR-0024, "Tipografia"):
+  - três famílias variáveis locais: Geist, Source Serif 4 e Geist Mono;
+  - subsets latin e latin-ext por `unicode-range`; o navegador baixa só o subset usado;
+  - `font-display: swap` em todas;
+  - `<link rel="preload">` só da Geist latin e da Source Serif 4 latin;
+  - fallback local com `size-adjust` e métricas ajustadas, contra CLS (NFR-05);
+  - se o LCP do login (NFR-03) passar de 2,5 s, o `h1` do auth troca para Geist.
+- Com o ADR-0024, vidro fica só no painel da gravação (NFR-06 na prática com 1) e mouse-tracking só na área de upload (NFR-08 medido lá).
 
 ## Consequências
 
 - Dependência nova `@tanstack/react-virtual` aprovada com este ADR ("Ask First" cumprido em 2026-10-22).
 - Job do CI falha se o bundle passar dos limites de tamanho (NFR-01 e NFR-02).
 - NFR-03 a NFR-06 e NFR-08 têm medição registrada no PR de release (`tasks/plan.md`, checkpoint "Complete").
+- Fontes novas do ADR-0024: NFR-03 e NFR-05 remedidos no checkpoint da tarefa de tokens e primitivos (`tasks/plan.md`, Fase 9) e de novo no checkpoint "Complete".
 - Seção de NFRs de frontend no `01-prd.md`: mudança aprovada no spec. Aplicado em `01-prd.md` (NFR-01 a NFR-08).

@@ -63,7 +63,7 @@ describe("glass.css: fallback opaco", () => {
     const base = glassCss.match(/(?:^|\})\s*\.glass\s*\{([^}]*)\}/)
     expect(base).not.toBeNull()
     expect(base![1]).not.toMatch(/backdrop-filter/)
-    expect(base![1]).toMatch(/background:\s*var\(--card\)/)
+    expect(base![1]).toMatch(/background:\s*var\(--surface\)/)
 
     const enhanced = glassCss.match(
       /@supports \(backdrop-filter:\s*blur\(1px\)\)\s*\{([\s\S]*)\}\s*$/
@@ -138,11 +138,9 @@ describe("glass.css: contraste sobre o pior fundo", () => {
     it.each(worstBackdrops)(
       "texto sobre vidro com fundo %s >= 4,5:1",
       (backdrop) => {
-        const glass = over(t["--card"], backdrop, alpha)
-        expect(contrast(t["--card-foreground"], glass)).toBeGreaterThanOrEqual(
-          4.5
-        )
-        expect(contrast(t["--highlight"], glass)).toBeGreaterThanOrEqual(4.5)
+        const glass = over(t["--surface"], backdrop, alpha)
+        expect(contrast(t["--ink"], glass)).toBeGreaterThanOrEqual(4.5)
+        expect(contrast(t["--signal"], glass)).toBeGreaterThanOrEqual(4.5)
       }
     )
   })

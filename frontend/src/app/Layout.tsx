@@ -39,7 +39,7 @@ export function Layout() {
             </span>
           ) : null}
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={onLogout}
             disabled={logout.isPending}

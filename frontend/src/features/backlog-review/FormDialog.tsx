@@ -1,7 +1,7 @@
 import { Dialog } from "radix-ui"
 import type { FormEvent, ReactNode } from "react"
 
-import { GlassPanel } from "@/components/surfaces/GlassPanel"
+import { DialogSurface } from "@/components/surfaces/DialogSurface"
 import { Button } from "@/components/ui/button"
 
 import { MESSAGES } from "./messages"
@@ -18,7 +18,7 @@ interface FormDialogProps {
   children: ReactNode
 }
 
-// Diálogo com formulário, sobre `GlassPanel` (NFR-06: um vidro aberto por vez).
+// Diálogo com formulário, opaco sobre `DialogSurface` (ADR-0024, "Vidro").
 export function FormDialog({
   trigger,
   title,
@@ -38,12 +38,12 @@ export function FormDialog({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="motion-fade-in fixed inset-0 z-50 bg-black/40" />
+        <Dialog.Overlay className="motion-fade-in fixed inset-0 z-50 bg-scrim" />
         <Dialog.Content
           asChild
           {...(description ? {} : { "aria-describedby": undefined })}
         >
-          <GlassPanel className="motion-enter fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-y-auto rounded-xl p-6">
+          <DialogSurface className="motion-enter fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-y-auto p-6">
             <form onSubmit={submit} className="flex flex-col gap-4">
               <Dialog.Title className="text-base font-semibold">
                 {title}
@@ -56,7 +56,7 @@ export function FormDialog({
               {children}
               <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <Dialog.Close asChild>
-                  <Button type="button" variant="outline">
+                  <Button type="button" variant="secondary">
                     {MESSAGES.cancel}
                   </Button>
                 </Dialog.Close>
@@ -65,7 +65,7 @@ export function FormDialog({
                 </Button>
               </div>
             </form>
-          </GlassPanel>
+          </DialogSurface>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

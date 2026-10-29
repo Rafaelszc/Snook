@@ -1,8 +1,8 @@
 # Todo: Snook
 
-> Status: task-breaker, 2026-10-22. Fonte: `tasks/plan.md` (aprovado), `docs/specs/` (aceitas) e ADRs 0001 a 0023 (todas Aceita).
-> Escopo: projeto inteiro, Fases 0 a 8, 9 módulos. Sem id de módulo único.
-> Sem código no repo ainda. Tudo abaixo vale para a primeira implementação.
+> Status: task-breaker, 2026-10-22; atualizado em 2026-10-28 com a Fase 9 "Redesign Ata" (ADR-0024). Fonte: `tasks/plan.md` (aprovado), `docs/specs/` (aceitas) e ADRs 0001 a 0024 (todas Aceita).
+> Escopo: projeto inteiro, Fases 0 a 9, 9 módulos. Sem id de módulo único.
+> Fases 0 a 8 implementadas até a Task 51.1 (tarefas `[x]`). Pendentes: Task 51.2, Fase 9 (Tasks 52 a 61) e, depois dela, Task 51.3.
 > Sem issue tracker designado em `AGENTS.md` ou `CLAUDE.md`. Tarefas vivem só neste arquivo.
 
 ## Como ler
@@ -23,8 +23,8 @@
 - **Gate frontend** = `cd frontend && npm run lint && npm run typecheck && npm test -- --run && npm run build`.
 - **Teste backend completo** = `cd backend && uv run pytest`. Teste focado = `cd backend && uv run pytest tests/<modulo> -q`.
 - **Teste frontend focado** = `cd frontend && npm test -- --run src/features/<modulo>`.
-- **Checagem de UI** (checkpoint com tela): `web-design-guidelines` sobre o diff; Vitest + `vitest-axe` sem violação; contraste 4,5:1 sobre vidro em tema claro e escuro e fallback opaco conferido; `prefers-reduced-motion` desliga movimento e mouse-tracking; nenhum listener de `pointermove` com `pointer: coarse`; orçamento do ADR-0023.
-- **Frontend:** carregar as skills da tarefa antes de implementar a tela. Restrições do ADR-0022 e do ADR-0023 valem em toda tarefa de tela.
+- **Checagem de UI** (checkpoint com tela; direção Ata, ADR-0024): `web-design-guidelines` sobre o diff; Vitest + `vitest-axe` sem violação; contraste AA em tema claro e escuro (sobre vidro só no painel da gravação, com fallback opaco conferido); anel de foco opaco de 2 px, sem alfa; `prefers-reduced-motion` desliga movimento e mouse-tracking; nenhum listener de `pointermove` com `pointer: coarse`; orçamento do ADR-0023.
+- **Frontend:** carregar as skills da tarefa antes de implementar a tela. Restrições do ADR-0022 que seguem valendo, as do ADR-0024 (direção Ata, que substitui em parte o ADR-0022) e as do ADR-0023 valem em toda tarefa de tela.
 - **Pergunte antes** (AGENTS.md): mudar auth, sessão ou senha; novo dado pessoal; dependência fora dos ADRs; CORS, `ALLOWED_HOSTS`, `ALLOWED_ORIGINS`, `TRUSTED_PROXY_IPS`, CSP, HSTS ou limites padrão no código; cifra; texto do aviso de consentimento. As tarefas abaixo já implementam o que os ADRs aceitos mandam; qualquer desvio para e pergunta.
 
 ---
@@ -652,7 +652,7 @@
 
 ### Task 9.4: Tela de cadastro
 
-**Description:** Tela de cadastro com card de vidro e mouse-tracking, erros da API, e ida à área autenticada após o cadastro.
+**Description:** Tela de cadastro com card, erros da API, e ida à área autenticada após o cadastro. Entregue com card de vidro e mouse-tracking (ADR-0022). Direção Ata (ADR-0024, Q3 e Q2 opção A): card opaco (`--surface`), com régua `--hairline`, sem sombra e sem mouse-tracking; a troca é da Task 55 (55.1 e 55.3). Os critérios abaixo não mudam.
 
 **Acceptance criteria:**
 - [x] A tela inicial oferece cadastro e login (`auth` 22).
@@ -696,7 +696,7 @@
 
 ### Task 10.2: Tela de login, guarda de rota e logout
 
-**Description:** Tela de login (card de vidro e mouse-tracking), guarda de autenticação com redirecionamento ao login e botão de sair.
+**Description:** Tela de login, guarda de autenticação com redirecionamento ao login e botão de sair. Entregue com card de vidro e mouse-tracking (ADR-0022). Direção Ata (ADR-0024, Q3 e Q2 opção A): card opaco (`--surface`), com régua `--hairline`, sem sombra e sem mouse-tracking; a troca é da Task 55 (55.1 e 55.2). Os critérios abaixo não mudam.
 
 **Acceptance criteria:**
 - [x] Abrir página protegida sem sessão leva ao login (`auth` 24).
@@ -1118,12 +1118,12 @@
 
 ### Task 17.2: Tela de configurações: testar, salvar, ativar e remover
 
-**Description:** "Testar conexão", "Salvar" travado até o teste passar, erros, ativar e remover com diálogo de confirmação (vidro no diálogo).
+**Description:** "Testar conexão", "Salvar" travado até o teste passar, erros, ativar e remover com diálogo de confirmação (diálogo opaco, `DialogSurface`; ADR-0024).
 
 **Acceptance criteria:**
 - [x] "Salvar" fica desabilitado até um "Testar conexão" bem-sucedido com os valores atuais do formulário (`llm-providers` 34); erros de teste e gravação aparecem com o motivo da API (`llm-providers` 35).
 - [x] Remover pede confirmação antes de chamar a API (`llm-providers` 37).
-- [x] Diálogo usa `GlassPanel`; feedback de teste respeita movimento reduzido; `vitest-axe` sem violação.
+- [ ] Diálogo de remoção usa `DialogSurface` opaco, sem `GlassPanel` (ADR-0024, "Vidro"; reaberto pela Fase 9, fecha na Task 52.19); feedback de teste respeita movimento reduzido; `vitest-axe` sem violação.
 
 **Verification:**
 - [x] `cd frontend && npm test -- --run src/features/llm-providers`.
@@ -1443,7 +1443,7 @@
 **Acceptance criteria:**
 - [x] Em `failed`, mostra o motivo e "Tentar novamente"; o botão não aparece em outro status; com `has_backlog` verdadeiro, pede confirmação com o aviso de que as edições do backlog se perdem se a nova geração terminar bem (`meetings` 42).
 - [x] Excluir pede confirmação e avisa que o áudio e o backlog serão apagados (`meetings` 43).
-- [x] Diálogos usam `GlassPanel`; `vitest-axe` sem violação.
+- [ ] Diálogos de nova tentativa e de exclusão usam `DialogSurface` opaco, sem `GlassPanel` (ADR-0024, "Vidro"; reaberto pela Fase 9, fecha na Task 52.16); `vitest-axe` sem violação.
 
 **Verification:**
 - [x] `cd frontend && npm test -- --run src/features/meetings`.
@@ -3078,7 +3078,7 @@
 **Acceptance criteria:**
 - [x] "Regenerar" avisa que todas as edições serão perdidas antes de confirmar; em Reunião dividida, oferece "mesmos cortes" e "reajustar cortes" (`backlog-review` 44).
 - [x] "Exportar Markdown" e "Exportar JSON" baixam o arquivo (`backlog-review` 45).
-- [x] "Renomear participante" aparece também com o backlog só para leitura, nas situações em que a regra por status permite (`backlog-review` 48); diálogos usam `GlassPanel` (máximo de 3 vidros por tela, NFR-06).
+- [ ] "Renomear participante" aparece também com o backlog só para leitura, nas situações em que a regra por status permite (`backlog-review` 48); os diálogos usam `DialogSurface` opaco, sem `GlassPanel` (ADR-0024, "Vidro"; NFR-06 segue valendo, a tela de revisão tem 0 vidros). Reaberto pela Fase 9, fecha nas Tasks 52.17 e 54.5.
 
 **Verification:**
 - [x] `cd frontend && npm test -- --run src/features/backlog-review`.
@@ -3199,20 +3199,1493 @@
 
 **Estimated scope:** Small
 
+### Checkpoint: Release sem auditoria visual
+
+- [ ] README, verificação do 03-security, auditorias e suítes opcionais registrados no PR
+- [ ] `/security-review` sobre o diff
+
+---
+
+## Phase 9: Redesign Ata (ADR-0024)
+
+**Regras da fase (valem para as Tasks 52 a 61):**
+
+- Escopo: só camada visual. Lógica, rotas, contratos de API, textos ao usuário e `CONSENT_NOTICE_TEXT` não mudam. Mudar o texto do aviso é "Perguntar antes".
+- Cada task mãe (52 a 61) = uma branch `feature/redesign-ata-task-NN` e um PR para `develop`, com `git pull --rebase` de `develop` antes. Subtasks (52.1, 52.2...) são passos da mesma branch. Gate frontend ao fim de cada subtask.
+- Rastreio: o `01-prd.md` só tem NFR-01 a NFR-08 para o visual (Q74 de `00-overview.md`). Critério visual cita ADR-0024 e `02-architecture.md`, "Frontend e UI". Critério "segue passando" cita o critério do módulo. Teste de critério existente não muda de asserção, exceto os de ADR-0024, "Testes a atualizar".
+- Migração (ADR-0024, Q1 opção C): a Task 52 troca só classes de cor de token removido e usos do `Button`. `rounded-xl` e acima, `text-[`, `transition-colors`, `ring-ring/50` e `outline-ring/50` saem na task da tela. Teste estático global só na Task 61.4.
+- **Grep local** (usado nas tasks de tela): `git grep -nE "rounded-(xl|2xl|3xl|4xl)|text-\[|transition-colors|ring-ring/50|outline-ring/50" -- <arquivos da task>` sem achado.
+- Alerta de bloco ou de página vira `Notice`. Erro de campo fica inline no `FormField`.
+- No máximo um `Button` `accent` por tela, no passo que avança o fluxo.
+- Largura: `--reading` na Transcrição, nomeação e formulários; `--shell` nas demais páginas. Página não escolhe `max-w-*` própria (ADR-0024, "Forma"). Ver "Questões em aberto" do relatório sobre as páginas que o ADR não lista.
+- No máximo três tamanhos de texto por tela, da escala 12, 14, 16, 20, 24, 32, 40 px. Espaço só 4, 8, 12, 16, 24, 32, 48, 64 px.
+- Texto vindo de API, banco ou LLM renderiza só pelo escape do React (SEC-12).
+
+### Task 52.1: Camada de cor Ata e apelidos shadcn
+
+**Description:** Em `tokens.css`, acrescenta os tokens Ata (tabela "Tokens") nos dois temas e aponta os apelidos shadcn para eles (tabela "Apelidos"). O `@theme` de `index.css` ganha as cores `--color-*` novas. Os tokens antigos (`--highlight*`, `--status-*`, `--sidebar-*`, `--chart-*`, `--elevation-*`, `--radius`) ficam até a Task 52.30, porque classes de `features/` ainda os leem.
+
+**Acceptance criteria:**
+- [x] Os tokens da tabela "Tokens" do ADR-0024 existem nos temas claro e escuro, e o `@theme` expõe `--color-canvas`, `--color-surface`, `--color-sunken`, `--color-hairline`, `--color-ink`, `--color-ink-muted`, `--color-signal`, `--color-signal-ink`, `--color-signal-soft`, `--color-done`, `--color-warn`, `--color-warn-soft`, `--color-failed`, `--color-failed-soft` e `--color-scrim` (ADR-0024, "Cor").
+- [x] Os apelidos shadcn da tabela "Apelidos" leem só tokens Ata; `--accent` é fundo de hover (`--sunken`) e `--ring` é `var(--signal)`, sem alfa (ADR-0024, "Apelidos" e "Foco").
+- [x] `tokens.test.ts` confere todos os pares das duas tabelas de "Contraste", nos dois temas; par abaixo do mínimo corrige o fundo `-soft`, nunca o mínimo (WCAG 2.2 AA; `02-architecture.md`, "Restrições obrigatórias").
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/styles`.
+- [x] Gate frontend.
+
+**Dependencies:** Checkpoint: Release sem auditoria visual
+
+**Skills:** `minimalist-ui`, `frontend-design`, `design-taste-frontend`, `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/styles/tokens.css`, `frontend/src/index.css`
+- `frontend/src/styles/tokens.test.ts`
+
+**Estimated scope:** Medium
+
+### Task 52.2: Fontes locais do Ata: serif, mono, preload, fallback
+
+**Description:** Quatro `.woff2` novos (Source Serif 4 latin e latin-ext; Geist Mono latin e latin-ext) e licenças em `frontend/public/fonts/`. `@font-face` com `unicode-range` e `font-display: swap` em `tokens.css`. Fallback local com métricas ajustadas para serif e sans. `--font-heading` e `--font-serif` apontam para Source Serif 4, `--font-sans` para Geist, `--font-mono` para Geist Mono (hoje `index.css:12` aponta `--font-heading` para a sans). Preload só da Geist latin e da Source Serif 4 latin. Arquivos vêm do pacote oficial das fontes, sem dependência npm nova.
+
+**Acceptance criteria:**
+- [x] Os quatro `.woff2`, `LICENSE-SourceSerif4.txt` (OFL) e a conferência da cobertura da Geist Mono por `LICENSE-Geist.txt` (se não cobrir, o arquivo da licença dela) estão em `public/fonts/`; nenhuma requisição externa e CSP `default-src 'self'` sem mudança (ADR-0024, "Tipografia"; SEC-13).
+- [x] `index.html` tem `<link rel="preload">` só da Geist latin e da Source Serif 4 latin; todas as famílias com `font-display: swap`; fallback com `size-adjust`, `ascent-override`, `descent-override` e `line-gap-override` (NFR-05).
+- [x] Teste lê `tokens.css`, `index.css` e `index.html` e confere a família de cada `--font-*`, os dois preloads e a ausência de URL `http`.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/styles`.
+- [x] Gate frontend. `cd frontend && npm run build && node scripts/check-bundle-size.mjs` (NFR-01, NFR-02).
+- [ ] Manual, Lighthouse na tela de login com CPU 4x mais lenta: LCP (NFR-03) e CLS (NFR-05) anotados no PR. LCP acima de 2,5 s: aplicar a contingência (`h1` do auth em Geist; ADR-0024, "Tipografia"), sem ADR novo.
+
+**Dependencies:** Task 52.1
+
+**Skills:** `minimalist-ui`, `frontend-design`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/public/fonts/*` (4 `.woff2` novos, licenças)
+- `frontend/src/styles/tokens.css`, `frontend/src/index.css`, `frontend/index.html`
+- `frontend/src/styles/fonts.test.ts`
+
+**Estimated scope:** Medium
+
+### Task 52.3: Forma no `@theme`: raio, sombra, larguras
+
+**Description:** `tokens.css` ganha `--r-4`, `--r-6`, `--r-10`. `@theme` em `index.css`: `--radius-*: initial`, `--radius-sm` = `--r-4`, `--radius-md` = `--r-6`, `--radius-lg` = `--r-10`; `--shadow-*: initial` e só `--shadow-overlay` (= `--overlay-shadow`); larguras `--shell` 72rem e `--reading` 44rem com utilitário para cada uma. Até a task de cada tela, `rounded-xl` e acima ficam sem raio (efeito só visual, aceito na Q1).
+
+**Acceptance criteria:**
+- [x] `rounded-sm`, `rounded-md` e `rounded-lg` resolvem a 4, 6 e 10 px; `--radius-xl` a `--radius-4xl` não existem (ADR-0024, "Forma").
+- [x] Só `--shadow-overlay` existe no `@theme`; nenhuma classe `shadow-sm` ou `shadow-md` em `src/` (ADR-0024, "Profundidade").
+- [x] `--shell` vale 72rem e `--reading` 44rem, e há utilitário de largura para cada uma.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/styles` (teste novo lê `index.css` e `tokens.css`).
+- [x] `git grep -nE "shadow-(sm|md)\b" -- frontend/src` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.1
+
+**Skills:** `minimalist-ui`, `frontend-design`, `shadcn`
+
+**Files likely touched:**
+- `frontend/src/index.css`, `frontend/src/styles/tokens.css`
+- `frontend/src/styles/forma.test.ts`
+
+**Estimated scope:** Small
+
+### Task 52.4: Campo `Input` e foco base opacos
+
+**Description:** Base de `index.css` troca `outline-ring/50` por `outline-ring`. `Input` passa a 40 px de altura, raio `--r-6`, borda `--input`, anel `ring-2 ring-ring` opaco com afastamento de 2 px, borda `--failed` opaca quando inválido, espaço da escala e sem `ring-ring/50`.
+
+**Acceptance criteria:**
+- [x] Nenhum anel ou contorno de foco usa alfa em `index.css` nem em `input.tsx` (ADR-0024, "Foco"; WCAG 2.2 AA).
+- [x] Campo tem 40 px de altura, raio `--r-6` e borda `--input`; campo com `aria-invalid` tem borda `--failed` opaca (ADR-0024, "Forma" e "Foco").
+- [x] `vitest-axe` sem violação no campo; foco por teclado mostra o anel de 2 px em `--ring`.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components`.
+- [x] `git grep -nE "ring-ring/50|outline-ring/50" -- frontend/src/index.css frontend/src/components/ui/input.tsx` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.3
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `emil-design-eng`
+
+**Files likely touched:**
+- `frontend/src/index.css`, `frontend/src/components/ui/input.tsx`
+- `frontend/src/components/ui/input.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.5: `Button` Ata com nomes antigos transitórios
+
+**Description:** `button.tsx` ganha as variantes `primary`, `accent`, `secondary`, `ghost` e `danger` (tabela do ADR-0024, "Componentes") e os tamanhos `default` 36 px, `sm` 32 px, `icon` 36 px, `icon-sm` 32 px. `link` sai (sem uso). Para o `typecheck` seguir verde enquanto os usos migram, as variantes `default`, `outline`, `destructive` e os tamanhos `xs`, `lg`, `icon-xs`, `icon-lg` ficam como apelidos temporários, removidos na Task 52.9. `defaultVariants` e o padrão `variant = "default"` (linhas 36 a 38 e 45 a 46) passam a `primary`. Sem `transition-colors` nem `ring-ring/50`.
+
+**Acceptance criteria:**
+- [x] Cada variante tem o visual da tabela: `primary` fundo `--ink` e texto `--canvas`; `accent` fundo `--signal` e texto `--signal-ink`; `secondary` transparente com borda `--input` e hover `--sunken`; `ghost` sem borda e hover `--sunken`; `danger` texto e borda `--failed` e hover `--failed-soft` (ADR-0024, "Componentes").
+- [x] Botão sem `variant` explícito renderiza `primary`; foco por teclado mostra anel opaco de 2 px em `--ring`; hover troca cor sem transição (ADR-0024, "Foco" e "Movimento").
+- [x] Espaço e raio seguem a escala (`--r-6`); `vitest-axe` sem violação.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components`.
+- [x] `cd frontend && npm run typecheck` passa com os nomes antigos ainda aceitos.
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.1, 52.3
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `emil-design-eng`
+
+**Files likely touched:**
+- `frontend/src/components/ui/button.tsx`
+- `frontend/src/components/ui/button.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.6: Usos do `Button` em `backlog-review`
+
+**Description:** Troca `outline` por `secondary` em 9 usos de 7 arquivos (conferido por grep em 2026-10-28). `ghost` não muda de nome.
+
+**Acceptance criteria:**
+- [x] Os 9 usos viram `secondary`: `StoryForm.tsx:207`, `FormDialog.tsx:59`, `ExportButtons.tsx:15` e `:23` (`buttonVariants({ variant })`), `EditableField.tsx:157`, `RenameParticipantDialog.tsx:55`, `CriteriaList.tsx:128`, `RegenerateDialog.tsx:71` e `:76` (ADR-0024, "Componentes").
+- [x] `backlog-review` 44, 45 e 48 seguem passando, sem mudar asserção.
+- [x] `npm run typecheck` verde.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] `git grep -n 'variant: "outline"\|variant="outline"' -- frontend/src/features/backlog-review` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.5
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/backlog-review/StoryForm.tsx`, `frontend/src/features/backlog-review/FormDialog.tsx`, `frontend/src/features/backlog-review/ExportButtons.tsx`
+- `frontend/src/features/backlog-review/EditableField.tsx`, `frontend/src/features/backlog-review/RenameParticipantDialog.tsx`, `frontend/src/features/backlog-review/CriteriaList.tsx`, `frontend/src/features/backlog-review/RegenerateDialog.tsx`
+
+**Estimated scope:** Medium (7 arquivos, troca de uma palavra por uso, guiada pelo `typecheck`)
+
+### Task 52.7: Usos do `Button`: lote 2 (`ProviderForm`, `RemoveDialog`, `ConfirmDialog`, `SourceWarningDialog`, `RecordingPanel`)
+
+**Description:** Troca `outline` por `secondary` e `destructive` por `danger` em 8 usos de 5 arquivos. O `secondary` de `ProviderForm.tsx:291` fica como está.
+
+**Acceptance criteria:**
+- [x] `ProviderForm.tsx:226` e `:274`, `RemoveDialog.tsx:39`, `ConfirmDialog.tsx:52` e `SourceWarningDialog.tsx:45` viram `secondary`.
+- [x] `RemoveDialog.tsx:42` e `RecordingPanel.tsx:46` viram `danger`; `ConfirmDialog.tsx:56` vira `destructive ? "danger" : "primary"`.
+- [x] `llm-providers` 34, 35 e 37, `meetings` 42 e 43 e `screen-recording` 8 e 13 seguem passando.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/features/llm-providers src/features/screen-recording src/features/meetings src/components`.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.5
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/llm-providers/ProviderForm.tsx`, `frontend/src/features/llm-providers/RemoveDialog.tsx`
+- `frontend/src/components/surfaces/ConfirmDialog.tsx`
+- `frontend/src/features/screen-recording/SourceWarningDialog.tsx`, `frontend/src/features/screen-recording/RecordingPanel.tsx`
+
+**Estimated scope:** Medium
+
+### Task 52.8: Usos do `Button`: lote 3 (`CancelSplitButton`, `Layout`, `MeetingListPage`, `TitleEditor`, `SpeakerRow`)
+
+**Description:** Troca `outline` por `secondary` em 4 usos e o ternário de `SpeakerRow` em 1; o tamanho `icon-lg` de `SpeakerRow` passa a `icon`. Com os lotes 1 e 2 fecha os 22 usos de `variant` em 17 arquivos.
+
+**Acceptance criteria:**
+- [x] `CancelSplitButton.tsx:24`, `Layout.tsx:42` (o `size="sm"` fica), `MeetingListPage.tsx:87` e `TitleEditor.tsx:57` viram `secondary`.
+- [x] `SpeakerRow.tsx:40` vira `playing ? "primary" : "secondary"` e `SpeakerRow.tsx:41` vira `size="icon"`.
+- [x] `participants` 26, `transcript-split` 45 e `meetings` 40 e 41 seguem passando.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/features/transcript-split src/features/participants src/features/meetings src/app`.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.5
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/transcript-split/CancelSplitButton.tsx`, `frontend/src/app/Layout.tsx`
+- `frontend/src/features/meetings/MeetingListPage.tsx`, `frontend/src/features/meetings/TitleEditor.tsx`
+- `frontend/src/features/participants/SpeakerRow.tsx`
+
+**Estimated scope:** Medium
+
+### Task 52.9: Remover variantes e tamanhos antigos do `Button`
+
+**Description:** `button.tsx` perde os apelidos transitórios (`default`, `outline`, `destructive`, `xs`, `lg`, `icon-xs`, `icon-lg`). `LoginPage.tsx:72` e `RegisterPage.tsx:85` trocam `size="lg"` por `default` (36 px). O `typecheck` passa a recusar nome antigo.
+
+**Acceptance criteria:**
+- [x] O tipo de `variant` aceita só `primary`, `accent`, `secondary`, `ghost` e `danger`; o de `size` só `default`, `sm`, `icon` e `icon-sm` (ADR-0024, "Componentes").
+- [x] Nenhum uso antigo resta em `src/` (grep abaixo); os 3 usos de `size` (`LoginPage.tsx:72`, `RegisterPage.tsx:85`, `SpeakerRow.tsx:41`) estão trocados.
+- [x] `auth` 22 a 26 seguem passando.
+
+**Verification:**
+- [x] `git grep -nE 'variant[=:] ?\{?"(default|outline|destructive|link)"|size="(xs|lg|icon-xs|icon-lg)"' -- frontend/src` sem achado.
+- [x] `cd frontend && npm test -- --run src/features/auth src/components` e `npm run typecheck`.
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.6, 52.7, 52.8
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/components/ui/button.tsx`
+- `frontend/src/features/auth/LoginPage.tsx`, `frontend/src/features/auth/RegisterPage.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.10: Classes de cor Ata no `StatusBadge`
+
+**Description:** Troca as classes de `StatusBadge.tsx:19` a `:25` conforme "Classes de cor a trocar" do ADR-0024. Pílula e rótulo ficam para a Task 53.3.
+
+**Acceptance criteria:**
+- [x] `pending` usa `text-ink-muted`; `processing` e `generating` usam `text-signal`; `transcribed` usa `text-ink`; `needs_split` usa `text-warn`; `done` usa `text-done`; `failed` usa `text-failed`.
+- [x] Os 7 estados seguem com ícone e texto, nunca só cor (WCAG 2.2 AA; `meetings` 40).
+- [x] `StatusBadge.test.tsx` passa sem mudar asserção de critério.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces/StatusBadge`.
+- [x] `git grep -nE "highlight|status-(pending|processing|done|failed)" -- frontend/src/components/surfaces/StatusBadge.tsx` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.1
+
+**Skills:** `minimalist-ui`, `shadcn`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/StatusBadge.tsx`
+- `frontend/src/components/surfaces/StatusBadge.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.11: Classes de cor Ata em `backlog-review`
+
+**Description:** `MergeNotice.tsx:5` e `EditableField.tsx:144` trocam `text-highlight` por `text-signal`.
+
+**Acceptance criteria:**
+- [x] As duas linhas usam `text-signal`; a dica do campo mantém `role="status"` (`backlog-review` 41 e 40).
+- [x] `backlog-review` 40 e 41 seguem passando.
+- [x] Nenhum `highlight` resta nos dois arquivos.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] `git grep -n "highlight" -- frontend/src/features/backlog-review/MergeNotice.tsx frontend/src/features/backlog-review/EditableField.tsx` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.1
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/backlog-review/MergeNotice.tsx`, `frontend/src/features/backlog-review/EditableField.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.12: Classes de cor Ata em `transcript-split`
+
+**Description:** `CutControls.tsx:58` troca `border-highlight bg-highlight text-highlight-foreground` por `border-signal bg-signal text-signal-ink`; `CutControls.tsx:71` troca `bg-highlight` por `bg-signal`; `PartSummary.tsx:27` troca `text-status-done` por `text-done` (`text-destructive` segue, é apelido).
+
+**Acceptance criteria:**
+- [x] Marcador de corte ativo e linha de corte usam `--signal` (`transcript-split` 33).
+- [x] "Parte cabe" usa `text-done`, e a Parte que não cabe segue com `text-destructive` (`transcript-split` 34).
+- [x] `transcript-split` 33 e 34 seguem passando.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [x] `git grep -nE "highlight|status-done" -- frontend/src/features/transcript-split` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.1
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/transcript-split/CutControls.tsx`, `frontend/src/features/transcript-split/PartSummary.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.13: Classes de cor Ata em `llm-providers`
+
+**Description:** `ProviderForm.tsx:254`, `:258` e `:260` e `SettingsPage.tsx:14` trocam `text-status-done` por `text-done`.
+
+**Acceptance criteria:**
+- [x] Sucesso do teste de conexão, "salvo" e provedor ativo usam `text-done` (`llm-providers` 33 a 35).
+- [x] `llm-providers` 33 a 35 seguem passando.
+- [x] Nenhum `status-done` resta em `llm-providers`.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [x] `git grep -n "status-" -- frontend/src/features/llm-providers` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.1
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/llm-providers/ProviderForm.tsx`, `frontend/src/features/llm-providers/SettingsPage.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.14: `Notice`
+
+**Description:** `components/surfaces/Notice.tsx` com variantes `info`, `warn`, `error` e `consent`. Régua esquerda de 2 px, texto em `--ink`, ícone na cor da variante. Substitui só alerta de bloco ou de página; as telas passam a usá-lo nas suas tasks (53 a 61). Erro de campo fica no `FormField`.
+
+**Acceptance criteria:**
+- [x] Fundo e régua por variante: `info` `--signal-soft` e `--signal`; `warn` `--warn-soft` e `--warn`; `error` `--failed-soft` e `--failed`; `consent` `--sunken` e `--ink-muted` (ADR-0024, "Componentes").
+- [x] `error` tem `role="alert"`; `info` e `warn` têm `role="status"`; `consent` não tem região viva.
+- [x] A mensagem renderiza só como texto React, inclusive com `<script>` (SEC-12); `vitest-axe` sem violação nas quatro variantes.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend. SEC-12.
+
+**Dependencies:** Tasks 52.1, 52.3
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `emil-design-eng`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/Notice.tsx`
+- `frontend/src/components/surfaces/Notice.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.15: `ConsentNotice` sobre `Notice variant="consent"`
+
+**Description:** `ConsentNotice` passa a renderizar `Notice variant="consent"` com `CONSENT_NOTICE_TEXT` intacto. As Tasks 57.2 e 61.2 só posicionam o componente. Mudar o texto é "Perguntar antes".
+
+**Acceptance criteria:**
+- [x] O componente renderiza `Notice variant="consent"` e o texto é igual a `CONSENT_NOTICE_TEXT`, sem checkbox, sem confirmação e sem bloquear nada (`meetings` 52; `screen-recording` 26; Q71).
+- [x] O texto continua em um único lugar do código (`messages.ts`); o teste que busca a frase em `src/` acha só esse arquivo (Q72).
+- [x] `ConsentNotice.test.tsx` afirma `Notice variant="consent"` e a igualdade com a constante (ADR-0024, "Testes a atualizar").
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces/ConsentNotice`.
+- [x] `git diff -- frontend/src/components/surfaces/ConsentNotice/messages.ts` vazio.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.14
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/ConsentNotice/ConsentNotice.tsx`
+- `frontend/src/components/surfaces/ConsentNotice/ConsentNotice.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.16: `DialogSurface` opaco, aplicado ao `ConfirmDialog`
+
+**Description:** `components/surfaces/DialogSurface.tsx`: superfície opaca de diálogo (`--surface`, `--r-10`, `--overlay-shadow`) sobre `--scrim`, sem `backdrop-filter`. `ConfirmDialog` troca `GlassPanel` por ele, o overlay `bg-black/40` por `bg-scrim`, e o comentário da linha 22. Cobre `meetings/DeleteMeetingDialog`, `meetings/RetryButton`, `backlog-review/RetryButton` e `backlog-review/ConfirmDeleteDialog`, que passam por `ConfirmDialog`.
+
+**Acceptance criteria:**
+- [x] `DialogSurface` é opaco (sem `backdrop-filter`), com `--surface`, raio `--r-10` e `--overlay-shadow`; o overlay usa `--scrim` (ADR-0024, "Componentes" e "Vidro").
+- [x] `ConfirmDialog` usa `DialogSurface`; `MeetingDetailPage.test.tsx` e `meetings/RetryButton.test.tsx` afirmam `DialogSurface` em vez de `data-slot="glass-panel"`, com as mesmas asserções de `meetings` 42 e 43.
+- [x] `vitest-axe` sem violação; foco entra no diálogo e volta ao gatilho.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces src/features/meetings src/features/backlog-review`.
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.3, 52.5
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `emil-design-eng`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/DialogSurface.tsx`, `frontend/src/components/surfaces/DialogSurface.test.tsx`, `frontend/src/components/surfaces/ConfirmDialog.tsx`
+- `frontend/src/features/meetings/MeetingDetailPage.test.tsx`, `frontend/src/features/meetings/RetryButton.test.tsx`
+
+**Estimated scope:** Medium
+
+### Task 52.17: `DialogSurface` em `FormDialog` e `RegenerateDialog`
+
+**Description:** `FormDialog` (e, por ele, `RenameParticipantDialog` e `MoveStoryDialog`) e `RegenerateDialog` trocam `GlassPanel` por `DialogSurface` e o overlay por `bg-scrim`. Comentário de `FormDialog.tsx:21` atualizado.
+
+**Acceptance criteria:**
+- [x] Os dois diálogos usam `DialogSurface`, sem `GlassPanel`; `RegenerateDialog.test.tsx` afirma `DialogSurface` em vez de `glass-panel` (ADR-0024, "Testes a atualizar").
+- [x] `backlog-review` 43, 44 e 48 seguem passando.
+- [x] Nenhum `rounded-xl` nos dois arquivos.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] `git grep -n "GlassPanel" -- frontend/src/features/backlog-review` só acha comentário ou nada (nenhum import).
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.16
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/backlog-review/FormDialog.tsx`, `frontend/src/features/backlog-review/RegenerateDialog.tsx`
+- `frontend/src/features/backlog-review/RegenerateDialog.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.18: `DialogSurface` em `SourceWarningDialog`
+
+**Description:** `SourceWarningDialog` (aviso de fontes da gravação) troca `GlassPanel` por `DialogSurface`.
+
+**Acceptance criteria:**
+- [x] O diálogo usa `DialogSurface`, sem `GlassPanel` nem `rounded-xl`.
+- [x] `screen-recording` 4, 5 e 7 (aviso de fonte ausente, "Cancelar" encerra a captura) seguem passando.
+- [x] `vitest-axe` sem violação.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.16
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/screen-recording/SourceWarningDialog.tsx`
+- `frontend/src/features/screen-recording/RecordPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.19: `DialogSurface` em `RemoveDialog`
+
+**Description:** `RemoveDialog` (e, por ele, `ProviderForm`) troca `GlassPanel` por `DialogSurface`. Comentário de `RemoveDialog.tsx:14` atualizado. Fecha o critério reaberto da Task 17.2.
+
+**Acceptance criteria:**
+- [x] O diálogo de remoção usa `DialogSurface`; `ProviderForm.test.tsx` afirma `DialogSurface` em vez de `glass-panel` (ADR-0024, "Testes a atualizar").
+- [x] "Remover" pede confirmação antes de chamar a API (`llm-providers` 37).
+- [x] Nenhum `rounded-xl` no arquivo.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.16
+
+**Skills:** `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/llm-providers/RemoveDialog.tsx`
+- `frontend/src/features/llm-providers/ProviderForm.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.20: `GlassPanel` com tokens Ata
+
+**Description:** `glass.css` lê `--surface` e `--ink` em vez de `--card` e `--card-foreground` (linhas 5, 6 e 16) e usa `box-shadow: var(--overlay-shadow)` em vez de `var(--elevation-2)` (linha 8). Comentários de `GlassPanel.tsx:11` e `glass.css:1` deixam de citar diálogo. `GlassPanel.test.tsx` passa a `--surface`, `--ink` e `--signal` (linha 145).
+
+**Acceptance criteria:**
+- [x] Texto sobre o painel mantém 4,5:1 contra o pior fundo, nos temas claro e escuro, com os tokens novos (ADR-0024, "Vidro"; `02-architecture.md`, "Contraste sobre vidro").
+- [x] Fallback opaco continua em `@supports not`, `prefers-reduced-transparency` e `forced-colors`.
+- [x] `no-stray-backdrop.test.ts` passa sem mudar regra.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces/GlassPanel src/styles`.
+- [x] `git grep -nE "elevation|--card" -- frontend/src/styles/glass.css` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.1
+
+**Skills:** `high-end-visual-design`, `frontend-ui-engineering`, `ui-animation`
+
+**Files likely touched:**
+- `frontend/src/styles/glass.css`, `frontend/src/components/surfaces/GlassPanel.tsx`
+- `frontend/src/components/surfaces/GlassPanel.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.21: Teste: nenhum diálogo renderiza `GlassPanel`
+
+**Description:** Teste estático varre `src/**/*.tsx` (sem testes): todo arquivo que importa `AlertDialog` ou `Dialog` de `radix-ui` importa `DialogSurface` e não importa `GlassPanel`.
+
+**Acceptance criteria:**
+- [x] O teste falha se um diálogo importar `GlassPanel` (ADR-0024, "Testes novos"; `02-architecture.md`, "Verificação").
+- [x] O teste falha se um diálogo não usar `DialogSurface`.
+- [x] O teste passa com os 5 diálogos diretos migrados (`ConfirmDialog`, `FormDialog`, `RegenerateDialog`, `SourceWarningDialog`, `RemoveDialog`).
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.17, 52.18, 52.19
+
+**Skills:** `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/dialogs-opaque.test.ts`
+
+**Estimated scope:** Small
+
+### Task 52.22: `PageHeader`
+
+**Description:** `components/surfaces/PageHeader.tsx`: título `h1` em serif, descrição em `--ink-muted`, ações à direita. Sem card.
+
+**Acceptance criteria:**
+- [x] Renderiza um `h1` com `font-heading` (Source Serif 4), descrição opcional em `--ink-muted` e área de ações à direita (ADR-0024, "Componentes").
+- [x] Usa só tamanhos da escala e espaço da escala; nenhum `text-[`.
+- [x] `vitest-axe` sem violação.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.2, 52.3
+
+**Skills:** `minimalist-ui`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/PageHeader.tsx`
+- `frontend/src/components/surfaces/PageHeader.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.23: `Skeleton`
+
+**Description:** `components/surfaces/Skeleton.tsx` único (hoje há cópias nas páginas). Fundo `--sunken`, raio `--r-4`, respiração lenta de opacidade em `motion.css`.
+
+**Acceptance criteria:**
+- [x] Anima só `opacity` e fica parado com `prefers-reduced-motion: reduce`; CSS e hook `useReducedMotion` concordam (ADR-0024, "Movimento"; `02-architecture.md`, "Restrições obrigatórias").
+- [x] Usa `--sunken` e `--r-4`; o contêiner de carregamento anuncia por `aria-busy` ou região `role="status"`.
+- [x] `vitest-axe` sem violação.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces src/styles`.
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.1, 52.3
+
+**Skills:** `minimalist-ui`, `emil-design-eng`, `ui-animation`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/Skeleton.tsx`, `frontend/src/styles/motion.css`
+- `frontend/src/components/surfaces/Skeleton.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.24: `EmptyState`
+
+**Description:** `components/surfaces/EmptyState.tsx` único: título, descrição e ação opcional, sem card.
+
+**Acceptance criteria:**
+- [x] Mostra título e descrição, e a ação só quando for passada (ADR-0024, "Componentes").
+- [x] Sem card, sem sombra e sem raio acima de 10 px; usa espaço da escala.
+- [x] `vitest-axe` sem violação.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.3, 52.5
+
+**Skills:** `minimalist-ui`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/EmptyState.tsx`
+- `frontend/src/components/surfaces/EmptyState.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.25: Remover o atalho de tecla `d` do `theme-provider`
+
+**Description:** `theme-provider.tsx` perde o `keydown` (linhas 160 a 177 hoje). A leitura e a escrita em `localStorage` e a sincronização entre abas ficam.
+
+**Acceptance criteria:**
+- [x] O `theme-provider` não registra listener de `keydown`; apertar `d` não muda o tema (WCAG 2.2, critério 2.1.4; ADR-0024, "Tema").
+- [x] A preferência de tema segue em `localStorage` e a sessão nunca vai a `localStorage` nem `sessionStorage` (`03-security.md`, "Never").
+- [x] O tema escolhido continua aplicado depois de recarregar.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components`.
+- [x] `git grep -n "keydown" -- frontend/src/components/theme-provider.tsx` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.1
+
+**Skills:** `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/components/theme-provider.tsx`
+- `frontend/src/components/theme-provider.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.26: `ThemeToggle`
+
+**Description:** `components/surfaces/ThemeToggle.tsx` com claro, escuro e sistema, ligado ao `useTheme`. O `AppShell` (Task 53.1) e o auth (Task 55.1) o encaixam.
+
+**Acceptance criteria:**
+- [x] Oferece claro, escuro e sistema; o escolhido aparece marcado e é gravado em `localStorage` pelo `theme-provider` (ADR-0024, "Tema").
+- [x] Opera por teclado, tem nome acessível e alvo de pelo menos 24 px; sem atalho de tecla.
+- [x] `vitest-axe` sem violação nos dois temas.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.5, 52.25
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/ThemeToggle.tsx`
+- `frontend/src/components/surfaces/ThemeToggle.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.27: `theme-color` do `index.html` igual a `--canvas`
+
+**Description:** `index.html:6-7` troca `#ffffff` e `#0a0a0a` pelo hex equivalente ao `oklch` de `--canvas` claro (`oklch(0.985 0.004 85)`) e escuro (`oklch(0.175 0.009 220)`).
+
+**Acceptance criteria:**
+- [x] O `theme-color` claro e o escuro são o hex de `--canvas` de cada tema (ADR-0024, "Tema").
+- [x] Teste converte o `oklch` de `tokens.css` (com `src/test/color.ts`) e compara com o `content` de cada meta, com tolerância de um nível por canal.
+- [x] O preload de fontes da Task 52.2 segue intacto.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/styles`.
+- [x] Gate frontend.
+
+**Dependencies:** Task 52.1
+
+**Skills:** `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/index.html`
+- `frontend/src/styles/theme-color.test.ts`
+
+**Estimated scope:** Small
+
+### Task 52.28: Regra ESLint: `components/**` não importa `@/features/*`
+
+**Description:** `eslint.config.js` ganha `no-restricted-imports` para `src/components/**` barrando `@/features/*`. Hoje não há import desse tipo em `components/` (grep de 2026-10-28), então o lint segue verde.
+
+**Acceptance criteria:**
+- [x] `npm run lint` falha com import de `@/features/*` dentro de `components/**` (`AGENTS.md`, "Regras de código"; ADR-0024, "Componentes").
+- [x] `npm run lint` passa no repo atual.
+- [x] A regra de SEC-12 (`dangerouslySetInnerHTML`) continua ativa.
+
+**Verification:**
+- [x] Manual: criar `frontend/src/components/surfaces/tmp-lint.tsx` com `import "@/features/auth/useSession"`, rodar `cd frontend && npx eslint src/components/surfaces/tmp-lint.tsx` e ver `no-restricted-imports`; apagar o arquivo antes do commit.
+- [x] `cd frontend && npm run lint`.
+
+**Dependencies:** None (dentro da Task 52)
+
+**Skills:** `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/eslint.config.js`
+
+**Estimated scope:** Small
+
+### Task 52.29: `SamplePage` no Ata
+
+**Description:** `app/SamplePage.tsx` refeita: lista os tokens da tabela "Tokens" (linha 20 hoje cita `highlight`), mostra `Button` (cinco variantes), `Notice` (quatro variantes), `StatusBadge` (sete estados), `PageHeader`, `Skeleton`, `EmptyState` e `ThemeToggle`. O vidro aparece só como exemplo do painel da gravação, sem gradiente (a linha 55 hoje usa `bg-gradient-to-br from-highlight to-foreground`; vira `rounded-lg bg-signal`).
+
+**Acceptance criteria:**
+- [x] A amostra lista os tokens Ata e usa os componentes novos (ADR-0024, "Testes a atualizar").
+- [x] Nenhum `GlassPanel` de diálogo e nenhum gradiente na amostra.
+- [x] `SamplePage.test.tsx` passa `vitest-axe` sem violação nos dois temas.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run src/app`.
+- [x] `git grep -nE "highlight|gradient" -- frontend/src/app/SamplePage.tsx` sem achado.
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.14, 52.16, 52.20, 52.22, 52.23, 52.24, 52.26
+
+**Skills:** `minimalist-ui`, `frontend-ui-engineering`, `shadcn`
+
+**Files likely touched:**
+- `frontend/src/app/SamplePage.tsx`
+- `frontend/src/app/SamplePage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 52.30: Remover os tokens substituídos e travar com teste
+
+**Description:** `tokens.css` perde `--highlight`, `--highlight-foreground`, `--status-*`, `--sidebar-*`, `--chart-*`, `--elevation-1`, `--elevation-2` e `--radius`. `index.css` perde `--color-highlight*`, `--color-status-*` (linhas 33 a 38), `--color-chart-*` e `--color-sidebar-*` (linhas 43 a 55). `spotlight.css:18` troca `var(--highlight)` por `var(--signal)`. `tokens.test.ts` perde os pares e nomes antigos (linhas 47 a 60 e 93; `--sidebar-foreground` na 52). Teste novo trava o retorno dos nomes.
+
+**Acceptance criteria:**
+- [x] Em `components/`, `styles/`, `index.css` e `app/SamplePage.tsx`, nenhum resultado para `highlight|status-(pending|processing|done|failed)|sidebar|chart-`, na forma de variável e na de classe (checkpoint da Task 52).
+- [x] Em todo o `src/`, nenhuma das classes da tabela "Classes de cor a trocar" resta (`text-highlight`, `bg-highlight`, `border-highlight`, `text-highlight-foreground`, `text-status-*`).
+- [x] `spotlight.css` lê `--signal`; a Task 57.1 recorta o realce para a borda.
+
+**Verification:**
+- [x] `cd frontend && npm test -- --run` (teste novo `removed-tokens.test.ts`, que se exclui da própria busca).
+- [x] Gate frontend.
+
+**Dependencies:** Tasks 52.10, 52.11, 52.12, 52.13, 52.20, 52.29
+
+**Skills:** `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/styles/tokens.css`, `frontend/src/index.css`, `frontend/src/styles/spotlight.css`
+- `frontend/src/styles/tokens.test.ts`, `frontend/src/styles/removed-tokens.test.ts`
+
+**Estimated scope:** Medium
+
+### Checkpoint: Tokens e primitivos
+
+- [x] `cd frontend && npm test -- --run`, `npm run lint`, `npm run typecheck` e `npm run build` passam
+- [x] `tokens.test.ts` com todos os pares de contraste do ADR-0024, nos dois temas; pares marcados "a conferir" confirmados ou fundos `-soft` ajustados
+- [x] Nenhum diálogo renderiza `GlassPanel`; `no-stray-backdrop.test.ts` passa
+- [x] Grep em `components/`, `styles/`, `index.css` e `app/SamplePage.tsx` sem resultado para `highlight|status-(pending|processing|done|failed)|sidebar|chart-` (forma de variável e forma de classe)
+- [x] Usos em `features/` da tabela "Classes de cor a trocar" do ADR-0024 trocados, conferidos linha a linha no PR
+- [x] `git grep -nE 'variant[=:] ?\{?"(default|outline|destructive|link)"|size="(xs|lg|icon-xs|icon-lg)"' -- frontend/src` sem achado (22 usos de `variant` em 17 arquivos e 3 de `size` trocados)
+- [x] `ConsentNotice` renderiza `Notice variant="consent"`; teste de igualdade com `CONSENT_NOTICE_TEXT` passa
+- [x] `npm run lint` falha com import de `@/features/*` dentro de `components/**` (conferido com arquivo de teste temporário, fora do commit)
+- [x] `index.html`: `theme-color` claro e escuro iguais a `--canvas` de cada tema
+- [x] `theme-provider` sem listener de `keydown`; `ThemeToggle` operável por teclado
+- [ ] Fontes: quatro `.woff2` e licenças em `public/fonts/`; CSP `default-src 'self'` sem mudança; LCP do login (NFR-03) e CLS (NFR-05) medidos; contingência do `h1` aplicada se LCP passar de 2,5 s
+- [x] JS inicial e total dentro de NFR-01 e NFR-02
+- [ ] Checagem de UI na página de amostra
+- [x] `/security-review` sobre o diff
+- [ ] Revisão humana antes de seguir
+
+### Task 53.1: `AppShell`
+
+**Description:** `components/surfaces/AppShell.tsx` só desenha: barra opaca com marca em serif, nav, nome do usuário, `ThemeToggle`, botão de sair, e a área de conteúdo na largura `--shell`. Recebe links, nome do usuário e `onLogout` por props e não importa `features/`.
+
+**Acceptance criteria:**
+- [ ] O item ativo da nav tem `aria-current="page"` e sublinhado de 2 px em `--signal`; a nav opera por teclado (ADR-0024, "Componentes").
+- [ ] A barra é opaca (sem `backdrop-filter`) e o conteúdo tem largura `--shell` (`02-architecture.md`, "Mapa de superfícies").
+- [ ] `ThemeToggle` presente; `vitest-axe` sem violação nos dois temas.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/components/surfaces src/styles`.
+- [ ] Gate frontend.
+
+**Dependencies:** Checkpoint: Tokens e primitivos
+
+**Skills:** `minimalist-ui`, `design-taste-frontend`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/AppShell.tsx`
+- `frontend/src/components/surfaces/AppShell.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 53.2: `app/Layout.tsx` compõe o `AppShell`
+
+**Description:** `Layout` segue em `app/` e guarda sessão (`useSession`), logout e links; passa tudo ao `AppShell` e coloca o `Outlet` como conteúdo.
+
+**Acceptance criteria:**
+- [ ] Depois do logout o frontend volta ao login (`auth` 26); página protegida sem sessão leva ao login (`auth` 24).
+- [ ] A nav mostra "Reuniões" e "Configurações", com o item da rota atual marcado por `aria-current="page"`.
+- [ ] A sessão nunca vai a `localStorage` nem `sessionStorage` (`03-security.md`, "Never"; SEC-03).
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/app src/features/auth`.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 53.1
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/app/Layout.tsx`
+- `frontend/src/app/routes.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 53.3: `StatusBadge` sem pílula
+
+**Description:** `StatusBadge` perde a pílula com borda: ícone mais rótulo, com as cores da tabela "Estados" (ícone por estado; rótulo `--ink`, e `--failed` em `failed`). Mantém a região `aria-live` de mudança de status.
+
+**Acceptance criteria:**
+- [ ] Os 7 estados mostram ícone e texto, sem borda e sem fundo de pílula, com as cores da tabela "Estados" (ADR-0024, "Estados").
+- [ ] A mudança de status segue anunciada em região `aria-live` (`meetings` 40).
+- [ ] `vitest-axe` sem violação; contraste do rótulo 4,5:1 nos dois temas.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/components/surfaces/StatusBadge`.
+- [ ] Gate frontend.
+
+**Dependencies:** Checkpoint: Tokens e primitivos
+
+**Skills:** `minimalist-ui`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/components/surfaces/StatusBadge.tsx`
+- `frontend/src/components/surfaces/StatusBadge.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 53.4: Lista de reuniões no Ata
+
+**Description:** `MeetingListPage` com `PageHeader`, linhas com régua `--hairline` e régua forte `--ink` no topo da lista (sem card), datas e durações em Geist Mono tabular, `Skeleton`, `EmptyState` e `Notice variant="error"` no lugar da caixa inline (linhas 40 a 41). Polling não muda.
+
+**Acceptance criteria:**
+- [ ] A lista atualiza o status sem recarregar enquanto a Reunião está em `pending`, `processing`, `generating`, ou `transcribed` com `participants_confirmed` verdadeiro, e não faz polling fora disso (`meetings` 40).
+- [ ] Linhas separadas por régua, sem card; datas e durações em `font-mono` com algarismos tabulares (ADR-0024, "Profundidade" e "Tipografia").
+- [ ] Grep local sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/meetings`.
+- [ ] Grep local em `MeetingListPage.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 53.1, 53.2, 53.3
+
+**Skills:** `minimalist-ui`, `design-taste-frontend`, `shadcn`, `frontend-ui-engineering`, `responsive-design`, `animate`
+
+**Files likely touched:**
+- `frontend/src/features/meetings/MeetingListPage.tsx`, `frontend/src/features/meetings/format.ts`
+- `frontend/src/features/meetings/MeetingListPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 54.1: Revisão do backlog no Ata: página, avisos e estados
+
+**Description:** `ReviewPage` com `PageHeader`, `Skeleton` e `EmptyState`. A constante `ALERT` (linha 19) e os blocos de erro (linhas 33 e 160) viram `Notice`: `error` para falha, `warn` para a última geração com falha, `info` para só leitura.
+
+**Acceptance criteria:**
+- [ ] Em `failed` com backlog, a tela mostra só leitura, aviso de que a última geração falhou, o motivo e "Tentar novamente"; em `transcribed`, `generating` e `needs_split` com backlog, só leitura com o status atual (`backlog-review` 46).
+- [ ] Texto de US e de Epic renderiza escapado, inclusive `<script>` (SEC-12; `backlog-review` 39).
+- [ ] Grep local em `ReviewPage.tsx` sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [ ] Grep local em `ReviewPage.tsx`. SEC-12.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 53.1, 53.2, 53.3, 53.4
+
+**Skills:** `minimalist-ui`, `design-taste-frontend`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/backlog-review/ReviewPage.tsx`
+- `frontend/src/features/backlog-review/ReviewPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 54.2: Revisão do backlog no Ata: Epic com régua forte
+
+**Description:** `EpicSection` sem card: régua forte em `--ink` no topo de cada Epic, título em serif, abrir e fechar animado só com `transform` e `opacity` (120 a 240 ms).
+
+**Acceptance criteria:**
+- [ ] A Epic não tem fundo de card nem borda em volta; a régua `--ink` fica no topo (ADR-0024, "Profundidade" e "Componentes").
+- [ ] Abrir e fechar anima só `transform` e `opacity`, desligado com `prefers-reduced-motion` (ADR-0024, "Movimento").
+- [ ] Com backlog de fixture de 30 Epics e 200 US o INP fica até 200 ms (NFR-04; medição manual no checkpoint).
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/backlog-review src/styles`.
+- [ ] Grep local em `EpicSection.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 54.1
+
+**Skills:** `minimalist-ui`, `design-taste-frontend`, `frontend-ui-engineering`, `animate`
+
+**Files likely touched:**
+- `frontend/src/features/backlog-review/EpicSection.tsx`
+- `frontend/src/features/backlog-review/ReviewPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 54.3: Revisão do backlog no Ata: US como linha com régua
+
+**Description:** `StoryCard` deixa de ser card: linha com régua `--hairline`, nome da US em serif, `US-id` e instante em Geist Mono tabular, demais campos em Geist.
+
+**Acceptance criteria:**
+- [ ] A US aparece como linha com régua, sem card, com todos os campos do formato, solicitante e instante (`backlog-review` 39).
+- [ ] `US-id` e instante usam `font-mono` com algarismos tabulares; nome da US usa `font-serif` (ADR-0024, "Tipografia").
+- [ ] Texto da US renderiza escapado (SEC-12); grep local sem achado.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [ ] Grep local em `StoryCard.tsx`. SEC-12.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 54.2
+
+**Skills:** `minimalist-ui`, `design-taste-frontend`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/backlog-review/StoryCard.tsx`
+- `frontend/src/features/backlog-review/ReviewPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 54.4: Revisão do backlog no Ata: campos editáveis
+
+**Description:** `EditableField`, `StoryForm`, `CriteriaList` e `NewEpicForm` no Ata: campos de 40 px, foco opaco, erro 422 inline junto do campo (sem `Notice`), espaço e raio da escala, sem `ring-ring/50` nem `text-[`.
+
+**Acceptance criteria:**
+- [ ] Cada campo de Epic, US e critério segue editável na tela, com prioridade, story points, solicitante e instante; erro 422 aparece junto ao campo (`backlog-review` 40).
+- [ ] Teclado em tudo e anel de foco opaco de 2 px (ADR-0024, "Foco").
+- [ ] Grep local sem achado nos quatro arquivos; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [ ] Grep local nos quatro arquivos.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 54.3
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/backlog-review/EditableField.tsx`, `frontend/src/features/backlog-review/StoryForm.tsx`
+- `frontend/src/features/backlog-review/CriteriaList.tsx`, `frontend/src/features/backlog-review/NewEpicForm.tsx`
+- `frontend/src/features/backlog-review/EditableField.test.tsx`
+
+**Estimated scope:** Medium
+
+### Task 54.5: Revisão do backlog no Ata: diálogos
+
+**Description:** Os diálogos já usam `DialogSurface` (Tasks 52.16 e 52.17). Aqui o conteúdo vai ao Ata: erro de diálogo vira `Notice variant="error"`, `MergeNotice` vira `Notice variant="info"`, e saem as classes proibidas de `RenameParticipantDialog`, `MoveStoryDialog`, `ConfirmDeleteDialog`, `FormDialog` e `RegenerateDialog`.
+
+**Acceptance criteria:**
+- [ ] Renomear ou criar Epic, ou renomear Participante, com nome que já existe mostra, antes de salvar, que os dois serão juntados (`backlog-review` 41).
+- [ ] Excluir US, Epic ou critério pede confirmação, e excluir Epic com US fica desabilitado (`backlog-review` 42); mover US abre a escolha de Epic (`backlog-review` 43); regenerar avisa da perda das edições (`backlog-review` 44).
+- [ ] Grep local sem achado nos arquivos; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [ ] Grep local nos arquivos da task.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 52.17, 54.4
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `animate`
+
+**Files likely touched:**
+- `frontend/src/features/backlog-review/RenameParticipantDialog.tsx`, `frontend/src/features/backlog-review/MoveStoryDialog.tsx`, `frontend/src/features/backlog-review/ConfirmDeleteDialog.tsx`
+- `frontend/src/features/backlog-review/MergeNotice.tsx`
+- `frontend/src/features/backlog-review/ConfirmDeleteDialog.test.tsx`
+
+**Estimated scope:** Medium
+
+### Task 54.6: Revisão do backlog no Ata: tentar de novo e exportar
+
+**Description:** `RetryButton` do backlog usa `Notice variant="error"` para o erro; `ExportButtons` sai de classes proibidas, com `secondary` já trocado na Task 52.6.
+
+**Acceptance criteria:**
+- [ ] "Tentar novamente" repete o aviso de perda das edições (`backlog-review` 46).
+- [ ] "Exportar Markdown" e "Exportar JSON" baixam o arquivo (`backlog-review` 45).
+- [ ] Grep local sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [ ] Grep local nos dois arquivos.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 54.5
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/backlog-review/RetryButton.tsx`, `frontend/src/features/backlog-review/ExportButtons.tsx`
+
+**Estimated scope:** Small
+
+### Checkpoint: Shell, lista e backlog
+
+- [ ] Testes de `meetings`, `backlog-review` e `app/` passam sem mudar critério de aceite
+- [ ] Nav com `aria-current="page"` no item ativo; largura `--shell`
+- [ ] INP com backlog de fixture 30 Epics e 200 US (NFR-04)
+- [ ] Checagem de UI; `impeccable-design-polish` no shell, na lista e na revisão
+- [ ] `/security-review` sobre o diff
+- [ ] Revisão humana antes de seguir
+
+### Task 55.1: `AuthShell` sai do `GlassPanel`: card opaco, sem sombra, sem spotlight
+
+**Description:** `AuthShell` deixa de usar `GlassPanel` e `usePointerSpotlight` (e a classe `spotlight`). Card opaco `--surface`, régua `--hairline`, raio `--r-10`, sem sombra (exceção do card de auth, ADR-0024, Q3), entrada por opacidade, marca e `h1` em serif, `ThemeToggle`. Comentário da linha 12 atualizado. Largura do card `max-w-sm` fica, por ser tela sem shell.
+
+**Acceptance criteria:**
+- [ ] O card é opaco, sem `backdrop-filter` e sem sombra, com `--surface` e `--hairline` (ADR-0024, "Princípios"; `02-architecture.md`, "Mapa de superfícies").
+- [ ] Nenhum listener de `pointermove` é registrado no auth e nada importa `GlassPanel` (`01-prd.md`, NFR-08: só o upload tem mouse-tracking).
+- [ ] `ThemeToggle` visível e operável por teclado; entrada do card só por `opacity`, desligada com `prefers-reduced-motion`; grep local sem achado.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/auth`.
+- [ ] `git grep -nE "GlassPanel|usePointerSpotlight|spotlight" -- frontend/src/features/auth` sem achado.
+- [ ] Gate frontend.
+
+**Dependencies:** Checkpoint: Tokens e primitivos
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`, `emil-design-eng`, `ui-animation`
+
+**Files likely touched:**
+- `frontend/src/features/auth/AuthShell.tsx`
+- `frontend/src/features/auth/LoginPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 55.2: Tela de login no Ata
+
+**Description:** `LoginPage` usa `Notice variant="error"` no lugar da caixa inline (linhas 44 a 46), mantém o anúncio `assertive` do erro, e o botão de entrar (`accent`, único da tela) em 36 px.
+
+**Acceptance criteria:**
+- [ ] Erros do login aparecem com a mensagem da API, anunciados por região viva (`auth` 25).
+- [ ] Página protegida sem sessão leva ao login (`auth` 24); depois do logout volta ao login (`auth` 26).
+- [ ] Grep local sem achado; `vitest-axe` sem violação; mensagem renderizada só como texto (SEC-12).
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/auth src/app`.
+- [ ] Grep local em `LoginPage.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 55.1
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/auth/LoginPage.tsx`
+- `frontend/src/features/auth/LoginPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 55.3: Tela de cadastro no Ata
+
+**Description:** `RegisterPage` usa `Notice variant="error"` no lugar da caixa inline (linhas 42 a 44) e o botão de cadastrar (`accent`, único da tela) em 36 px.
+
+**Acceptance criteria:**
+- [ ] A tela inicial oferece cadastro e login (`auth` 22); cadastro bem-sucedido leva direto à área autenticada (`auth` 23).
+- [ ] Erros do cadastro aparecem com a mensagem da API (`auth` 25).
+- [ ] Grep local sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/auth`.
+- [ ] Grep local em `RegisterPage.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 55.1
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/auth/RegisterPage.tsx`
+- `frontend/src/features/auth/RegisterPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 56.1: Configurações de LLM no Ata: página
+
+**Description:** `SettingsPage` com `PageHeader`, provedores em linhas com régua (sem card), provedor ativo com `--done`, `Skeleton` e `Notice variant="error"` no lugar da caixa das linhas 105 a 106.
+
+**Acceptance criteria:**
+- [ ] Mostra os 4 provedores com estado, máscara, modelo, janela e indicação do ativo (`llm-providers` 33).
+- [ ] O campo de chave nunca é pré-preenchido e a máscara serve só de referência (`llm-providers` 36; SEC-07).
+- [ ] Grep local sem achado; `vitest-axe` sem violação; layout de 360 a 1920 px.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [ ] Grep local em `SettingsPage.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 53.1, 53.2
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/llm-providers/SettingsPage.tsx`
+- `frontend/src/features/llm-providers/SettingsPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 56.2: Configurações de LLM no Ata: formulário do provedor
+
+**Description:** `ProviderForm` com `Notice variant="error"` para falha do teste (linhas 263 a 265), mensagens de sucesso em `--done`, "Salvar" como `accent` (único da tela). `ModelSelect` e `RemoveDialog` perdem as classes proibidas.
+
+**Acceptance criteria:**
+- [ ] "Salvar" fica desabilitado até um "Testar conexão" bem-sucedido com os valores atuais (`llm-providers` 34); erros de teste e gravação aparecem com o motivo da API (`llm-providers` 35).
+- [ ] Remover pede confirmação antes de chamar a API (`llm-providers` 37); a chave nunca aparece em tela nem em log (SEC-07).
+- [ ] Grep local sem achado nos três arquivos; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [ ] Grep local em `ProviderForm.tsx`, `ModelSelect.tsx` e `RemoveDialog.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 56.1
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/llm-providers/ProviderForm.tsx`, `frontend/src/features/llm-providers/ModelSelect.tsx`, `frontend/src/features/llm-providers/RemoveDialog.tsx`
+- `frontend/src/features/llm-providers/ProviderForm.test.tsx`
+
+**Estimated scope:** Medium
+
+### Task 57.1: Realce de mouse-tracking só na borda da área de upload
+
+**Description:** `spotlight.css` recorta o `::before` para a faixa da borda com `mask-composite: exclude` (e `-webkit-mask-composite: xor`), em gradiente radial `--signal`, com o miolo transparente. Sem suporte a `mask-composite`, o realce não aparece. Comentário da linha 1 (cita login) atualizado. É o único gradiente permitido.
+
+**Acceptance criteria:**
+- [ ] O realce cobre só a faixa da borda; o fundo e o texto do miolo não mudam com o ponteiro sobre a área (ADR-0024, "Mouse-tracking").
+- [ ] O CSS só liga com `(hover: hover) and (pointer: fine)`, fica desligado com `prefers-reduced-motion`, `forced-colors` e sem suporte a `mask-composite` (`02-architecture.md`, "Restrições obrigatórias").
+- [ ] Teste lê `spotlight.css` e confere `mask-composite`, a cor `--signal`, a ausência de `--highlight` e o comentário sem "login".
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/styles src/lib/ui`.
+- [ ] Gate frontend.
+
+**Dependencies:** Checkpoint: Tokens e primitivos
+
+**Skills:** `minimalist-ui`, `emilkowalski-motion`, `animate`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/styles/spotlight.css`
+- `frontend/src/styles/spotlight.test.ts`
+
+**Estimated scope:** Small
+
+### Task 57.2: Tela de upload no Ata
+
+**Description:** `UploadPage` com `PageHeader`, área de soltar arquivo com borda fixa `--input` e realce da Task 57.1, foco opaco, `transition-colors` removido (linha 63), `Notice variant="error"` no lugar da caixa das linhas 187 e 188, envio como `accent` (único da tela) e `ConsentNotice` posicionado junto do botão de envio. Não mexe no componente nem no texto.
+
+**Acceptance criteria:**
+- [ ] A tela aceita arquivo, título e número de participantes, recusa antes de enviar extensão fora da lista ou mais de 524.288.000 bytes, mostra erros da API e leva ao detalhe (`meetings` 35 a 39).
+- [ ] O aviso mostra exatamente `CONSENT_NOTICE_TEXT` junto do botão de envio (`meetings` 52).
+- [ ] O mouse-tracking só liga com `(hover: hover) and (pointer: fine)` e sem movimento reduzido, e nenhum listener de `pointermove` entra em toque; grep local sem achado.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/meetings`.
+- [ ] Grep local em `UploadPage.tsx`. Manual: quadros do spotlight abaixo de 16 ms no DevTools Performance (NFR-08).
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 53.1, 53.2, 57.1
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`, `emilkowalski-motion`, `animate`
+
+**Files likely touched:**
+- `frontend/src/features/meetings/UploadPage.tsx`
+- `frontend/src/features/meetings/UploadPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 57.3: Detalhe da Reunião no Ata
+
+**Description:** `MeetingDetailPage` com `PageHeader`, `StatusBadge` novo, links `buttonVariants()` (padrão `primary`), `Notice` no lugar das caixas das linhas 58 e 128 a 129, instantes e durações em Geist Mono. `TitleEditor` perde classes proibidas.
+
+**Acceptance criteria:**
+- [ ] O detalhe atualiza o status sem recarregar enquanto a Reunião está em `pending`, `processing`, `generating`, ou `transcribed` com `participants_confirmed` verdadeiro (`meetings` 40) e permite editar o título (`meetings` 41).
+- [ ] Mudança de status anunciada em `aria-live`; no máximo um `accent` na tela.
+- [ ] Grep local sem achado em `MeetingDetailPage.tsx` e `TitleEditor.tsx`; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/meetings`.
+- [ ] Grep local nos dois arquivos.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 53.3, 57.2
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/meetings/MeetingDetailPage.tsx`, `frontend/src/features/meetings/TitleEditor.tsx`
+- `frontend/src/features/meetings/MeetingDetailPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 57.4: Diálogos do detalhe: tentar de novo, exclusão
+
+**Description:** `RetryButton` e `DeleteMeetingDialog` da pasta `meetings` usam `Notice variant="error"` para o erro de diálogo. Os diálogos já usam `DialogSurface` (Task 52.16).
+
+**Acceptance criteria:**
+- [ ] Em `failed`, mostra o motivo e "Tentar novamente"; com `has_backlog` verdadeiro, pede confirmação com o aviso de perda das edições (`meetings` 42).
+- [ ] Excluir pede confirmação e avisa que o áudio e o backlog serão apagados (`meetings` 43).
+- [ ] Grep local sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/meetings`.
+- [ ] Grep local nos dois arquivos.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 57.3
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/meetings/RetryButton.tsx`, `frontend/src/features/meetings/DeleteMeetingDialog.tsx`
+- `frontend/src/features/meetings/RetryButton.test.tsx`
+
+**Estimated scope:** Small
+
+### Checkpoint: Auth, configurações, upload e detalhe
+
+- [ ] Critérios de `auth`, `llm-providers` e `meetings` com tela seguem passando
+- [ ] Critério 52 de `meetings`: texto do `ConsentNotice` igual a `CONSENT_NOTICE_TEXT`
+- [ ] Spotlight do upload: realce só na faixa da borda; fundo e texto do miolo sem mudança com ponteiro sobre a área
+- [ ] LCP do login (NFR-03) remedido; mouse-tracking só no upload (NFR-08)
+- [ ] Checagem de UI
+- [ ] `/security-review` sobre o diff
+
+### Task 58: Transcrição no Ata
+
+**Description:** `TranscriptPage` com `PageHeader`, largura `--reading`, fala em Source Serif 4, speaker em Geist, instantes `hh:mm:ss` em Geist Mono tabular, `Skeleton`, e `Notice variant="error"` no lugar da caixa das linhas 92 e 93. Lista virtualizada e `useTranscript` não mudam.
+
+**Acceptance criteria:**
+- [ ] Mostra segmentos em ordem, cada um com instante, speaker e texto (`diarized-transcription` 25); antes de `transcribed`, mostra o status (`diarized-transcription` 27); mostra o nome do Participante depois da nomeação (`diarized-transcription` 26).
+- [ ] Com Transcrição de 2 h de fixture, só os segmentos perto da área visível ficam no DOM (`diarized-transcription` 31; NFR-07); texto de segmento renderiza escapado (SEC-12).
+- [ ] Grep local sem achado; `vitest-axe` sem violação; fala em `font-serif` e instante em `font-mono`.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/diarized-transcription`.
+- [ ] Grep local em `TranscriptPage.tsx`. SEC-12.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 52 (Checkpoint: Tokens e primitivos), 53.1, 53.2
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/diarized-transcription/TranscriptPage.tsx`
+- `frontend/src/features/diarized-transcription/TranscriptPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 59.1: Nomeação no Ata: página
+
+**Description:** `NamingPage` com `PageHeader`, largura `--reading`, `Notice` no lugar da constante `ALERT` (linha 21) e dos blocos das linhas 26, 135, 144 e 195 (`error`, e `warn` para falta de provedor), e "Confirmar" como `accent` (único da tela).
+
+**Acceptance criteria:**
+- [ ] Mostra o provedor ativo e o modelo da geração (`participants` 28); sem provedor ativo, mostra a mensagem com link para configurações e desabilita confirmar (`participants` 29).
+- [ ] O botão de confirmar fica desabilitado enquanto algum speaker está sem nome (`participants` 30); depois de confirmar, leva ao detalhe (`participants` 31).
+- [ ] Grep local sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/participants`.
+- [ ] Grep local em `NamingPage.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 53.1, 53.2
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/participants/NamingPage.tsx`
+- `frontend/src/features/participants/NamingPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 59.2: Nomeação no Ata: linha do speaker
+
+**Description:** `SpeakerRow` como linha com régua: botão de amostra (`primary` tocando, `secondary` parado, tamanho `icon`), tempo de fala em Geist Mono, campo de nome de 40 px, erro inline no campo e indicação de junção por nome igual com `transform` e `opacity`.
+
+**Acceptance criteria:**
+- [ ] Cada speaker mostra o botão para tocar a amostra, o tempo total de fala e um campo de nome (`participants` 26); foco e teclado funcionam no botão de amostra.
+- [ ] Dois ou mais speakers com o mesmo nome mostram que serão juntados num só Participante (`participants` 27).
+- [ ] Grep local sem achado; `vitest-axe` sem violação; movimento desligado com `prefers-reduced-motion`.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/participants`.
+- [ ] Grep local em `SpeakerRow.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 59.1
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/participants/SpeakerRow.tsx`
+- `frontend/src/features/participants/NamingPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 60.1: Divisão no Ata: página
+
+**Description:** `SplitPage` com `PageHeader`, `Skeleton` e `Notice` no lugar da constante `ALERT` (linha 17) e dos blocos das linhas 24, 93 e 155 (`error`; `warn` para falta de provedor).
+
+**Acceptance criteria:**
+- [ ] Ao abrir, chama `POST /meetings/{id}/split/refresh` antes de mostrar os cortes, e se a resposta traz `generating` leva ao detalhe (`transcript-split` 47); explica a divisão com estimativa, orçamento, provedor, modelo e link (`transcript-split` 31).
+- [ ] Sem provedor ativo, mostra só a mensagem que aponta para a configuração (`transcript-split` 44).
+- [ ] Grep local sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [ ] Grep local em `SplitPage.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 53.1, 53.2
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/transcript-split/SplitPage.tsx`
+- `frontend/src/features/transcript-split/SplitPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 60.2: Divisão no Ata: segmentos, cortes e Partes
+
+**Description:** `SegmentList`, `CutControls` e `PartSummary` no Ata: instantes em Geist Mono tabular, corte ativo em `--signal` (já trocado na Task 52.12), "Parte cabe" em `--done`, sem classes proibidas. Virtualização e atalhos de teclado não mudam.
+
+**Acceptance criteria:**
+- [ ] O usuário move, adiciona e remove cortes por mouse e por teclado, sem corte no meio de um segmento (`transcript-split` 33); cada Parte mostra intervalo, estimativa e se cabe, e "Confirmar" fica desabilitado enquanto alguma Parte não couber (`transcript-split` 34 e 35).
+- [ ] Com Transcrição de 2 h de fixture, só os segmentos perto da área visível ficam no DOM (NFR-07), e o INP da divisão fica até 200 ms (NFR-04; medição manual no checkpoint).
+- [ ] Grep local sem achado; `vitest-axe` sem violação; feedback ao mover corte só com `transform` e `opacity`.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [ ] Grep local nos três arquivos.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 60.1
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/transcript-split/SegmentList.tsx`, `frontend/src/features/transcript-split/CutControls.tsx`, `frontend/src/features/transcript-split/PartSummary.tsx`
+- `frontend/src/features/transcript-split/CutControls.test.tsx`
+
+**Estimated scope:** Medium
+
+### Task 60.3: Divisão no Ata: "Cancelar divisão"
+
+**Description:** `CancelSplitButton` usa `Notice variant="error"` para o erro (linha 39) e perde classes proibidas.
+
+**Acceptance criteria:**
+- [ ] O botão aparece só quando a resposta do `GET` indica backlog gravado, e depois de cancelar volta à revisão do backlog (`transcript-split` 45).
+- [ ] O botão de cancelar usa `secondary`; no máximo um `accent` na tela da divisão ("Confirmar").
+- [ ] Grep local sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [ ] Grep local em `CancelSplitButton.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 60.2
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/features/transcript-split/CancelSplitButton.tsx`
+- `frontend/src/features/transcript-split/CancelSplitButton.test.tsx`
+
+**Estimated scope:** Small
+
+### Checkpoint: Transcrição, nomeação e divisão
+
+- [ ] Critérios de `diarized-transcription`, `participants` e `transcript-split` com tela seguem passando
+- [ ] Transcrição de 2 h de fixture: lista virtualizada (NFR-07) e INP da divisão (NFR-04)
+- [ ] Checagem de UI
+- [ ] `/security-review` sobre o diff
+
+### Task 61.1: Gravação no Ata: painel flutuante e indicador
+
+**Description:** `RecordingPanel` segue como único `GlassPanel` do app: `fixed` no rodapé, raio `--r-10`, espaço da escala (sem `px-5`, `gap-0.5`), cronômetro em Geist Mono tabular, botão "Parar" `danger`. `RecordingIndicator` com pulso fixo em movimento reduzido. Comentário da linha 11 atualizado.
+
+**Acceptance criteria:**
+- [ ] Mostra o tempo decorrido e "Parar"; ao parar, encerra tela e microfone (`screen-recording` 8 e 13).
+- [ ] O painel é o único elemento com vidro na tela, com fallback opaco e texto com contraste 4,5:1 (ADR-0024, "Vidro"; NFR-06).
+- [ ] O pulso para com `prefers-reduced-motion`; grep local sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [ ] Grep local em `RecordingPanel.tsx` e `RecordingIndicator.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 52.20, 53.1, 53.2
+
+**Skills:** `minimalist-ui`, `high-end-visual-design`, `shadcn`, `frontend-ui-engineering`, `ui-animation`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/screen-recording/RecordingPanel.tsx`, `frontend/src/features/screen-recording/RecordingIndicator.tsx`
+- `frontend/src/features/screen-recording/RecordingPanel.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 61.2: Gravação no Ata: página, aviso de consentimento e aviso de fontes
+
+**Description:** `RecordPage` com `PageHeader`, `Notice` no lugar das caixas das linhas 116 e 117 (`error`; `warn` para fora de contexto seguro), e `ConsentNotice` posicionado antes de "Gravar reunião", sem mexer no componente nem no texto. `SourceWarningDialog` (já em `DialogSurface`, Task 52.18) perde classes de texto proibidas.
+
+**Acceptance criteria:**
+- [ ] A área oferece duas entradas, enviar arquivo e "Gravar reunião" (`screen-recording` 1); o aviso mostra exatamente `CONSENT_NOTICE_TEXT` junto de "Gravar reunião", sem confirmação nem bloqueio (`screen-recording` 26).
+- [ ] Fora de contexto seguro, o botão fica desabilitado com a mensagem do critério 27 (`screen-recording` 27 e 28).
+- [ ] Grep local sem achado em `RecordPage.tsx` e `SourceWarningDialog.tsx`; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [ ] Grep local nos dois arquivos; `git diff -- frontend/src/components/surfaces/ConsentNotice` vazio.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 61.1
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/screen-recording/RecordPage.tsx`, `frontend/src/features/screen-recording/SourceWarningDialog.tsx`
+- `frontend/src/features/screen-recording/RecordPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 61.3: Envio da gravação no Ata
+
+**Description:** `SendRecordingPage` com `PageHeader`, largura `--reading`, `Notice variant="error"` no lugar da caixa das linhas 110 e 111, "Enviar" como `accent` (único da tela) e "Tentar de novo" como `secondary`.
+
+**Acceptance criteria:**
+- [ ] O nome do arquivo segue `gravacao-AAAA-MM-DD-HHhMM.webm`; título vem preenchido e editável; campo opcional de participantes valida como o upload (`screen-recording` 14, 15 e 16).
+- [ ] O envio cria a Reunião e leva ao detalhe (`screen-recording` 17 e 20); recusa do servidor aparece com a mensagem da API (`screen-recording` 18); em falha de rede, "Tentar de novo" reenvia a mesma gravação (`screen-recording` 19).
+- [ ] Grep local sem achado; `vitest-axe` sem violação.
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [ ] Grep local em `SendRecordingPage.tsx`.
+- [ ] Gate frontend.
+
+**Dependencies:** Task 61.2
+
+**Skills:** `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`
+
+**Files likely touched:**
+- `frontend/src/features/screen-recording/SendRecordingPage.tsx`
+- `frontend/src/features/screen-recording/SendRecordingPage.test.tsx`
+
+**Estimated scope:** Small
+
+### Task 61.4: Teste estático global do Ata
+
+**Description:** O plano exige "grep e teste estático global" no "Checkpoint: Redesign Ata" mas nenhuma task o cria; esta cria. Teste varre `src/**/*.{ts,tsx,css}` (sem `*.test.*`) e falha com `rounded-xl` ou acima, `text-[`, `transition-colors`, `transition: all`, `ring-ring/50`, `outline-ring/50`, e com `GlassPanel` fora de `RecordingPanel.tsx` e de `SamplePage.tsx`.
+
+**Acceptance criteria:**
+- [ ] O teste falha com cada padrão proibido e passa em `src/` inteiro, depois das Tasks 53 a 61 (ADR-0024, "Testes novos"; `02-architecture.md`, "Verificação").
+- [ ] No máximo 1 `GlassPanel` por tela (ADR-0024, "Vidro"; NFR-06 permite até 3).
+- [ ] `backdrop-filter` segue só em `glass.css` (`no-stray-backdrop.test.ts` passa).
+
+**Verification:**
+- [ ] `cd frontend && npm test -- --run src/styles`.
+- [ ] `git grep -nE "rounded-(xl|2xl|3xl|4xl)|text-\[|transition-colors|ring-ring/50|outline-ring/50" -- frontend/src` sem achado.
+- [ ] Gate frontend.
+
+**Dependencies:** Tasks 54.6, 55.3, 56.2, 57.4, 58, 59.2, 60.3, 61.3
+
+**Skills:** `frontend-ui-engineering`
+
+**Files likely touched:**
+- `frontend/src/styles/ata-static.test.ts`
+
+**Estimated scope:** Small
+
+### Checkpoint: Redesign Ata
+
+- [ ] Critérios de `screen-recording` com tela seguem passando; critério 26 com o mesmo texto do `meetings` critério 52
+- [ ] No máximo 1 `GlassPanel` por tela (ADR-0024; NFR-06 permite ≤3)
+- [ ] Grep e teste estático global em `src/` (Task 61.4): nenhum `rounded-xl` ou acima, `text-[`, `transition-colors`, `ring-ring/50` ou `outline-ring/50` (ADR-0024, Q1)
+- [ ] Checagem de UI em todas as telas, claro e escuro; `impeccable-design-polish` no conjunto
+- [ ] `/security-review` sobre o diff
+- [ ] Revisão humana antes de seguir
+
+---
+
+## Fechamento: auditoria final
+
 ### Task 51.3: Auditoria WCAG, polimento visual e medições de NFR
 
-**Description:** Auditoria WCAG 2.2 AA de todas as telas, polimento visual final e medições manuais de NFR-03 a NFR-06 e NFR-08.
+**Description:** Auditoria WCAG 2.2 AA de todas as telas, polimento visual final e medições manuais de NFR-03 a NFR-06 e NFR-08, sobre o visual Ata (ADR-0024). Roda depois da Fase 9, não antes.
 
 **Acceptance criteria:**
 - [ ] Todas as telas passam `vitest-axe`, `web-design-guidelines` e revisão manual de contraste em tema claro e escuro, de 360 a 1920 px; `prefers-reduced-motion` desliga movimento e mouse-tracking.
-- [ ] Medição registrada no PR: LCP da tela de login até 2,5 s com CPU 4x mais lenta (NFR-03); CLS até 0,1 (NFR-05); no máximo 3 vidros por tela (NFR-06); nenhum quadro acima de 16 ms por causa do mouse-tracking (NFR-08); INP de divisão e revisão até 200 ms (NFR-04).
+- [ ] Medição registrada no PR: LCP da tela de login até 2,5 s com CPU 4x mais lenta (NFR-03); CLS até 0,1 (NFR-05); no máximo 3 vidros por tela, e o Ata usa 1 (NFR-06); nenhum quadro acima de 16 ms por causa do mouse-tracking, que só existe no upload (NFR-08); INP de divisão e revisão até 200 ms (NFR-04).
 - [ ] CI confirma JS inicial até 200 KB gzip e total até 500 KB gzip (NFR-01, NFR-02).
 
 **Verification:**
 - [ ] `cd frontend && npm test -- --run && npm run build && node scripts/check-bundle-size.mjs`.
 - [ ] Manual: Lighthouse e DevTools Performance conforme `01-prd.md`, "NFRs de performance do frontend".
 
-**Dependencies:** Task 51.1
+**Dependencies:** Checkpoint: Redesign Ata, Task 51.1
 
 **Skills:** `impeccable-design-polish`, `web-design-guidelines`, `frontend-ui-engineering`, `high-end-visual-design`
 

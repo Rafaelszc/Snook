@@ -144,7 +144,7 @@ it("excluir pede confirmação, avisa o que se apaga e volta à lista (meetings 
   await user.click(await screen.findByRole("button", { name: "Excluir" }))
   const dialog = screen.getByRole("alertdialog", { name: "Excluir reunião?" })
   expect(dialog).toHaveAccessibleDescription(/áudio.*backlog.*apagados/)
-  expect(dialog).toHaveAttribute("data-slot", "glass-panel")
+  expect(dialog).toHaveAttribute("data-slot", "dialog-surface")
   expect(await axe(dialog)).toHaveNoViolations()
   expect(deleted).toBe(false)
 

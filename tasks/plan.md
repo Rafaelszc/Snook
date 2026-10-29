@@ -1,12 +1,14 @@
 # Implementation Plan: Snook
 
-> Status: planner, 2026-10-22. Escopo: projeto inteiro (9 módulos). ADR-0001 a ADR-0023 com Status "Aceita"; ADR-0006 a ADR-0021 e ADR-0023 aceitos pelo usuário em 2026-10-22 (rodada Q1 a Q17 do planner). Terceira rodada: correções da revisão do spec-reviewer aplicadas (perfil `lan`, `delete-user`, faixas de critérios, aviso de consentimento). Quarta rodada: correções da segunda revisão aplicadas (checkpoint Fundação só com o que a Fase 0 verifica; cookie e limitador pelo Caddy no checkpoint `auth`; critério transversal 22 no checkpoint `screen-recording`; Windows e Fedora no checklist manual, decisão do usuário de 2026-10-22).
-> Spec: `docs/specs/00-overview.md`, `docs/specs/01-prd.md`, `docs/specs/01-prd/*.md` (aprovados). Diretriz visual do usuário de 2026-10-22 (ADR-0022).
+> Status: planner, 2026-10-22. Escopo: projeto inteiro (9 módulos). ADR-0001 a ADR-0024 com Status "Aceita"; ADR-0006 a ADR-0021 e ADR-0023 aceitos pelo usuário em 2026-10-22 (rodada Q1 a Q17 do planner). Terceira rodada: correções da revisão do spec-reviewer aplicadas (perfil `lan`, `delete-user`, faixas de critérios, aviso de consentimento). Quarta rodada: correções da segunda revisão aplicadas (checkpoint Fundação só com o que a Fase 0 verifica; cookie e limitador pelo Caddy no checkpoint `auth`; critério transversal 22 no checkpoint `screen-recording`; Windows e Fedora no checklist manual, decisão do usuário de 2026-10-22).
+> Quinta rodada (planner, 2026-10-28): Fase 9 "Redesign Ata" (ADR-0024, Aceita; Q74 de `00-overview.md`; rodada Q1 a Q7 aceita pelo usuário em 2026-10-28). Task 51.3 (auditoria WCAG, polimento e medições de NFR) passa para depois da Fase 9.
+> Sexta rodada (planner, 2026-10-28): segunda revisão do spec-reviewer da Fase 9; Q1 (opção C) e Q2 (opção A) aceitas pelo usuário em 2026-10-28 ("Aceito"). Task 52 troca as classes de cor de token removido em todo o `src/`; teste estático global passa ao "Checkpoint: Redesign Ata"; `ConsentNotice` sobre `Notice` na Task 52; spotlight só na borda na Task 57; Task 55 depende só da Task 52.
+> Spec: `docs/specs/00-overview.md`, `docs/specs/01-prd.md`, `docs/specs/01-prd/*.md` (aprovados). Diretriz visual do usuário de 2026-10-22 (ADR-0022), substituída em parte pela de 2026-10-28 (ADR-0024).
 > Tarefas só como títulos. Detalhamento (critérios, arquivos, verificação) fica com o task-breaker, em `tasks/todo.md`.
 
 ## Overview
 
-Snook recebe gravação de reunião (upload ou gravação de tela), trata o áudio, diariza e transcreve localmente em pt-BR, deixa o usuário nomear as vozes e gera Epics e User Stories com o provedor de LLM ativo do Usuário. Reunião longa é dividida em Partes no app. Usuário revisa, edita, regenera e exporta. Plano segue a build order aprovada (Q18, Q52), com fatias verticais por módulo, spikes de risco técnico e design system base na Fase 0.
+Snook recebe gravação de reunião (upload ou gravação de tela), trata o áudio, diariza e transcreve localmente em pt-BR, deixa o usuário nomear as vozes e gera Epics e User Stories com o provedor de LLM ativo do Usuário. Reunião longa é dividida em Partes no app. Usuário revisa, edita, regenera e exporta. Plano segue a build order aprovada (Q18, Q52), com fatias verticais por módulo, spikes de risco técnico e design system base na Fase 0. Fase 9 troca a camada visual pela direção "Ata" (ADR-0024), uma fatia por tela, sem mudar lógica, rotas nem integrações.
 
 ## Documentos de arquitetura
 
@@ -17,7 +19,7 @@ Snook recebe gravação de reunião (upload ou gravação de tela), trata o áud
 - `docs/specs/06-integrations.md`
 - `docs/specs/07-observability.md`
 - `docs/specs/08-deployment.md`
-- `docs/specs/adrs/0001` a `0023`
+- `docs/specs/adrs/0001` a `0024`
 
 ## Architecture Decisions
 
@@ -32,15 +34,17 @@ Snook recebe gravação de reunião (upload ou gravação de tela), trata o áud
 - Modelos padrão de custo baixo e janela por provedor, conferidos na implementação (ADR-0013, Aceita).
 - faster-whisper `large-v3-turbo`, Pyannote 3.1, ffmpeg (ADR-0014, Aceita).
 - Vite + TanStack Query + Vitest/RTL/MSW/`vitest-axe` (ADR-0015, Aceita).
-- Direção visual minimalista, alto contraste, vidro e mouse-tracking só onde agregam, com `prefers-reduced-motion`, contraste AA sobre vidro e fallback opaco (ADR-0022, Aceita).
-- Orçamento de performance do frontend e virtualização das listas longas (ADR-0023, Aceita).
+- Direção visual minimalista, alto contraste, movimento suave com `prefers-reduced-motion`, contraste AA e fallback opaco do vidro (ADR-0022, Aceita; substituído em parte pelo ADR-0024).
+- Direção "Ata" (ADR-0024, Aceita, 2026-10-28): paleta papel e tinta com um acento `--signal` (petróleo); apelidos shadcn para tokens Ata; Source Serif 4 + Geist + Geist Mono; raio 4/6/10 e espaço 4 a 64 px também em `components/ui/*`; foco opaco; vidro só no painel da gravação; mouse-tracking só na borda da área de upload; diálogos em `DialogSurface` opaco; controle de tema visível, sem atalho `d`.
+- Migração Ata (ADR-0024, Q1 opção C): Task 52 troca, em todo o `src/`, só as classes de cor que dependem de token removido (tabela "Classes de cor a trocar") e os usos de variante e tamanho do `Button` (o `typecheck` exige). Raio, tamanho arbitrário, `transition-colors` e `ring-ring/50` saem na task de cada tela; teste estático global só no "Checkpoint: Redesign Ata".
+- Orçamento de performance do frontend e virtualização das listas longas (ADR-0023, Aceita; item de fontes atualizado pelo ADR-0024).
 - Mesma origem via nginx; bind em `127.0.0.1`; perfil `lan` com Caddy, `tls internal`, `SNOOK_LAN_HOST` e cabeçalhos `X-Forwarded-*` aceitos só de `TRUSTED_PROXY_IPS` (ADR-0016, Aceita; `08-deployment.md`, "Perfil lan"; SEC-27).
 - `uv`, `npm`, GitHub Actions (ADR-0017, Aceita).
 - Upload em streaming, limite de 500 MiB (ADR-0018, Aceita).
 - Checagem de divisão por `POST /split/refresh` (ADR-0019, Aceita).
 - System Prompt e schema em `shared/prompts/` (ADR-0020, Aceita).
 - Senha com bcrypt custo 12, até 72 bytes (ADR-0021, Aceita).
-- Aviso de consentimento com texto único em `ConsentNotice` (`meetings` critério 52; `screen-recording` critério 26).
+- Aviso de consentimento com texto único em `ConsentNotice` (`meetings` critério 52; `screen-recording` critério 26). Na Task 52, `ConsentNotice` passa a renderizar `Notice variant="consent"` com o mesmo texto; Tasks 57 e 61 só posicionam.
 - ASVS 5.0 L2 (`03-security.md`).
 
 ## Grafo de dependências
@@ -62,18 +66,28 @@ llm-providers (2A)          meetings (2B)
                        |
                  backlog-review (7)
                        |
-                 delete-user e release (8)
+                 delete-user e release (8: Tasks 50, 51.1, 51.2)
+                       |
+                 redesign Ata (9)
+                   Task 52 (tokens, primitivos, classes de cor em todo o src)
+                       |-------------------------------------------.
+                   Task 53 (AppShell + lista de reuniões)     Task 55 (login e cadastro; fora do AppShell)
+                       |-----------------------------------.       |
+                   Task 54 (revisão do backlog)     Tasks 56 a 61  |
+                       '-----------------------------------'-------'
+                       |
+                 auditoria final (Task 51.3) e checkpoint Complete
 ```
 
 ## Skills de frontend por tarefa
 
-Skills de apoio na implementação das telas. Restrições do ADR-0022 valem em todas.
+Skills de apoio na implementação das telas. Restrições do ADR-0022 que seguem valendo e do ADR-0024 valem em todas.
 
 | Tarefa | Skills |
 |---|---|
 | Task 4 (esqueleto do frontend) | `shadcn`, `frontend-ui-engineering` |
 | Task 5 (design system base) | `minimalist-ui`, `high-end-visual-design`, `design-taste-frontend`, `frontend-design`, `emil-design-eng`, `emilkowalski-motion`, `animate`, `ui-animation`, `frontend-ui-engineering`, `responsive-design`, `shadcn` |
-| Tasks 9 e 10 (telas de cadastro e login, com mouse-tracking no card) | `shadcn`, `minimalist-ui`, `frontend-ui-engineering`, `responsive-design`, `emil-design-eng`, `ui-animation` |
+| Tasks 9 e 10 (telas de cadastro e login; card e spotlight revistos na Task 55) | `shadcn`, `minimalist-ui`, `frontend-ui-engineering`, `responsive-design`, `emil-design-eng`, `ui-animation` |
 | Task 17 (tela de configurações de LLM) | `shadcn`, `minimalist-ui`, `frontend-ui-engineering`, `responsive-design` |
 | Task 22 (upload, lista e detalhe, com mouse-tracking na área de upload e `ConsentNotice`) | `shadcn`, `minimalist-ui`, `frontend-ui-engineering`, `responsive-design`, `emilkowalski-motion`, `animate` |
 | Task 27 (tela da Transcrição, lista virtualizada) | `shadcn`, `frontend-ui-engineering`, `responsive-design` |
@@ -81,14 +95,18 @@ Skills de apoio na implementação das telas. Restrições do ADR-0022 valem em 
 | Task 34 (tela de nomeação) | `shadcn`, `minimalist-ui`, `frontend-ui-engineering`, `responsive-design` |
 | Task 38 (tela de divisão, cortes por teclado) | `shadcn`, `design-taste-frontend`, `frontend-ui-engineering`, `ui-animation`, `responsive-design` |
 | Task 49 (tela de revisão do backlog) | `shadcn`, `minimalist-ui`, `design-taste-frontend`, `frontend-ui-engineering`, `animate`, `responsive-design` |
+| Task 52 (tokens e primitivos Ata) | `minimalist-ui`, `frontend-design`, `design-taste-frontend`, `shadcn`, `frontend-ui-engineering`, `emil-design-eng`, `responsive-design` |
+| Tasks 53 e 54 (AppShell, lista de reuniões, revisão do backlog) | `minimalist-ui`, `design-taste-frontend`, `shadcn`, `frontend-ui-engineering`, `responsive-design`, `animate` |
+| Tasks 55 a 61 (demais telas no Ata) | `minimalist-ui`, `shadcn`, `frontend-ui-engineering`, `responsive-design`; Task 61 também `high-end-visual-design` e `ui-animation` (painel de vidro) |
 | Checkpoints com tela | `web-design-guidelines` (revisão do diff de UI) |
 | Último checkpoint de cada fase com tela | `impeccable-design-polish` |
-| Task 51 (release) | `impeccable-design-polish`, `web-design-guidelines`, `frontend-ui-engineering` (auditoria WCAG 2.2 AA), `high-end-visual-design` |
+| Task 51 (release; 51.3 depois da Fase 9) | `impeccable-design-polish`, `web-design-guidelines`, `frontend-ui-engineering` (auditoria WCAG 2.2 AA), `high-end-visual-design` |
 
 Checagem de UI em todo checkpoint com tela (abaixo chamada "checagem de UI"):
 - revisão com `web-design-guidelines`;
 - Vitest + `vitest-axe` sem violação;
-- contraste AA sobre vidro, em tema claro e escuro, e fallback opaco conferido;
+- contraste AA em tema claro e escuro; sobre vidro só no painel da gravação, com fallback opaco conferido;
+- anel de foco opaco de 2 px, sem alfa (ADR-0024, "Foco");
 - `prefers-reduced-motion` desliga movimento e mouse-tracking;
 - mouse-tracking sem listener em toque (`pointer: coarse`);
 - orçamento do ADR-0023 respeitado.
@@ -353,7 +371,86 @@ Checagem de UI em todo checkpoint com tela (abaixo chamada "checagem de UI"):
 - [ ] Evento `operator.user_deleted` com `user_id` e `meetings_count`, sem email nem nome de usuário (SEC-20)
 - [ ] `/security-review` sobre o diff
 
-- [ ] Task 51: Checklist de release: verificação do 03-security, auditorias, suítes opcionais, auditoria WCAG e polimento visual, README
+- [ ] Task 51: Checklist de release: README (51.1), verificação do 03-security, auditorias e suítes opcionais (51.2). Auditoria WCAG, polimento visual e medições de NFR (51.3) rodam depois da Fase 9, sobre o visual final
+
+### Checkpoint: Release sem auditoria visual
+
+- [ ] README, verificação do 03-security, auditorias e suítes opcionais registrados no PR
+- [ ] `/security-review` sobre o diff
+
+### Phase 9: Redesign Ata (ADR-0024)
+
+Escopo: só camada visual. Lógica, rotas, contratos de API, textos ao usuário e `CONSENT_NOTICE_TEXT` não mudam. Cada task é uma task mãe com PR próprio.
+
+- [ ] Task 52: Tokens e primitivos Ata: camada de cor e apelidos, troca das classes de cor de token removido em todo o `src/` (Q1), fontes com preload e fallback, raio e espaço em `components/ui/*`, foco opaco, `Button` novo com usos de variante e tamanho atualizados em todo o `src/`, `DialogSurface` em todos os diálogos, `Notice`, `ConsentNotice` sobre `Notice variant="consent"`, `Skeleton`, `EmptyState`, `PageHeader`, `ThemeToggle`, remoção do atalho `d`, `theme-color` do `index.html` e regra ESLint `components/**` sem `@/features/*`
+
+### Checkpoint: Tokens e primitivos
+
+- [ ] `cd frontend && npm test -- --run`, `npm run lint`, `npm run typecheck` e `npm run build` passam
+- [ ] `tokens.test.ts` com todos os pares de contraste do ADR-0024, nos dois temas; pares marcados "a conferir" confirmados ou fundos `-soft` ajustados
+- [ ] Nenhum diálogo renderiza `GlassPanel`; `no-stray-backdrop.test.ts` passa
+- [ ] Grep em `components/`, `styles/`, `index.css` e `app/SamplePage.tsx` sem resultado para `highlight|status-(pending|processing|done|failed)|sidebar|chart-` (forma de variável e forma de classe)
+- [ ] Usos em `features/` da tabela "Classes de cor a trocar" do ADR-0024 trocados, conferidos linha a linha no PR
+- [ ] `ConsentNotice` renderiza `Notice variant="consent"`; teste de igualdade com `CONSENT_NOTICE_TEXT` passa
+- [ ] `npm run lint` falha com import de `@/features/*` dentro de `components/**` (conferido com arquivo de teste temporário, fora do commit)
+- [ ] `index.html`: `theme-color` claro e escuro iguais a `--canvas` de cada tema
+- [ ] `theme-provider` sem listener de `keydown`; `ThemeToggle` operável por teclado
+- [ ] Fontes: quatro `.woff2` e licenças em `public/fonts/`; CSP `default-src 'self'` sem mudança; LCP do login (NFR-03) e CLS (NFR-05) medidos; contingência do `h1` aplicada se LCP passar de 2,5 s
+- [ ] JS inicial e total dentro de NFR-01 e NFR-02
+- [ ] Checagem de UI na página de amostra
+- [ ] `/security-review` sobre o diff
+- [ ] Revisão humana antes de seguir
+
+- [ ] Task 53: AppShell e lista de reuniões no Ata (`app/Layout.tsx` compõe `AppShell`; `StatusBadge` sem pílula)
+- [ ] Task 54: Revisão do backlog no Ata (US como linha com régua, Epic com régua forte)
+
+### Checkpoint: Shell, lista e backlog
+
+- [ ] Testes de `meetings`, `backlog-review` e `app/` passam sem mudar critério de aceite
+- [ ] Nav com `aria-current="page"` no item ativo; largura `--shell`
+- [ ] INP com backlog de fixture 30 Epics e 200 US (NFR-04)
+- [ ] Checagem de UI; `impeccable-design-polish` no shell, na lista e na revisão
+- [ ] `/security-review` sobre o diff
+- [ ] Revisão humana antes de seguir
+
+- [ ] Task 55: Login e cadastro no Ata (card opaco sem sombra, sem spotlight, `ThemeToggle`)
+- [ ] Task 56: Configurações de LLM no Ata
+- [ ] Task 57: Upload e detalhe da Reunião no Ata (spotlight só na borda, em `--signal`; `ConsentNotice` posicionado junto do envio)
+
+### Checkpoint: Auth, configurações, upload e detalhe
+
+- [ ] Critérios de `auth`, `llm-providers` e `meetings` com tela seguem passando
+- [ ] Critério 52 de `meetings`: texto do `ConsentNotice` igual a `CONSENT_NOTICE_TEXT`
+- [ ] Spotlight do upload: realce só na faixa da borda; fundo e texto do miolo sem mudança com ponteiro sobre a área
+- [ ] LCP do login (NFR-03) remedido; mouse-tracking só no upload (NFR-08)
+- [ ] Checagem de UI
+- [ ] `/security-review` sobre o diff
+
+- [ ] Task 58: Transcrição no Ata (fala em serif, instantes em mono, largura `--reading`)
+- [ ] Task 59: Nomeação no Ata
+- [ ] Task 60: Divisão no Ata
+
+### Checkpoint: Transcrição, nomeação e divisão
+
+- [ ] Critérios de `diarized-transcription`, `participants` e `transcript-split` com tela seguem passando
+- [ ] Transcrição de 2 h de fixture: lista virtualizada (NFR-07) e INP da divisão (NFR-04)
+- [ ] Checagem de UI
+- [ ] `/security-review` sobre o diff
+
+- [ ] Task 61: Gravação no Ata (único `GlassPanel` no painel `fixed` do rodapé; aviso de fontes em `DialogSurface`; `ConsentNotice` posicionado antes de gravar)
+
+### Checkpoint: Redesign Ata
+
+- [ ] Critérios de `screen-recording` com tela seguem passando; critério 26 com o mesmo texto do `meetings` critério 52
+- [ ] No máximo 1 `GlassPanel` por tela (ADR-0024; NFR-06 permite ≤3)
+- [ ] Grep e teste estático global em `src/`: nenhum `rounded-xl` ou acima, `text-[`, `transition-colors`, `ring-ring/50` ou `outline-ring/50` (ADR-0024, Q1)
+- [ ] Checagem de UI em todas as telas, claro e escuro; `impeccable-design-polish` no conjunto
+- [ ] `/security-review` sobre o diff
+- [ ] Revisão humana antes de seguir
+
+### Fechamento: auditoria final
+
+- [ ] Task 51.3: Auditoria WCAG 2.2 AA de todas as telas, polimento visual e medições de NFR-03 a NFR-06 e NFR-08, sobre o visual Ata
 
 ### Checkpoint: Complete
 
@@ -376,8 +473,8 @@ Checagem de UI em todo checkpoint com tela (abaixo chamada "checagem de UI"):
 | Gravação de tela quebra em acesso pela rede sem HTTPS | Med | ADR-0016; perfil `lan` na Task 6b, na Fase 0; checagem de contexto seguro na Task 28 |
 | `X-Forwarded-*` forjado burla o limite por IP ou marca HTTP como HTTPS | Med | SEC-27: backend confia só em `TRUSTED_PROXY_IPS` (IPs fixos de nginx e Caddy); nginx só repassa `X-Forwarded-Proto` vindo do Caddy; resolvedor testado no checkpoint Fundação; cookie e limitador pelo Caddy no checkpoint `auth` |
 | `delete-user` com backend no ar corrompe estado ou deixa arquivo órfão | Med | Trava `/data/snook.lock` desde a Task 3; teste na Task 50 |
-| Vidro reduz contraste ou pesa na GPU | Med | `GlassPanel` único com fallback opaco; vidro só em superfícies flutuantes; máximo de 3 visíveis; checagem de UI em todo checkpoint de tela |
-| Visual vira exagero (efeitos demais) | Low | ADR-0022 lista onde há vidro, movimento e mouse-tracking; revisão `web-design-guidelines` e `impeccable-design-polish` |
+| Vidro reduz contraste ou pesa na GPU | Low | ADR-0024: vidro só no painel da gravação; `GlassPanel` único com fallback opaco; teste "nenhum diálogo usa `GlassPanel`" |
+| Visual vira exagero (efeitos demais) | Low | ADR-0024 lista onde há vidro, gradiente, movimento e mouse-tracking; revisão `web-design-guidelines` e `impeccable-design-polish` |
 | Telas de Transcrição e divisão lentas com 2 h | Med | Virtualização (ADR-0023); estimativa somada no cliente; medição de INP no checkpoint |
 | Estimativa heurística erra para cima demais e divide reuniões sem necessidade | Low | Task 2 compara heurística com contagem real; ajustar `chars_per_token` |
 | Nomes de modelo padrão desatualizados | Low | Tarefa da Fase 2A confere na documentação; padrão editável |
@@ -386,6 +483,13 @@ Checagem de UI em todo checkpoint com tela (abaixo chamada "checagem de UI"):
 | Exclusão durante processamento deixa arquivo órfão | Med | Temporário em `.tmp`, movimento só depois do commit, limpeza no startup |
 | Webm sem duração no cabeçalho mede errado | Med | Task 30 com fixture real do gravador; leitura pelo último pacote |
 | Pesos de modelo com pickle | Low | Revisão fixa de repositório oficial (SEC-22) |
+| Fontes novas estouram LCP do login (NFR-03) ou geram CLS (NFR-05) | Med | Task 52 primeiro e medida no checkpoint; preload só de Geist latin e Source Serif 4 latin; fallback com `size-adjust`; contingência: `h1` do auth em Geist |
+| Fundos `-soft` do `Notice` ou `--ring` sobre `--surface` abaixo do mínimo de contraste | Med | Valores estimados no ADR-0024; `tokens.test.ts` confere na Task 52; ajuste no fundo, nunca no mínimo |
+| Redesign muda comportamento sem querer (texto, rota, foco, `aria-live`) | Med | Escopo só visual; testes de critério de aceite existentes rodam sem mudança de asserção, exceto as listadas no ADR-0024 ("Testes a atualizar") |
+| Troca de apelidos quebra componente shadcn que lê nome antigo | Med | Tabela "Apelidos" do ADR-0024; grep por nome removido no checkpoint da Task 52 |
+| Classe Tailwind some sem erro quando o token sai (ex.: `text-highlight`, `text-status-done`, `rounded-xl`) | Med | Q1: Task 52 troca em todo o `src/` as classes de cor de token removido (tabela "Classes de cor a trocar" do ADR-0024); grep por forma de classe no checkpoint da Task 52; raio e demais classes conferidos pelo grep global do "Checkpoint: Redesign Ata"; até a task da tela, `rounded-xl` fica sem raio (só visual) |
+| Renome de variante ou tamanho do `Button` quebra build em telas ainda não migradas | Med | Task 52 troca todos os usos (22 de `variant` em 17 arquivos, 3 de `size`, ADR-0024 "Componentes"); `npm run typecheck` no checkpoint da Task 52 |
+| Texto do aviso de consentimento muda ao migrar para `Notice` | High | Troca para `Notice variant="consent"` só na Task 52, com teste de igualdade com `CONSENT_NOTICE_TEXT` no mesmo PR; Tasks 57 e 61 não mexem no componente, só posicionam; mudar o texto é "Ask First" |
 
 ## Parallelization Opportunities
 
@@ -395,17 +499,20 @@ Checagem de UI em todo checkpoint com tela (abaixo chamada "checagem de UI"):
   - Tasks 1 e 2 (spikes) entre si e com as Tasks 3, 4 e 5.
   - Task 5 (design system) em paralelo com a Task 3.
   - Telas (Tasks 17, 22, 27, 34, 38, 49) em paralelo com a tarefa seguinte do backend, depois que o contrato do `05-api.md` da rota estiver pronto.
+  - Fase 9: Task 55 em paralelo com a Task 53, depois da Task 52. Tasks 54 e 56 a 61 entre si, depois das Tasks 52 e 53. Cada uma mexe só na pasta da sua feature.
 - **Sequencial:**
   - Migrações Alembic: uma revisão por vez, na ordem de `04-data-model.md`.
   - Fases 4 a 7 seguem a build order.
   - Tasks 3, 5, 6, 7 e 6b antes de qualquer tarefa de módulo.
   - Task 6b depois das Tasks 6 e 7 (usa o compose e a checagem de `Host` e de proxies).
   - Task 50 depois da Fase 7: a cascata do `delete-user` cobre todas as tabelas.
+  - Task 52 antes de toda tela da Fase 9. Task 53 antes das Tasks 54 e 56 a 61 (essas páginas ficam dentro do `AppShell`). Task 55 depende só da Task 52: login e cadastro ficam fora do `AppShell` e usam só o `ThemeToggle` e os primitivos.
+  - Task 51.3 depois da Fase 9.
 - **Coordenação:**
   - Interfaces internas (`service.py`) de `meetings` e `llm-providers` definidas antes das fases 3 a 6.
   - Contrato de erro (`05-api.md`) usado por backend e frontend desde a Task 3.
-  - Tokens e `GlassPanel` da Task 5 usados por todas as telas; mudança neles passa por revisão de UI.
-  - `ConsentNotice` e a constante do texto (Task 22) usados pela Task 29; mudança no texto vale para as duas telas.
+  - Tokens e primitivos da Task 52 (`DialogSurface`, `Notice`, `PageHeader`, `Skeleton`, `EmptyState`, `Button`) usados por todas as telas; mudança neles passa por revisão de UI. `GlassPanel` só no painel da gravação.
+  - `ConsentNotice` e a constante do texto (Task 22) usados pela Task 29. Na Fase 9, o componente muda só na Task 52 (`Notice variant="consent"`); Tasks 57 e 61 só posicionam. Mudança no texto vale para as duas telas.
 
 ## Open Questions
 

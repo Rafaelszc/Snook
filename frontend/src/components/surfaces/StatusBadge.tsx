@@ -16,13 +16,13 @@ export type { Status }
 
 // Texto e ícone sempre presentes: a cor nunca carrega o estado sozinha.
 const VISUAL: Record<Status, { icon: LucideIcon; color: string }> = {
-  pending: { icon: Clock, color: "text-status-pending" },
-  processing: { icon: Loader, color: "text-status-processing" },
-  transcribed: { icon: CheckCheck, color: "text-highlight" },
-  needs_split: { icon: Scissors, color: "text-highlight" },
-  generating: { icon: Sparkles, color: "text-status-processing" },
-  done: { icon: CircleCheck, color: "text-status-done" },
-  failed: { icon: CircleAlert, color: "text-status-failed" },
+  pending: { icon: Clock, color: "text-ink-muted" },
+  processing: { icon: Loader, color: "text-signal" },
+  transcribed: { icon: CheckCheck, color: "text-ink" },
+  needs_split: { icon: Scissors, color: "text-warn" },
+  generating: { icon: Sparkles, color: "text-signal" },
+  done: { icon: CircleCheck, color: "text-done" },
+  failed: { icon: CircleAlert, color: "text-failed" },
 }
 
 // role="status" é uma região aria-live polite: o leitor de tela anuncia a troca de texto.

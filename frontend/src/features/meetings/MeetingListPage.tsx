@@ -84,7 +84,7 @@ export function MeetingListPage() {
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button variant="outline" asChild>
+          <Button variant="secondary" asChild>
             <Link to="/meetings/record">
               <Mic aria-hidden="true" />
               {MESSAGES.recordMeeting}

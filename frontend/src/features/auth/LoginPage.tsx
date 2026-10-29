@@ -69,7 +69,6 @@ export function LoginPage() {
         />
         <Button
           type="submit"
-          size="lg"
           className="mt-2 h-10"
           disabled={login.isPending}
         >

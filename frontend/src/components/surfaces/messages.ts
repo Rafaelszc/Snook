@@ -18,3 +18,10 @@ export const STATUS_LABELS: Record<Status, string> = {
 }
 
 export const CONFIRM_CANCEL = "Cancelar"
+
+export const THEME_LABELS = {
+  group: "Tema",
+  light: "Claro",
+  dark: "Escuro",
+  system: "Sistema",
+} as const

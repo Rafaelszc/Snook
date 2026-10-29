@@ -43,7 +43,7 @@ export function RecordingPanel({
           {formatElapsed(elapsed)}
         </p>
       </div>
-      <Button variant="destructive" disabled={stopping} onClick={onStop}>
+      <Button variant="danger" disabled={stopping} onClick={onStop}>
         <Square aria-hidden="true" />
         {stopping ? MESSAGES.stopping : MESSAGES.stop}
       </Button>

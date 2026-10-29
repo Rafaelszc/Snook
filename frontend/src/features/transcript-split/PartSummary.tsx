@@ -24,7 +24,7 @@ export function PartSummary({ parts }: { parts: ClientPart[] }) {
           <span
             className={cn(
               "inline-flex items-center gap-1",
-              part.fits ? "text-status-done" : "text-destructive"
+              part.fits ? "text-done" : "text-destructive"
             )}
           >
             {part.fits ? (

@@ -30,8 +30,15 @@ function isTheme(value: string | null): value is Theme {
   return THEME_VALUES.includes(value as Theme)
 }
 
+// Sem matchMedia (jsdom, navegador antigo): tema claro.
+function systemQuery(): MediaQueryList | null {
+  return typeof window.matchMedia === "function"
+    ? window.matchMedia(COLOR_SCHEME_QUERY)
+    : null
+}
+
 function getSystemTheme(): ResolvedTheme {
-  if (window.matchMedia(COLOR_SCHEME_QUERY).matches) {
+  if (systemQuery()?.matches) {
     return "dark"
   }
 
@@ -55,25 +62,6 @@ function disableTransitionsTemporarily() {
       })
     })
   }
-}
-
-function isEditableTarget(target: EventTarget | null) {
-  if (!(target instanceof HTMLElement)) {
-    return false
-  }
-
-  if (target.isContentEditable) {
-    return true
-  }
-
-  const editableParent = target.closest(
-    "input, textarea, select, [contenteditable='true']"
-  )
-  if (editableParent) {
-    return true
-  }
-
-  return false
 }
 
 export function ThemeProvider({
@@ -126,7 +114,10 @@ export function ThemeProvider({
       return undefined
     }
 
-    const mediaQuery = window.matchMedia(COLOR_SCHEME_QUERY)
+    const mediaQuery = systemQuery()
+    if (!mediaQuery) {
+      return undefined
+    }
     const handleChange = () => {
       applyTheme("system")
     }
@@ -137,46 +128,6 @@ export function ThemeProvider({
       mediaQuery.removeEventListener("change", handleChange)
     }
   }, [theme, applyTheme])
-
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat) {
-        return
-      }
-
-      if (event.metaKey || event.ctrlKey || event.altKey) {
-        return
-      }
-
-      if (isEditableTarget(event.target)) {
-        return
-      }
-
-      if (event.key.toLowerCase() !== "d") {
-        return
-      }
-
-      setThemeState((currentTheme) => {
-        const nextTheme =
-          currentTheme === "dark"
-            ? "light"
-            : currentTheme === "light"
-              ? "dark"
-              : getSystemTheme() === "dark"
-                ? "light"
-                : "dark"
-
-        localStorage.setItem(storageKey, nextTheme)
-        return nextTheme
-      })
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-    }
-  }, [storageKey])
 
   React.useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {

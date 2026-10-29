@@ -204,7 +204,7 @@ export function StoryForm({
         <Button type="submit" disabled={create.isPending}>
           {create.isPending ? MESSAGES.saving : MESSAGES.createStory}
         </Button>
-        <Button type="button" variant="outline" onClick={onDone}>
+        <Button type="button" variant="secondary" onClick={onDone}>
           {MESSAGES.cancel}
         </Button>
       </div>

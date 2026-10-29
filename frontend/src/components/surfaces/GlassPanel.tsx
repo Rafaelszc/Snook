@@ -8,7 +8,7 @@ function supportsBackdropFilter(): boolean {
   )
 }
 
-// Única superfície com vidro (ADR-0022); fallback opaco em glass.css.
+// Única superfície com vidro, só no painel da gravação (ADR-0024); fallback opaco em glass.css.
 function GlassPanel({ className, ...props }: React.ComponentProps<"div">) {
   const [glass] = React.useState(supportsBackdropFilter)
 
