@@ -303,3 +303,45 @@ it("reunião de outro usuário ou inexistente: não encontrada", async () => {
     "Reunião não encontrada."
   )
 })
+
+it("Ata: confirmar é o único accent; título no PageHeader", async () => {
+  serve()
+  const { container } = renderPage()
+
+  await screen.findByLabelText("Nome de SPEAKER_00")
+  expect(confirmButton()).toHaveAttribute("data-variant", "accent")
+  expect(container.querySelectorAll('[data-variant="accent"]')).toHaveLength(1)
+  expect(
+    container.querySelector('[data-slot="page-header"] h1')
+  ).toHaveTextContent("Nomear participantes")
+})
+
+it("Ata: sem provedor ativo é Notice warn", async () => {
+  serve({ configs: NONE })
+  renderPage()
+
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveAttribute("data-slot", "notice")
+  expect(alert).toHaveAttribute("data-variant", "warn")
+})
+
+it("Ata: amostra 40 px, tempo em mono, junção com movimento", async () => {
+  serve()
+  const user = userEvent.setup()
+  renderPage()
+
+  const sample = await screen.findByRole("button", {
+    name: "Ouvir amostra de SPEAKER_00",
+  })
+  expect(sample).toHaveClass("size-10")
+  expect(sample).toHaveAttribute("data-variant", "secondary")
+  expect(screen.getByText("4:05")).toHaveClass("font-mono", "tabular-nums")
+
+  await user.type(screen.getByLabelText("Nome de SPEAKER_00"), "Ana")
+  await user.type(screen.getByLabelText("Nome de SPEAKER_01"), "ana")
+  expect(
+    screen.getByText(
+      "Mesmo nome de SPEAKER_01: serão juntados num só participante."
+    )
+  ).toHaveClass("motion-enter")
+})
