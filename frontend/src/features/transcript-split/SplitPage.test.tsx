@@ -152,3 +152,46 @@ it("reunião de outro usuário ou inexistente: não encontrada (28)", async () =
     "Reunião não encontrada."
   )
 })
+
+it("Ata: confirmar é o único accent; fala em serif, instante em mono", async () => {
+  serveRefresh(smallSplit({ can_cancel: true }))
+  const { container } = renderSplit()
+
+  const confirm = await screen.findByRole("button", {
+    name: "Confirmar divisão",
+  })
+  expect(confirm).toHaveAttribute("data-variant", "accent")
+  expect(container.querySelectorAll('[data-variant="accent"]')).toHaveLength(1)
+  expect(
+    container.querySelector('[data-slot="page-header"] h1')
+  ).toHaveTextContent("Dividir reunião")
+
+  const region = screen.getByRole("region", { name: "Segmentos da reunião" })
+  const first = within(region).getAllByRole("listitem")[0]
+  expect(first.querySelector("p")).toHaveClass("font-serif")
+  expect(within(first).getByText("00:00:00")).toHaveClass(
+    "font-mono",
+    "tabular-nums"
+  )
+})
+
+it("Ata: recusa da API vira Notice de erro", async () => {
+  serveRefresh(smallSplit())
+  server.use(
+    http.put(`/api/meetings/${ID}/split`, () =>
+      HttpResponse.json(
+        { error: { code: "x", message: "Recusado." } },
+        { status: 409 }
+      )
+    )
+  )
+  renderSplit()
+
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Confirmar divisão" })
+  )
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveTextContent("Recusado.")
+  expect(alert).toHaveAttribute("data-slot", "notice")
+  expect(alert).toHaveAttribute("data-variant", "error")
+})
