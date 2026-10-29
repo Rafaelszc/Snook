@@ -1,10 +1,13 @@
 from collections.abc import Callable
+from concurrent.futures import Executor
 from datetime import datetime
+from functools import partial
 from pathlib import Path
 
 from snook.core import files
 from snook.core.errors import AppError
 from snook.core.events import EventBus, MeetingCreated, RetryRequested
+from snook.core.logging import setup_logging
 from snook.core.settings import Settings
 from snook.core.uow import UnitOfWork
 from snook.modules.diarized_transcription import messages, repository
@@ -20,6 +23,7 @@ from snook.modules.diarized_transcription.engines.pyannote import PyannoteDiariz
 from snook.modules.diarized_transcription.engines.whisper import WhisperTranscriber, repo_for
 from snook.modules.diarized_transcription.merge import Segment, Speaker, speakers
 from snook.modules.diarized_transcription.schemas import SegmentOut, TranscriptOut
+from snook.modules.diarized_transcription.spawn_executor import SpawnExecutor
 from snook.modules.meetings import service as meetings
 
 
@@ -65,8 +69,13 @@ def download_models(
 
 
 def build_dispatcher(settings: Settings, now: Callable[[], datetime]) -> TranscriptionDispatcher:
+    def pool(_workers: int) -> Executor:
+        # Filho com logs JSON e redação, como o processo principal (07-observability.md).
+        return SpawnExecutor(initializer=partial(setup_logging, settings))
+
     return TranscriptionDispatcher(
         engines=build_engines(settings),
+        executor_factory=pool,
         workers=settings.transcription_workers,
         max_per_user=settings.transcription_max_per_user,
         audio_root=settings.audio_root,

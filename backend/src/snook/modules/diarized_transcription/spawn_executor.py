@@ -20,8 +20,15 @@ class WorkerDied(RuntimeError):
     """Subprocesso morreu sem devolver resultado (OOM, sinal, parada)."""
 
 
-def _child(sender: Connection, fn: Callable[..., Any], args: tuple[Any, ...]) -> None:
+def _child(
+    sender: Connection,
+    initializer: Callable[[], None] | None,
+    fn: Callable[..., Any],
+    args: tuple[Any, ...],
+) -> None:
     try:
+        if initializer is not None:
+            initializer()
         outcome: tuple[str, Any] = (_OK, fn(*args))
     except BaseException as exc:  # a exceção volta ao processo principal
         outcome = (_ERROR, exc)
@@ -34,7 +41,9 @@ def _child(sender: Connection, fn: Callable[..., Any], args: tuple[Any, ...]) ->
 
 
 class SpawnExecutor(Executor):
-    def __init__(self) -> None:
+    def __init__(self, initializer: Callable[[], None] | None = None) -> None:
+        # Roda no filho antes do trabalho (logging JSON e redação): o `spawn` começa do zero.
+        self._initializer = initializer
         self._context = multiprocessing.get_context("spawn")
         self._lock = threading.Lock()
         self._processes: set[BaseProcess] = set()
@@ -47,7 +56,9 @@ class SpawnExecutor(Executor):
         with self._lock:
             if self._closed:
                 raise RuntimeError("executor parado")
-            process = self._context.Process(target=_child, args=(sender, fn, args), daemon=True)
+            process = self._context.Process(
+                target=_child, args=(sender, self._initializer, fn, args), daemon=True
+            )
             process.start()
             self._processes.add(process)
         sender.close()
