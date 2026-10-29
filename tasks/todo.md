@@ -4266,14 +4266,14 @@
 **Description:** `SettingsPage` com `PageHeader`, provedores em linhas com régua (sem card), provedor ativo com `--done`, `Skeleton` e `Notice variant="error"` no lugar da caixa das linhas 105 a 106.
 
 **Acceptance criteria:**
-- [ ] Mostra os 4 provedores com estado, máscara, modelo, janela e indicação do ativo (`llm-providers` 33).
-- [ ] O campo de chave nunca é pré-preenchido e a máscara serve só de referência (`llm-providers` 36; SEC-07).
-- [ ] Grep local sem achado; `vitest-axe` sem violação; layout de 360 a 1920 px.
+- [x] Mostra os 4 provedores com estado, máscara, modelo, janela e indicação do ativo (`llm-providers` 33).
+- [x] O campo de chave nunca é pré-preenchido e a máscara serve só de referência (`llm-providers` 36; SEC-07).
+- [x] Grep local sem achado; `vitest-axe` sem violação; layout de 360 a 1920 px.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/llm-providers`.
-- [ ] Grep local em `SettingsPage.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [x] Grep local em `SettingsPage.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 53.1, 53.2
 
@@ -4290,14 +4290,14 @@
 **Description:** `ProviderForm` com `Notice variant="error"` para falha do teste (linhas 263 a 265), mensagens de sucesso em `--done`, "Salvar" como `accent` (único da tela). `ModelSelect` e `RemoveDialog` perdem as classes proibidas.
 
 **Acceptance criteria:**
-- [ ] "Salvar" fica desabilitado até um "Testar conexão" bem-sucedido com os valores atuais (`llm-providers` 34); erros de teste e gravação aparecem com o motivo da API (`llm-providers` 35).
-- [ ] Remover pede confirmação antes de chamar a API (`llm-providers` 37); a chave nunca aparece em tela nem em log (SEC-07).
-- [ ] Grep local sem achado nos três arquivos; `vitest-axe` sem violação.
+- [x] "Salvar" fica desabilitado até um "Testar conexão" bem-sucedido com os valores atuais (`llm-providers` 34); erros de teste e gravação aparecem com o motivo da API (`llm-providers` 35).
+- [x] Remover pede confirmação antes de chamar a API (`llm-providers` 37); a chave nunca aparece em tela nem em log (SEC-07).
+- [x] Grep local sem achado nos três arquivos; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/llm-providers`.
-- [ ] Grep local em `ProviderForm.tsx`, `ModelSelect.tsx` e `RemoveDialog.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [x] Grep local em `ProviderForm.tsx`, `ModelSelect.tsx` e `RemoveDialog.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 56.1
 
