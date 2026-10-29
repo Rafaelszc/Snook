@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react"
 import { FileAudio, RotateCcw } from "lucide-react"
 
 import { FormField } from "@/components/forms/FormField"
+import { Notice } from "@/components/surfaces/Notice"
+import { PageHeader } from "@/components/surfaces/PageHeader"
 import { Button } from "@/components/ui/button"
 
 import { recordingFileName } from "./fileName"
@@ -57,28 +59,25 @@ export function SendRecordingPage({
   const percent = Math.round(send.progress * 100)
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 py-4">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-balance">
-          {MESSAGES.sendTitle}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {MESSAGES.sendDescription}
-        </p>
-      </header>
+    <div className="flex w-full max-w-reading flex-col gap-8">
+      <PageHeader
+        title={MESSAGES.sendTitle}
+        description={MESSAGES.sendDescription}
+      />
       {recording.limitReached ? (
-        <p className="rounded-lg border border-border bg-muted px-3 py-2 text-sm">
-          {MESSAGES.limitReached}
-        </p>
+        <Notice variant="info">{MESSAGES.limitReached}</Notice>
       ) : null}
-      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5">
-        <div className="flex items-center gap-3 rounded-xl border border-border px-4 py-3">
-          <FileAudio aria-hidden="true" className="size-5 shrink-0" />
+      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-6">
+        <div className="flex items-center gap-3 border-y border-hairline py-3">
+          <FileAudio
+            aria-hidden="true"
+            className="size-5 shrink-0 text-signal"
+          />
           <div className="flex min-w-0 flex-col">
             <span className="truncate font-mono text-sm" translate="no">
               {file.name}
             </span>
-            <span className="font-mono text-sm text-muted-foreground tabular-nums">
+            <span className="font-mono text-sm text-ink-muted tabular-nums">
               {formatBytes(file.size)}
             </span>
           </div>
@@ -105,22 +104,15 @@ export function SendRecordingPage({
           onChange={(e) => setSpeakers(e.target.value)}
           className="sm:max-w-40"
         />
-        {generalError ? (
-          <p
-            role="alert"
-            className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-          >
-            {generalError}
-          </p>
-        ) : null}
-        <div className="flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center">
+        {generalError ? <Notice variant="error">{generalError}</Notice> : null}
+        <div className="flex flex-col gap-3 border-t border-ink pt-4 sm:flex-row sm:items-center">
           {network && !send.isPending ? (
-            <Button type="button" onClick={submit}>
+            <Button type="button" variant="secondary" onClick={submit}>
               <RotateCcw aria-hidden="true" />
               {MESSAGES.retry}
             </Button>
           ) : (
-            <Button type="submit" disabled={send.isPending}>
+            <Button type="submit" variant="accent" disabled={send.isPending}>
               {send.isPending ? MESSAGES.sending : MESSAGES.send}
             </Button>
           )}
@@ -130,11 +122,11 @@ export function SendRecordingPage({
                 aria-label={MESSAGES.progress}
                 max={100}
                 value={percent}
-                className="h-1.5 flex-1 accent-foreground"
+                className="h-1 flex-1 accent-signal"
               />
               <span
                 role="status"
-                className="font-mono text-sm text-muted-foreground tabular-nums"
+                className="font-mono text-sm text-ink-muted tabular-nums"
               >
                 {percent}%
               </span>

@@ -4569,14 +4569,14 @@
 **Description:** `RecordingPanel` segue como único `GlassPanel` do app: `fixed` no rodapé, raio `--r-10`, espaço da escala (sem `px-5`, `gap-0.5`), cronômetro em Geist Mono tabular, botão "Parar" `danger`. `RecordingIndicator` com pulso fixo em movimento reduzido. Comentário da linha 11 atualizado.
 
 **Acceptance criteria:**
-- [ ] Mostra o tempo decorrido e "Parar"; ao parar, encerra tela e microfone (`screen-recording` 8 e 13).
-- [ ] O painel é o único elemento com vidro na tela, com fallback opaco e texto com contraste 4,5:1 (ADR-0024, "Vidro"; NFR-06).
-- [ ] O pulso para com `prefers-reduced-motion`; grep local sem achado; `vitest-axe` sem violação.
+- [x] Mostra o tempo decorrido e "Parar"; ao parar, encerra tela e microfone (`screen-recording` 8 e 13).
+- [x] O painel é o único elemento com vidro na tela, com fallback opaco e texto com contraste 4,5:1 (ADR-0024, "Vidro"; NFR-06).
+- [x] O pulso para com `prefers-reduced-motion`; grep local sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
-- [ ] Grep local em `RecordingPanel.tsx` e `RecordingIndicator.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [x] Grep local em `RecordingPanel.tsx` e `RecordingIndicator.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.20, 53.1, 53.2
 
@@ -4593,14 +4593,14 @@
 **Description:** `RecordPage` com `PageHeader`, `Notice` no lugar das caixas das linhas 116 e 117 (`error`; `warn` para fora de contexto seguro), e `ConsentNotice` posicionado antes de "Gravar reunião", sem mexer no componente nem no texto. `SourceWarningDialog` (já em `DialogSurface`, Task 52.18) perde classes de texto proibidas.
 
 **Acceptance criteria:**
-- [ ] A área oferece duas entradas, enviar arquivo e "Gravar reunião" (`screen-recording` 1); o aviso mostra exatamente `CONSENT_NOTICE_TEXT` junto de "Gravar reunião", sem confirmação nem bloqueio (`screen-recording` 26).
-- [ ] Fora de contexto seguro, o botão fica desabilitado com a mensagem do critério 27 (`screen-recording` 27 e 28).
-- [ ] Grep local sem achado em `RecordPage.tsx` e `SourceWarningDialog.tsx`; `vitest-axe` sem violação.
+- [x] A área oferece duas entradas, enviar arquivo e "Gravar reunião" (`screen-recording` 1); o aviso mostra exatamente `CONSENT_NOTICE_TEXT` junto de "Gravar reunião", sem confirmação nem bloqueio (`screen-recording` 26).
+- [x] Fora de contexto seguro, o botão fica desabilitado com a mensagem do critério 27 (`screen-recording` 27 e 28).
+- [x] Grep local sem achado em `RecordPage.tsx` e `SourceWarningDialog.tsx`; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
-- [ ] Grep local nos dois arquivos; `git diff -- frontend/src/components/surfaces/ConsentNotice` vazio.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [x] Grep local nos dois arquivos; `git diff -- frontend/src/components/surfaces/ConsentNotice` vazio.
+- [x] Gate frontend.
 
 **Dependencies:** Task 61.1
 
@@ -4617,14 +4617,14 @@
 **Description:** `SendRecordingPage` com `PageHeader`, largura `--reading`, `Notice variant="error"` no lugar da caixa das linhas 110 e 111, "Enviar" como `accent` (único da tela) e "Tentar de novo" como `secondary`.
 
 **Acceptance criteria:**
-- [ ] O nome do arquivo segue `gravacao-AAAA-MM-DD-HHhMM.webm`; título vem preenchido e editável; campo opcional de participantes valida como o upload (`screen-recording` 14, 15 e 16).
-- [ ] O envio cria a Reunião e leva ao detalhe (`screen-recording` 17 e 20); recusa do servidor aparece com a mensagem da API (`screen-recording` 18); em falha de rede, "Tentar de novo" reenvia a mesma gravação (`screen-recording` 19).
-- [ ] Grep local sem achado; `vitest-axe` sem violação.
+- [x] O nome do arquivo segue `gravacao-AAAA-MM-DD-HHhMM.webm`; título vem preenchido e editável; campo opcional de participantes valida como o upload (`screen-recording` 14, 15 e 16).
+- [x] O envio cria a Reunião e leva ao detalhe (`screen-recording` 17 e 20); recusa do servidor aparece com a mensagem da API (`screen-recording` 18); em falha de rede, "Tentar de novo" reenvia a mesma gravação (`screen-recording` 19).
+- [x] Grep local sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
-- [ ] Grep local em `SendRecordingPage.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [x] Grep local em `SendRecordingPage.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 61.2
 
