@@ -25,6 +25,20 @@ describe("StatusBadge", () => {
     }
   )
 
+  // ADR-0024, "Estados": cores Ata.
+  it.each([
+    ["pending", "text-ink-muted"],
+    ["processing", "text-signal"],
+    ["transcribed", "text-ink"],
+    ["needs_split", "text-warn"],
+    ["generating", "text-signal"],
+    ["done", "text-done"],
+    ["failed", "text-failed"],
+  ] as const)("%s usa %s", (status, color) => {
+    render(<StatusBadge status={status} />)
+    expect(screen.getByRole("status")).toHaveClass(color)
+  })
+
   it("cobre exatamente os 7 status", () => {
     expect(Object.keys(STATUS_LABELS).sort()).toEqual(
       Object.keys(expected).sort()
