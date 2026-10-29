@@ -8,8 +8,11 @@ import { Input } from "@/components/ui/input"
 import { fieldError } from "./fieldError"
 import { MESSAGES } from "./messages"
 
-export const TEXTAREA =
-  "min-h-20 w-full rounded-lg border border-input bg-background px-3 py-2 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive sm:text-sm dark:bg-input/30"
+// Mesma borda, fundo e anel opaco de 2 px do `Input` (ADR-0024, "Foco").
+const FIELD =
+  "rounded-md border border-input bg-surface text-ink outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50 aria-invalid:border-failed"
+export const TEXTAREA = `min-h-20 w-full px-3 py-2 text-base sm:text-sm ${FIELD}`
+export const SELECT = `h-10 px-3 text-sm ${FIELD}`
 
 interface EditableFieldProps {
   // Nome acessível do campo ("Editar <label>").
@@ -86,7 +89,7 @@ export function EditableField({
             variant="ghost"
             size="icon-sm"
             aria-label={MESSAGES.edit(label)}
-            className="shrink-0 text-muted-foreground"
+            className="shrink-0 text-ink-muted"
             onClick={() => {
               setDraft(value)
               setEditing(true)
@@ -146,7 +149,7 @@ export function EditableField({
         </p>
       ) : null}
       {error ? (
-        <p id={errorId} role="alert" className="text-sm text-destructive">
+        <p id={errorId} role="alert" className="text-sm text-failed">
           {error}
         </p>
       ) : null}
@@ -193,7 +196,7 @@ export function SelectField({
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-sm text-muted-foreground">
+      <label htmlFor={id} className="text-sm text-ink-muted">
         {label}
       </label>
       {readOnly ? (
@@ -210,10 +213,7 @@ export function SelectField({
           disabled={saving}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
-          className={cn(
-            "h-9 rounded-lg border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive dark:bg-input/30",
-            mono && "font-mono tabular-nums"
-          )}
+          className={cn(SELECT, mono && "font-mono tabular-nums")}
           onChange={async (event) => {
             setSaving(true)
             setError(undefined)
@@ -234,7 +234,7 @@ export function SelectField({
         </select>
       )}
       {error ? (
-        <p id={`${id}-error`} role="alert" className="text-sm text-destructive">
+        <p id={`${id}-error`} role="alert" className="text-sm text-failed">
           {error}
         </p>
       ) : null}

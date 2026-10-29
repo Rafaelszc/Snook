@@ -31,7 +31,7 @@ export function NewEpicForm() {
 
   return (
     <form
-      className="flex flex-col gap-2 border-t border-border pt-5"
+      className="flex flex-col gap-2 border-t border-ink pt-4"
       onSubmit={(event) => {
         event.preventDefault()
         create.mutate(name, { onSuccess: () => setName("") })
@@ -59,7 +59,7 @@ export function NewEpicForm() {
         message={target && MESSAGES.mergeEpic(target.name)}
       />
       {error ? (
-        <p id={`${id}-error`} role="alert" className="text-sm text-destructive">
+        <p id={`${id}-error`} role="alert" className="text-sm text-failed">
           {error}
         </p>
       ) : null}
