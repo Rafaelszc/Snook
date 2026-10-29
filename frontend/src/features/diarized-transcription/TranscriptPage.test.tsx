@@ -222,3 +222,44 @@ it("nome renomeado aparece ao reabrir a tela, sem passo extra (26)", async () =>
 
   expect(await screen.findByText("Ana Souza")).toBeVisible()
 })
+
+it("Ata: fala em serif, instante em mono tabular", async () => {
+  serve(done, ONE_SEGMENT)
+  renderPage()
+
+  expect(await screen.findByText("Bom dia.")).toHaveClass("font-serif")
+  expect(screen.getByText("00:00:00")).toHaveClass("font-mono", "tabular-nums")
+  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+    "Transcrição"
+  )
+})
+
+it("Ata: erro vira Notice de erro", async () => {
+  server.use(
+    http.get(`/api/meetings/${ID}`, () =>
+      HttpResponse.json(
+        { error: { code: "meeting_not_found", message: "x" } },
+        { status: 404 }
+      )
+    )
+  )
+  const { container } = renderPage()
+
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveTextContent("Reunião não encontrada.")
+  expect(alert).toHaveAttribute("data-slot", "notice")
+  expect(await axe(container)).toHaveNoViolations()
+})
+
+it("Ata: carregando mostra Skeleton com status", async () => {
+  server.use(
+    http.get(`/api/meetings/${ID}`, () => HttpResponse.json(done)),
+    http.get(`/api/meetings/${ID}/participants`, () => HttpResponse.json([])),
+    http.get(`/api/meetings/${ID}/transcript`, () => new Promise(() => {}))
+  )
+  renderPage()
+
+  const status = await screen.findByRole("status")
+  expect(status).toHaveAttribute("aria-busy", "true")
+  expect(status).toHaveTextContent("Carregando…")
+})
