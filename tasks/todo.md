@@ -4418,14 +4418,14 @@
 **Description:** `TranscriptPage` com `PageHeader`, largura `--reading`, fala em Source Serif 4, speaker em Geist, instantes `hh:mm:ss` em Geist Mono tabular, `Skeleton`, e `Notice variant="error"` no lugar da caixa das linhas 92 e 93. Lista virtualizada e `useTranscript` não mudam.
 
 **Acceptance criteria:**
-- [ ] Mostra segmentos em ordem, cada um com instante, speaker e texto (`diarized-transcription` 25); antes de `transcribed`, mostra o status (`diarized-transcription` 27); mostra o nome do Participante depois da nomeação (`diarized-transcription` 26).
-- [ ] Com Transcrição de 2 h de fixture, só os segmentos perto da área visível ficam no DOM (`diarized-transcription` 31; NFR-07); texto de segmento renderiza escapado (SEC-12).
-- [ ] Grep local sem achado; `vitest-axe` sem violação; fala em `font-serif` e instante em `font-mono`.
+- [x] Mostra segmentos em ordem, cada um com instante, speaker e texto (`diarized-transcription` 25); antes de `transcribed`, mostra o status (`diarized-transcription` 27); mostra o nome do Participante depois da nomeação (`diarized-transcription` 26).
+- [x] Com Transcrição de 2 h de fixture, só os segmentos perto da área visível ficam no DOM (`diarized-transcription` 31; NFR-07); texto de segmento renderiza escapado (SEC-12).
+- [x] Grep local sem achado; `vitest-axe` sem violação; fala em `font-serif` e instante em `font-mono`.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/diarized-transcription`.
-- [ ] Grep local em `TranscriptPage.tsx`. SEC-12.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/diarized-transcription`.
+- [x] Grep local em `TranscriptPage.tsx`. SEC-12.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52 (Checkpoint: Tokens e primitivos), 53.1, 53.2
 
