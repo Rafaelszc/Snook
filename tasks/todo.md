@@ -4194,14 +4194,14 @@
 **Description:** `AuthShell` deixa de usar `GlassPanel` e `usePointerSpotlight` (e a classe `spotlight`). Card opaco `--surface`, régua `--hairline`, raio `--r-10`, sem sombra (exceção do card de auth, ADR-0024, Q3), entrada por opacidade, marca e `h1` em serif, `ThemeToggle`. Comentário da linha 12 atualizado. Largura do card `max-w-sm` fica, por ser tela sem shell.
 
 **Acceptance criteria:**
-- [ ] O card é opaco, sem `backdrop-filter` e sem sombra, com `--surface` e `--hairline` (ADR-0024, "Princípios"; `02-architecture.md`, "Mapa de superfícies").
-- [ ] Nenhum listener de `pointermove` é registrado no auth e nada importa `GlassPanel` (`01-prd.md`, NFR-08: só o upload tem mouse-tracking).
-- [ ] `ThemeToggle` visível e operável por teclado; entrada do card só por `opacity`, desligada com `prefers-reduced-motion`; grep local sem achado.
+- [x] O card é opaco, sem `backdrop-filter` e sem sombra, com `--surface` e `--hairline` (ADR-0024, "Princípios"; `02-architecture.md`, "Mapa de superfícies").
+- [x] Nenhum listener de `pointermove` é registrado no auth e nada importa `GlassPanel` (`01-prd.md`, NFR-08: só o upload tem mouse-tracking).
+- [x] `ThemeToggle` visível e operável por teclado; entrada do card só por `opacity`, desligada com `prefers-reduced-motion`; grep local sem achado.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/auth`.
-- [ ] `git grep -nE "GlassPanel|usePointerSpotlight|spotlight" -- frontend/src/features/auth` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/auth`.
+- [x] `git grep -nE "GlassPanel|usePointerSpotlight|spotlight" -- frontend/src/features/auth` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Checkpoint: Tokens e primitivos
 
@@ -4218,14 +4218,14 @@
 **Description:** `LoginPage` usa `Notice variant="error"` no lugar da caixa inline (linhas 44 a 46), mantém o anúncio `assertive` do erro, e o botão de entrar (`accent`, único da tela) em 36 px.
 
 **Acceptance criteria:**
-- [ ] Erros do login aparecem com a mensagem da API, anunciados por região viva (`auth` 25).
-- [ ] Página protegida sem sessão leva ao login (`auth` 24); depois do logout volta ao login (`auth` 26).
-- [ ] Grep local sem achado; `vitest-axe` sem violação; mensagem renderizada só como texto (SEC-12).
+- [x] Erros do login aparecem com a mensagem da API, anunciados por região viva (`auth` 25).
+- [x] Página protegida sem sessão leva ao login (`auth` 24); depois do logout volta ao login (`auth` 26).
+- [x] Grep local sem achado; `vitest-axe` sem violação; mensagem renderizada só como texto (SEC-12).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/auth src/app`.
-- [ ] Grep local em `LoginPage.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/auth src/app`.
+- [x] Grep local em `LoginPage.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 55.1
 
@@ -4242,14 +4242,14 @@
 **Description:** `RegisterPage` usa `Notice variant="error"` no lugar da caixa inline (linhas 42 a 44) e o botão de cadastrar (`accent`, único da tela) em 36 px.
 
 **Acceptance criteria:**
-- [ ] A tela inicial oferece cadastro e login (`auth` 22); cadastro bem-sucedido leva direto à área autenticada (`auth` 23).
-- [ ] Erros do cadastro aparecem com a mensagem da API (`auth` 25).
-- [ ] Grep local sem achado; `vitest-axe` sem violação.
+- [x] A tela inicial oferece cadastro e login (`auth` 22); cadastro bem-sucedido leva direto à área autenticada (`auth` 23).
+- [x] Erros do cadastro aparecem com a mensagem da API (`auth` 25).
+- [x] Grep local sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/auth`.
-- [ ] Grep local em `RegisterPage.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/auth`.
+- [x] Grep local em `RegisterPage.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 55.1
 
