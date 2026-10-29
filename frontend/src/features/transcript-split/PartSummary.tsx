@@ -12,10 +12,12 @@ export function PartSummary({ parts }: { parts: ClientPart[] }) {
       {parts.map((part) => (
         <li
           key={part.index}
-          className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-border py-2 text-sm last:border-b-0"
+          className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-hairline py-2 text-sm last:border-b-0"
         >
-          <span className="font-medium">{MESSAGES.partName(part.index)}</span>
-          <span className="flex flex-wrap gap-x-3 font-mono text-muted-foreground tabular-nums">
+          <span className="font-medium text-ink">
+            {MESSAGES.partName(part.index)}
+          </span>
+          <span className="flex flex-wrap gap-x-3 font-mono text-ink-muted tabular-nums">
             <span>
               {MESSAGES.partRange(part.startSeconds, part.endSeconds)}
             </span>
@@ -24,7 +26,7 @@ export function PartSummary({ parts }: { parts: ClientPart[] }) {
           <span
             className={cn(
               "inline-flex items-center gap-1",
-              part.fits ? "text-done" : "text-destructive"
+              part.fits ? "text-done" : "text-failed"
             )}
           >
             {part.fits ? (

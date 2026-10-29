@@ -104,3 +104,46 @@ it("sem provedor ativo, mostra só a mensagem com link para configurações (44)
   )
   expect(router.state.location.pathname).toBe("/settings")
 })
+
+it("Ata: cancelar é secondary; recusa vira Notice de erro", async () => {
+  serveRefresh(smallSplit({ can_cancel: true }))
+  server.use(
+    http.post(`/api/meetings/${ID}/split/cancel`, () =>
+      HttpResponse.json(
+        { error: { code: "x", message: "Recusado." } },
+        { status: 409 }
+      )
+    )
+  )
+  renderSplit()
+
+  const button = await screen.findByRole("button", {
+    name: "Cancelar divisão",
+  })
+  expect(button).toHaveAttribute("data-variant", "secondary")
+  await userEvent.click(button)
+  expect(await screen.findByRole("alert")).toHaveAttribute(
+    "data-variant",
+    "error"
+  )
+})
+
+it("Ata: sem provedor ativo é Notice warn", async () => {
+  serveRefresh(
+    smallSplit({
+      message: "Nenhum provedor de LLM ativo. Ative um nas configurações.",
+      provider: null,
+      model: null,
+      budget: null,
+      total_tokens: null,
+      segments: [],
+      cuts: [],
+    })
+  )
+  renderSplit()
+
+  expect(await screen.findByRole("alert")).toHaveAttribute(
+    "data-variant",
+    "warn"
+  )
+})

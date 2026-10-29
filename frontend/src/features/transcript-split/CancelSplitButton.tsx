@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router"
 
+import { Notice } from "@/components/surfaces/Notice"
 import { Button } from "@/components/ui/button"
 
 import { MESSAGES } from "./messages"
@@ -32,13 +33,11 @@ export function CancelSplitButton({
       >
         {cancel.isPending ? MESSAGES.canceling : MESSAGES.cancel}
       </Button>
-      <p id="split-cancel-hint" className="text-sm text-muted-foreground">
+      <p id="split-cancel-hint" className="text-sm text-ink-muted">
         {MESSAGES.cancelHint}
       </p>
       {cancel.error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {cancel.error.message}
-        </p>
+        <Notice variant="error">{cancel.error.message}</Notice>
       ) : null}
     </div>
   )

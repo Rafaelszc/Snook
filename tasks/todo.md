@@ -4490,14 +4490,14 @@
 **Description:** `SplitPage` com `PageHeader`, `Skeleton` e `Notice` no lugar da constante `ALERT` (linha 17) e dos blocos das linhas 24, 93 e 155 (`error`; `warn` para falta de provedor).
 
 **Acceptance criteria:**
-- [ ] Ao abrir, chama `POST /meetings/{id}/split/refresh` antes de mostrar os cortes, e se a resposta traz `generating` leva ao detalhe (`transcript-split` 47); explica a divisão com estimativa, orçamento, provedor, modelo e link (`transcript-split` 31).
-- [ ] Sem provedor ativo, mostra só a mensagem que aponta para a configuração (`transcript-split` 44).
-- [ ] Grep local sem achado; `vitest-axe` sem violação.
+- [x] Ao abrir, chama `POST /meetings/{id}/split/refresh` antes de mostrar os cortes, e se a resposta traz `generating` leva ao detalhe (`transcript-split` 47); explica a divisão com estimativa, orçamento, provedor, modelo e link (`transcript-split` 31).
+- [x] Sem provedor ativo, mostra só a mensagem que aponta para a configuração (`transcript-split` 44).
+- [x] Grep local sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
-- [ ] Grep local em `SplitPage.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [x] Grep local em `SplitPage.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 53.1, 53.2
 
@@ -4514,14 +4514,14 @@
 **Description:** `SegmentList`, `CutControls` e `PartSummary` no Ata: instantes em Geist Mono tabular, corte ativo em `--signal` (já trocado na Task 52.12), "Parte cabe" em `--done`, sem classes proibidas. Virtualização e atalhos de teclado não mudam.
 
 **Acceptance criteria:**
-- [ ] O usuário move, adiciona e remove cortes por mouse e por teclado, sem corte no meio de um segmento (`transcript-split` 33); cada Parte mostra intervalo, estimativa e se cabe, e "Confirmar" fica desabilitado enquanto alguma Parte não couber (`transcript-split` 34 e 35).
-- [ ] Com Transcrição de 2 h de fixture, só os segmentos perto da área visível ficam no DOM (NFR-07), e o INP da divisão fica até 200 ms (NFR-04; medição manual no checkpoint).
-- [ ] Grep local sem achado; `vitest-axe` sem violação; feedback ao mover corte só com `transform` e `opacity`.
+- [x] O usuário move, adiciona e remove cortes por mouse e por teclado, sem corte no meio de um segmento (`transcript-split` 33); cada Parte mostra intervalo, estimativa e se cabe, e "Confirmar" fica desabilitado enquanto alguma Parte não couber (`transcript-split` 34 e 35).
+- [x] Com Transcrição de 2 h de fixture, só os segmentos perto da área visível ficam no DOM (NFR-07), e o INP da divisão fica até 200 ms (NFR-04; medição manual no checkpoint).
+- [x] Grep local sem achado; `vitest-axe` sem violação; feedback ao mover corte só com `transform` e `opacity`.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
-- [ ] Grep local nos três arquivos.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [x] Grep local nos três arquivos.
+- [x] Gate frontend.
 
 **Dependencies:** Task 60.1
 
@@ -4538,14 +4538,14 @@
 **Description:** `CancelSplitButton` usa `Notice variant="error"` para o erro (linha 39) e perde classes proibidas.
 
 **Acceptance criteria:**
-- [ ] O botão aparece só quando a resposta do `GET` indica backlog gravado, e depois de cancelar volta à revisão do backlog (`transcript-split` 45).
-- [ ] O botão de cancelar usa `secondary`; no máximo um `accent` na tela da divisão ("Confirmar").
-- [ ] Grep local sem achado; `vitest-axe` sem violação.
+- [x] O botão aparece só quando a resposta do `GET` indica backlog gravado, e depois de cancelar volta à revisão do backlog (`transcript-split` 45).
+- [x] O botão de cancelar usa `secondary`; no máximo um `accent` na tela da divisão ("Confirmar").
+- [x] Grep local sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
-- [ ] Grep local em `CancelSplitButton.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [x] Grep local em `CancelSplitButton.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 60.2
 

@@ -71,7 +71,7 @@ export function SegmentList({
       aria-label={MESSAGES.segmentsLabel}
       // Região rolável precisa ser alcançável pelo teclado.
       tabIndex={0}
-      className="h-[60vh] min-h-80 overflow-auto rounded-xl border border-border"
+      className="h-[60vh] min-h-80 overflow-auto border-y border-hairline outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <ol
         className="relative w-full"
@@ -89,11 +89,15 @@ export function SegmentList({
               style={{ transform: `translateY(${item.start}px)` }}
             >
               <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 gap-y-1 px-4 pt-3 pb-1 text-sm">
-                <span className="font-mono text-muted-foreground tabular-nums">
+                <span className="font-mono text-ink-muted tabular-nums">
                   {formatTimestamp(segment.start_seconds)}
                 </span>
-                <span className="font-medium">{segment.participant}</span>
-                <p className="col-start-2 text-base">{segment.text}</p>
+                <span className="font-sans font-medium text-ink">
+                  {segment.participant}
+                </span>
+                <p className="col-start-2 font-serif text-base text-pretty text-ink">
+                  {segment.text}
+                </p>
               </div>
               {isLast ? (
                 <div className="h-3" />
