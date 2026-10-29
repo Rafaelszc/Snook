@@ -25,7 +25,7 @@ export function ModelSelect({
   const options = value && !models.includes(value) ? [value, ...models] : models
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
@@ -37,7 +37,7 @@ export function ModelSelect({
         aria-invalid={error ? true : undefined}
         aria-describedby={error || hint ? describedBy : undefined}
         className={cn(
-          "h-10 w-full min-w-0 rounded-lg border border-input bg-background px-3 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 sm:text-sm dark:bg-input/30"
+          "h-10 w-full min-w-0 rounded-md border border-input bg-surface px-3 text-base text-ink outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50 aria-invalid:border-failed sm:text-sm"
         )}
       >
         {options.map((model) => (
@@ -47,11 +47,11 @@ export function ModelSelect({
         ))}
       </select>
       {error ? (
-        <p id={describedBy} className="text-sm text-destructive">
+        <p id={describedBy} className="text-sm text-failed">
           {error}
         </p>
       ) : hint ? (
-        <p id={describedBy} className="text-sm text-muted-foreground">
+        <p id={describedBy} className="text-sm text-ink-muted">
           {hint}
         </p>
       ) : null}
