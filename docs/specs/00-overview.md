@@ -1,7 +1,7 @@
 # 00 - Visão geral: Snook
 
-> Status: rascunho aprovado em decisões. Q1 a Q73 fechadas. Nenhuma marca "proposto" de decisão de produto.
-> Fontes: briefing do usuário de 2026-10-21, rodadas 1 a 5, decisões Q53 a Q69, Q70 (mudanças do planner aprovadas em 2026-10-22), Q71 e Q72 (2026-10-22). Repo sem código no momento da escrita.
+> Status: rascunho aprovado em decisões. Q1 a Q74 fechadas. Nenhuma marca "proposto" de decisão de produto.
+> Fontes: briefing do usuário de 2026-10-21, rodadas 1 a 5, decisões Q53 a Q69, Q70 (mudanças do planner aprovadas em 2026-10-22), Q71, Q72 e Q73 (2026-10-22), Q74 (2026-10-28). Repo sem código no momento da escrita.
 
 ## Visão
 
@@ -156,7 +156,7 @@ Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q70:
 - Uso na rede exige HTTPS, pelo perfil `lan` (Q70, ADR-0016). Motivo: `getDisplayMedia` e `getUserMedia` só funcionam em contexto seguro (`https://` ou `http://localhost`). Em `http://<ip-da-rede>`, a gravação de tela não funciona.
 - Sem o perfil `lan`, a porta do app fica ligada a `127.0.0.1` por padrão. Acesso pela rede em HTTP, sem o perfil, aceita upload, mas não grava tela (ADR-0016).
 
-### Decisões do usuário (fonte: rodadas 1 a 5 e decisões Q53 a Q73)
+### Decisões do usuário (fonte: rodadas 1 a 5 e decisões Q53 a Q74)
 
 | Q | Decisão |
 |---|---|
@@ -228,6 +228,7 @@ Confirmados na Q18, mais itens das rodadas 2 a 5 e das decisões Q53 a Q70:
 | Q71 | Aviso de consentimento dos participantes é só texto visível junto de "Gravar reunião" e do botão de envio, sem confirmação obrigatória e sem bloquear a ação (2026-10-22). |
 | Q72 | Texto literal do aviso de consentimento (2026-10-22): "Antes de gravar ou enviar, obtenha o consentimento de todos os participantes da reunião (LGPD). O áudio fica só neste servidor; o texto da transcrição vai ao provedor de LLM ativo." O texto vem de uma constante única do frontend, usada na tela de upload e na de gravação (`meetings`, critério 52; `screen-recording`, critério 26). |
 | Q73 | LCP (NFR-03) medido na tela de login, a mesma rota do NFR-01 (2026-10-22). |
+| Q74 | Aprovada a direção visual "Ata" (2026-10-28; ADR-0024): papel e tinta com acento petróleo (`--signal`); serif + sans + mono (Source Serif 4, Geist, Geist Mono); vidro só no painel flutuante da gravação; mouse-tracking só na borda da área de upload; card de login e cadastro opaco; controle de tema no shell, sem atalho de tecla; escala de espaço 4 a 64 e raios 4, 6 e 10, também nos primitivos. Substitui em parte o ADR-0022 e a fonte única do ADR-0023. Aprovado junto: nenhuma dependência npm nova; fontes locais `.woff2` com licença OFL. |
 
 Mudanças em relação ao briefing e a rodadas anteriores:
 - Briefing: usuário fornece o próprio token da LLM. Após idas e vindas (Q15, Q21, Q22), a Q33 confirmou: cada Usuário informa a própria chave na UI; app guarda cifrada.
@@ -298,6 +299,6 @@ Nenhum ajuste muda a build order.
 
 ## Decisões pendentes
 
-Q1 a Q73 fechadas. Nenhuma decisão do usuário em aberto.
+Q1 a Q74 fechadas. Nenhuma decisão do usuário em aberto.
 
 Pendências do planner: todas resolvidas. Ver `02-architecture.md`, seção "Respostas às decisões pendentes do spec", que liga cada pendência ao ADR ou documento que a responde. Meta de tempo de processamento: sem meta na v1; o spike da Task 1 mede (`02-architecture.md`, "Questões em aberto").

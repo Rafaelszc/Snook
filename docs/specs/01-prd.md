@@ -1,6 +1,6 @@
 # 01 - PRD: requisitos transversais e índice de módulos
 
-> Status: rascunho aprovado em decisões. Q1 a Q73 fechadas. Todos os PRDs de módulo escritos. Nenhuma marca "proposto" de decisão de produto.
+> Status: rascunho aprovado em decisões. Q1 a Q74 fechadas. Todos os PRDs de módulo escritos. Nenhuma marca "proposto" de decisão de produto.
 > Visão, glossário, decisões e capability map: `docs/specs/00-overview.md`.
 > Cada módulo tem PRD próprio em `docs/specs/01-prd/<id-do-modulo>.md`.
 
@@ -270,7 +270,7 @@ Ver "Não-objetivos" em `00-overview.md`.
 
 - NFR-01 e NFR-02: o CI falha se o build passar dos limites (ADR-0023).
 - NFR-07 cobre `diarized-transcription` (tela da Transcrição) e `transcript-split` (tela de divisão).
-- NFR-08 cobre as telas com mouse-tracking: card de login e cadastro (`auth`) e área de upload (`meetings`) (`02-architecture.md`, "Mapa de superfícies").
+- NFR-08 cobre só a área de upload (`meetings`), única superfície com mouse-tracking. Card de login e cadastro (`auth`) é opaco e não tem mouse-tracking (Q74, ADR-0024; `02-architecture.md`, "Mapa de superfícies").
 
 ## Estratégia de testes (confirmada na Q32)
 
@@ -299,6 +299,6 @@ Build order e dependências: `00-overview.md`, seção "Capability map".
 
 ## Questões em aberto
 
-1. Nenhuma decisão de produto pendente. Q1 a Q73 fechadas.
+1. Nenhuma decisão de produto pendente. Q1 a Q74 fechadas.
 2. Pendências do planner: todas resolvidas. Ver `02-architecture.md`, "Respostas às decisões pendentes do spec". Inclui onde mora o comando `delete-user`, sem ciclo entre módulos (`02-architecture.md`, "Exclusão de Usuário pelo Operador").
 3. **Rota do LCP (NFR-03).** Resolvido (Q73): tela de login, a mesma rota do NFR-01.
