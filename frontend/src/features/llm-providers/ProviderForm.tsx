@@ -223,7 +223,7 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
           />
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             size="sm"
             className="self-start"
             onClick={onLoadModels}
@@ -271,7 +271,7 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
       <div className="flex flex-wrap items-center gap-2">
         <Button
           type="button"
-          variant="outline"
+          variant="secondary"
           onClick={onTest}
           disabled={busy}
         >

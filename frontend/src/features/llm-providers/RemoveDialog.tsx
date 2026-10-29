@@ -36,10 +36,10 @@ export function RemoveDialog({
             </AlertDialog.Description>
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <AlertDialog.Cancel asChild>
-                <Button variant="outline">{MESSAGES.cancel}</Button>
+                <Button variant="secondary">{MESSAGES.cancel}</Button>
               </AlertDialog.Cancel>
               <AlertDialog.Action asChild>
-                <Button variant="destructive" onClick={onConfirm}>
+                <Button variant="danger" onClick={onConfirm}>
                   {MESSAGES.removeConfirm}
                 </Button>
               </AlertDialog.Action>

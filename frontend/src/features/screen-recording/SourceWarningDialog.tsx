@@ -42,7 +42,7 @@ export function SourceWarningDialog({
               {description}
             </AlertDialog.Description>
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button variant="outline" onClick={onCancel}>
+              <Button variant="secondary" onClick={onCancel}>
                 {MESSAGES.cancel}
               </Button>
               <Button onClick={onConfirm}>{copy.confirm}</Button>

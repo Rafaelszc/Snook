@@ -49,11 +49,11 @@ export function ConfirmDialog({
             {children}
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <AlertDialog.Cancel asChild>
-                <Button variant="outline">{CONFIRM_CANCEL}</Button>
+                <Button variant="secondary">{CONFIRM_CANCEL}</Button>
               </AlertDialog.Cancel>
               <AlertDialog.Action asChild>
                 <Button
-                  variant={destructive ? "destructive" : "default"}
+                  variant={destructive ? "danger" : "primary"}
                   onClick={onConfirm}
                 >
                   {confirm}
