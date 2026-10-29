@@ -1,6 +1,6 @@
 import { AlertDialog } from "radix-ui"
 
-import { GlassPanel } from "@/components/surfaces/GlassPanel"
+import { DialogSurface } from "@/components/surfaces/DialogSurface"
 import { Button } from "@/components/ui/button"
 
 import type { Browser } from "./capture/interfaces"
@@ -32,9 +32,9 @@ export function SourceWarningDialog({
   return (
     <AlertDialog.Root open onOpenChange={(open) => !open && onCancel()}>
       <AlertDialog.Portal>
-        <AlertDialog.Overlay className="motion-fade-in fixed inset-0 z-50 bg-black/40" />
+        <AlertDialog.Overlay className="motion-fade-in fixed inset-0 z-50 bg-scrim" />
         <AlertDialog.Content asChild>
-          <GlassPanel className="motion-enter fixed top-1/2 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-xl p-6">
+          <DialogSurface className="motion-enter fixed top-1/2 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 p-6">
             <AlertDialog.Title className="text-base font-semibold">
               {MESSAGES.missingTitle}
             </AlertDialog.Title>
@@ -47,7 +47,7 @@ export function SourceWarningDialog({
               </Button>
               <Button onClick={onConfirm}>{copy.confirm}</Button>
             </div>
-          </GlassPanel>
+          </DialogSurface>
         </AlertDialog.Content>
       </AlertDialog.Portal>
     </AlertDialog.Root>
