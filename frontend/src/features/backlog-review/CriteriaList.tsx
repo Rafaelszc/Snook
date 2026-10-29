@@ -125,7 +125,11 @@ function NewCriterion({ story }: { story: UserStory }) {
         <Button type="submit" disabled={add.isPending}>
           {add.isPending ? MESSAGES.saving : MESSAGES.createCriterion}
         </Button>
-        <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => setOpen(false)}
+        >
           {MESSAGES.cancel}
         </Button>
       </div>

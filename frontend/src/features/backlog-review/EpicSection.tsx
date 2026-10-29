@@ -90,10 +90,7 @@ export const EpicSection = memo(function EpicSection({ epic }: { epic: Epic }) {
         )}
       </header>
       {open ? (
-        <div
-          id={contentId}
-          className="motion-enter flex flex-col gap-3 sm:pl-10"
-        >
+        <div id={contentId} className="motion-enter flex flex-col sm:pl-10">
           {epic.user_stories.map((story) => (
             <StoryCard key={story.id} story={story} epicId={epic.id} />
           ))}
@@ -102,7 +99,7 @@ export const EpicSection = memo(function EpicSection({ epic }: { epic: Epic }) {
           ) : (
             <Button
               variant="ghost"
-              className="self-start"
+              className="mt-3 self-start"
               onClick={() => setAdding(true)}
             >
               <Plus aria-hidden="true" />

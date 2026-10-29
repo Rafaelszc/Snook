@@ -201,6 +201,20 @@ it("abrir e fechar a Epic anima só por classes de motion.css (ADR-0024)", async
   expect(toggle.querySelector("svg")).toHaveStyle({ transform: "none" })
 })
 
+it("US como linha com régua, nome serif, US-id e instante em mono (ADR-0024)", async () => {
+  serve(meeting())
+  renderReview()
+
+  const us = await screen.findByRole("article", { name: "Cadastrar cliente" })
+  expect(us).toHaveClass("border-t", "border-hairline")
+  expect(us.className).not.toMatch(/\b(bg-|rounded|shadow|p-\d)/)
+  expect(
+    within(us).getByRole("heading", { name: "Cadastrar cliente" })
+  ).toHaveClass("font-heading")
+  for (const text of ["US-01", "00:01:05"])
+    expect(within(us).getByText(text)).toHaveClass("font-mono", "tabular-nums")
+})
+
 it("renderiza o backlog de fixture de 30 Epics e 200 US (NFR-04)", async () => {
   serve(meeting(), bigBacklog())
   renderReview()

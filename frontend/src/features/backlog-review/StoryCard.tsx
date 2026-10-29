@@ -38,6 +38,7 @@ const SENTENCES = [
 ] as const
 
 // US no formato da Q11, com solicitante e instante (`backlog-review` 39, 40).
+// Linha com régua --hairline, sem card (ADR-0024, "Componentes"); nome em serif, US-id e instante em mono.
 export const StoryCard = memo(function StoryCard({
   story,
   epicId,
@@ -60,10 +61,11 @@ export const StoryCard = memo(function StoryCard({
   return (
     <article
       aria-labelledby={`story-${story.id}`}
-      className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 [contain-intrinsic-size:auto_24rem] [content-visibility:auto] sm:p-5"
+      data-slot="story"
+      className="flex flex-col gap-4 border-t border-hairline py-4 [contain-intrinsic-size:auto_24rem] [content-visibility:auto]"
     >
       <header className="flex items-start gap-3">
-        <span className="shrink-0 pt-1.5 font-mono text-sm text-muted-foreground tabular-nums">
+        <span className="shrink-0 pt-1 font-mono text-sm text-ink-muted tabular-nums">
           {story.us_id}
         </span>
         <EditableField
@@ -75,7 +77,10 @@ export const StoryCard = memo(function StoryCard({
           onSave={(name) => save({ name })}
           className="min-w-0 flex-1"
         >
-          <h3 id={`story-${story.id}`} className="pt-1 text-base font-semibold">
+          <h3
+            id={`story-${story.id}`}
+            className="pt-1 font-heading text-base font-semibold text-ink"
+          >
             {story.name}
           </h3>
         </EditableField>
@@ -98,7 +103,7 @@ export const StoryCard = memo(function StoryCard({
       <dl className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-2 gap-y-1 text-sm">
         {SENTENCES.map(({ key, label }) => (
           <div key={key} className="contents">
-            <dt className="pt-1 text-muted-foreground">{label}</dt>
+            <dt className="pt-1 text-ink-muted">{label}</dt>
             <dd>
               <EditableField
                 label={label}
@@ -142,9 +147,7 @@ export const StoryCard = memo(function StoryCard({
           onSave={(id) => save({ requested_by: id ? Number(id) : null })}
         />
         <div className="flex flex-col gap-1">
-          <span className="text-sm text-muted-foreground">
-            {MESSAGES.requestedAt}
-          </span>
+          <span className="text-sm text-ink-muted">{MESSAGES.requestedAt}</span>
           <EditableField
             label={MESSAGES.requestedAt}
             value={story.requested_at ?? ""}

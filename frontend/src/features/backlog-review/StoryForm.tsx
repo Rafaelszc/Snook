@@ -90,7 +90,7 @@ export function StoryForm({
   return (
     <form
       aria-label={MESSAGES.newStory}
-      className="motion-enter flex flex-col gap-4 rounded-xl border border-border p-4 sm:p-5"
+      className="motion-enter rounded-xl flex flex-col gap-4 border border-border p-4 sm:p-5"
       onSubmit={(event) => {
         event.preventDefault()
         create.mutate(draft, { onSuccess: onDone })
