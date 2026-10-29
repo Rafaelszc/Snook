@@ -9,7 +9,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: var(--font-family-sans);
+  --font-heading: var(--font-family-serif);
+  --font-serif: var(--font-family-serif);
   --font-sans: var(--font-family-sans);
   --font-mono: var(--font-family-mono);
   --text-*: initial;
