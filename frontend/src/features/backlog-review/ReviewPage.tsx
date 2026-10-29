@@ -1,7 +1,11 @@
-import { ArrowLeft, CircleAlert, Info } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { useMemo } from "react"
 import { Link, useParams } from "react-router"
 
+import { EmptyState } from "@/components/surfaces/EmptyState"
+import { Notice } from "@/components/surfaces/Notice"
+import { PageHeader } from "@/components/surfaces/PageHeader"
+import { Skeleton, SkeletonGroup } from "@/components/surfaces/Skeleton"
 import { StatusBadge } from "@/components/surfaces/StatusBadge"
 
 import { canRenameParticipant, type Backlog, type ReviewMeeting } from "./api"
@@ -15,9 +19,6 @@ import { RenameParticipantDialog } from "./RenameParticipantDialog"
 import { RetryButton } from "./RetryButton"
 import { useBacklog, useParticipants, useReviewMeeting } from "./useBacklog"
 
-const ALERT =
-  "rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-
 // Só leitura: falha da última geração com motivo e "Tentar novamente", ou situação atual (46).
 function ReadOnlyNotice({
   meeting,
@@ -29,34 +30,17 @@ function ReadOnlyNotice({
   if (!backlog.read_only) return null
   if (backlog.last_generation_failed)
     return (
-      <section
-        role="alert"
-        className="flex flex-col gap-3 rounded-xl border border-destructive/40 p-4"
-      >
-        <p className="flex items-start gap-2 text-sm font-medium">
-          <CircleAlert
-            aria-hidden="true"
-            className="mt-0.5 size-4 shrink-0 text-destructive"
-          />
-          {MESSAGES.failed}
-        </p>
-        {meeting.error_message ? (
-          <p className="text-sm text-muted-foreground">
-            {meeting.error_message}
-          </p>
-        ) : null}
-        <RetryButton meetingId={meeting.id} />
-      </section>
+      <Notice variant="warn">
+        <div className="flex flex-col gap-3">
+          <p className="font-medium">{MESSAGES.failed}</p>
+          {meeting.error_message ? (
+            <p className="text-ink-muted">{meeting.error_message}</p>
+          ) : null}
+          <RetryButton meetingId={meeting.id} />
+        </div>
+      </Notice>
     )
-  return (
-    <p className="flex items-start gap-2 rounded-xl border border-border p-4 text-sm">
-      <Info
-        aria-hidden="true"
-        className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-      />
-      {MESSAGES.readOnly(meeting.status)}
-    </p>
-  )
+  return <Notice variant="info">{MESSAGES.readOnly(meeting.status)}</Notice>
 }
 
 function Actions({
@@ -84,12 +68,10 @@ function Actions({
 function Epics({ backlog }: { backlog: Backlog }) {
   if (backlog.epics.length === 0)
     return (
-      <div className="flex flex-col gap-1 rounded-xl border border-dashed border-border p-6">
-        <p className="text-base font-medium">{MESSAGES.empty}</p>
-        {backlog.read_only ? null : (
-          <p className="text-sm text-muted-foreground">{MESSAGES.emptyHint}</p>
-        )}
-      </div>
+      <EmptyState
+        title={MESSAGES.empty}
+        description={backlog.read_only ? undefined : MESSAGES.emptyHint}
+      />
     )
   return (
     <div className="flex flex-col gap-8">
@@ -102,17 +84,14 @@ function Epics({ backlog }: { backlog: Backlog }) {
 
 function Loading() {
   return (
-    <div aria-busy="true" className="flex flex-col gap-4">
-      <span role="status" className="sr-only">
-        {MESSAGES.loading}
-      </span>
-      <div className="h-10 w-2/3 rounded-lg bg-muted" />
-      <div className="h-48 rounded-xl bg-muted" />
-    </div>
+    <SkeletonGroup label={MESSAGES.loading}>
+      <Skeleton className="h-10 w-2/3" />
+      <Skeleton className="h-48" />
+    </SkeletonGroup>
   )
 }
 
-// Tamanhos de texto: sm, base, 2xl.
+// Tamanhos de texto: sm, base, 2xl; lg do EmptyState só sem Epic (aí sem base).
 export function ReviewPage() {
   const { id = "" } = useParams()
   const meeting = useReviewMeeting(id)
@@ -131,35 +110,36 @@ export function ReviewPage() {
     backlog.data?.epics.reduce((sum, e) => sum + e.user_stories.length, 0) ?? 0
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 py-4">
+    <div className="flex flex-col gap-8">
       <Link
         to={`/meetings/${id}`}
-        className="inline-flex items-center gap-1.5 self-start text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-2 self-start rounded-sm text-sm text-ink-muted outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
         {MESSAGES.back}
       </Link>
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold break-words">
-          {meeting.data?.title ?? MESSAGES.title}
-        </h1>
-        {meeting.data && backlog.data ? (
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
-            <StatusBadge status={meeting.data.status} />
-            <span>
-              {MESSAGES.epics(backlog.data.epics.length)} ·{" "}
-              {MESSAGES.stories(total)}
+      <PageHeader
+        className="break-words"
+        title={meeting.data?.title ?? MESSAGES.title}
+        description={
+          meeting.data && backlog.data ? (
+            <span className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <StatusBadge status={meeting.data.status} />
+              <span className="font-mono tabular-nums">
+                {MESSAGES.epics(backlog.data.epics.length)} ·{" "}
+                {MESSAGES.stories(total)}
+              </span>
             </span>
-          </div>
-        ) : null}
-      </header>
+          ) : undefined
+        }
+      />
       {error ? (
         error.status === 409 ? (
-          <p className="text-sm text-muted-foreground">{MESSAGES.noBacklog}</p>
+          <EmptyState title={MESSAGES.noBacklog} />
         ) : (
-          <p role="alert" className={ALERT}>
+          <Notice variant="error">
             {error.status === 404 ? MESSAGES.notFound : error.message}
-          </p>
+          </Notice>
         )
       ) : !meeting.data || !backlog.data || !review ? (
         <Loading />

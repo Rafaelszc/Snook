@@ -81,7 +81,12 @@ it("em failed mostra só leitura, motivo e Tentar novamente com aviso (backlog-r
   )
   const { container } = renderReview()
 
-  const alert = await screen.findByRole("alert")
+  // Notice warn tem role="status" (ADR-0024, "Componentes").
+  const alert = (await screen.findByText(/A última geração falhou/)).closest(
+    '[data-slot="notice"]'
+  ) as HTMLElement
+  expect(alert).toHaveAttribute("data-variant", "warn")
+  expect(alert).toHaveAttribute("role", "status")
   expect(alert).toHaveTextContent("A última geração falhou")
   expect(alert).toHaveTextContent("O provedor recusou a chave.")
   expect(
