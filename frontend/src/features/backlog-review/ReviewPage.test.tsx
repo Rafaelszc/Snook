@@ -109,6 +109,32 @@ it("em failed mostra só leitura, motivo e Tentar novamente com aviso (backlog-r
   expect(retry).toHaveLength(1)
 })
 
+it("erro do Tentar novamente aparece em Notice error (ADR-0024)", async () => {
+  serve(
+    meeting({ status: "failed", failed_stage: "generation" }),
+    backlog(TWO_EPICS, { read_only: true, last_generation_failed: true })
+  )
+  record("post", "/retry", () =>
+    HttpResponse.json(
+      { error: { code: "conflict", message: "Já está em andamento." } },
+      { status: 409 }
+    )
+  )
+  const { container } = renderReview()
+
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Tentar novamente" })
+  )
+  const dialog = await screen.findByRole("alertdialog")
+  await userEvent.click(
+    within(dialog).getByRole("button", { name: "Tentar novamente" })
+  )
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveTextContent("Já está em andamento.")
+  expect(alert).toHaveAttribute("data-variant", "error")
+  expect(await axe(container)).toHaveNoViolations()
+})
+
 it.each([
   ["transcribed", "Transcrita"],
   ["generating", "Gerando backlog"],
