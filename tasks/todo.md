@@ -3226,13 +3226,13 @@
 **Description:** Em `tokens.css`, acrescenta os tokens Ata (tabela "Tokens") nos dois temas e aponta os apelidos shadcn para eles (tabela "Apelidos"). O `@theme` de `index.css` ganha as cores `--color-*` novas. Os tokens antigos (`--highlight*`, `--status-*`, `--sidebar-*`, `--chart-*`, `--elevation-*`, `--radius`) ficam até a Task 52.30, porque classes de `features/` ainda os leem.
 
 **Acceptance criteria:**
-- [ ] Os tokens da tabela "Tokens" do ADR-0024 existem nos temas claro e escuro, e o `@theme` expõe `--color-canvas`, `--color-surface`, `--color-sunken`, `--color-hairline`, `--color-ink`, `--color-ink-muted`, `--color-signal`, `--color-signal-ink`, `--color-signal-soft`, `--color-done`, `--color-warn`, `--color-warn-soft`, `--color-failed`, `--color-failed-soft` e `--color-scrim` (ADR-0024, "Cor").
-- [ ] Os apelidos shadcn da tabela "Apelidos" leem só tokens Ata; `--accent` é fundo de hover (`--sunken`) e `--ring` é `var(--signal)`, sem alfa (ADR-0024, "Apelidos" e "Foco").
-- [ ] `tokens.test.ts` confere todos os pares das duas tabelas de "Contraste", nos dois temas; par abaixo do mínimo corrige o fundo `-soft`, nunca o mínimo (WCAG 2.2 AA; `02-architecture.md`, "Restrições obrigatórias").
+- [x] Os tokens da tabela "Tokens" do ADR-0024 existem nos temas claro e escuro, e o `@theme` expõe `--color-canvas`, `--color-surface`, `--color-sunken`, `--color-hairline`, `--color-ink`, `--color-ink-muted`, `--color-signal`, `--color-signal-ink`, `--color-signal-soft`, `--color-done`, `--color-warn`, `--color-warn-soft`, `--color-failed`, `--color-failed-soft` e `--color-scrim` (ADR-0024, "Cor").
+- [x] Os apelidos shadcn da tabela "Apelidos" leem só tokens Ata; `--accent` é fundo de hover (`--sunken`) e `--ring` é `var(--signal)`, sem alfa (ADR-0024, "Apelidos" e "Foco").
+- [x] `tokens.test.ts` confere todos os pares das duas tabelas de "Contraste", nos dois temas; par abaixo do mínimo corrige o fundo `-soft`, nunca o mínimo (WCAG 2.2 AA; `02-architecture.md`, "Restrições obrigatórias").
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/styles`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/styles`.
+- [x] Gate frontend.
 
 **Dependencies:** Checkpoint: Release sem auditoria visual
 
@@ -3249,13 +3249,13 @@
 **Description:** Quatro `.woff2` novos (Source Serif 4 latin e latin-ext; Geist Mono latin e latin-ext) e licenças em `frontend/public/fonts/`. `@font-face` com `unicode-range` e `font-display: swap` em `tokens.css`. Fallback local com métricas ajustadas para serif e sans. `--font-heading` e `--font-serif` apontam para Source Serif 4, `--font-sans` para Geist, `--font-mono` para Geist Mono (hoje `index.css:12` aponta `--font-heading` para a sans). Preload só da Geist latin e da Source Serif 4 latin. Arquivos vêm do pacote oficial das fontes, sem dependência npm nova.
 
 **Acceptance criteria:**
-- [ ] Os quatro `.woff2`, `LICENSE-SourceSerif4.txt` (OFL) e a conferência da cobertura da Geist Mono por `LICENSE-Geist.txt` (se não cobrir, o arquivo da licença dela) estão em `public/fonts/`; nenhuma requisição externa e CSP `default-src 'self'` sem mudança (ADR-0024, "Tipografia"; SEC-13).
-- [ ] `index.html` tem `<link rel="preload">` só da Geist latin e da Source Serif 4 latin; todas as famílias com `font-display: swap`; fallback com `size-adjust`, `ascent-override`, `descent-override` e `line-gap-override` (NFR-05).
-- [ ] Teste lê `tokens.css`, `index.css` e `index.html` e confere a família de cada `--font-*`, os dois preloads e a ausência de URL `http`.
+- [x] Os quatro `.woff2`, `LICENSE-SourceSerif4.txt` (OFL) e a conferência da cobertura da Geist Mono por `LICENSE-Geist.txt` (se não cobrir, o arquivo da licença dela) estão em `public/fonts/`; nenhuma requisição externa e CSP `default-src 'self'` sem mudança (ADR-0024, "Tipografia"; SEC-13).
+- [x] `index.html` tem `<link rel="preload">` só da Geist latin e da Source Serif 4 latin; todas as famílias com `font-display: swap`; fallback com `size-adjust`, `ascent-override`, `descent-override` e `line-gap-override` (NFR-05).
+- [x] Teste lê `tokens.css`, `index.css` e `index.html` e confere a família de cada `--font-*`, os dois preloads e a ausência de URL `http`.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/styles`.
-- [ ] Gate frontend. `cd frontend && npm run build && node scripts/check-bundle-size.mjs` (NFR-01, NFR-02).
+- [x] `cd frontend && npm test -- --run src/styles`.
+- [x] Gate frontend. `cd frontend && npm run build && node scripts/check-bundle-size.mjs` (NFR-01, NFR-02).
 - [ ] Manual, Lighthouse na tela de login com CPU 4x mais lenta: LCP (NFR-03) e CLS (NFR-05) anotados no PR. LCP acima de 2,5 s: aplicar a contingência (`h1` do auth em Geist; ADR-0024, "Tipografia"), sem ADR novo.
 
 **Dependencies:** Task 52.1
@@ -3274,14 +3274,14 @@
 **Description:** `tokens.css` ganha `--r-4`, `--r-6`, `--r-10`. `@theme` em `index.css`: `--radius-*: initial`, `--radius-sm` = `--r-4`, `--radius-md` = `--r-6`, `--radius-lg` = `--r-10`; `--shadow-*: initial` e só `--shadow-overlay` (= `--overlay-shadow`); larguras `--shell` 72rem e `--reading` 44rem com utilitário para cada uma. Até a task de cada tela, `rounded-xl` e acima ficam sem raio (efeito só visual, aceito na Q1).
 
 **Acceptance criteria:**
-- [ ] `rounded-sm`, `rounded-md` e `rounded-lg` resolvem a 4, 6 e 10 px; `--radius-xl` a `--radius-4xl` não existem (ADR-0024, "Forma").
-- [ ] Só `--shadow-overlay` existe no `@theme`; nenhuma classe `shadow-sm` ou `shadow-md` em `src/` (ADR-0024, "Profundidade").
-- [ ] `--shell` vale 72rem e `--reading` 44rem, e há utilitário de largura para cada uma.
+- [x] `rounded-sm`, `rounded-md` e `rounded-lg` resolvem a 4, 6 e 10 px; `--radius-xl` a `--radius-4xl` não existem (ADR-0024, "Forma").
+- [x] Só `--shadow-overlay` existe no `@theme`; nenhuma classe `shadow-sm` ou `shadow-md` em `src/` (ADR-0024, "Profundidade").
+- [x] `--shell` vale 72rem e `--reading` 44rem, e há utilitário de largura para cada uma.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/styles` (teste novo lê `index.css` e `tokens.css`).
-- [ ] `git grep -nE "shadow-(sm|md)\b" -- frontend/src` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/styles` (teste novo lê `index.css` e `tokens.css`).
+- [x] `git grep -nE "shadow-(sm|md)\b" -- frontend/src` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.1
 
@@ -3298,14 +3298,14 @@
 **Description:** Base de `index.css` troca `outline-ring/50` por `outline-ring`. `Input` passa a 40 px de altura, raio `--r-6`, borda `--input`, anel `ring-2 ring-ring` opaco com afastamento de 2 px, borda `--failed` opaca quando inválido, espaço da escala e sem `ring-ring/50`.
 
 **Acceptance criteria:**
-- [ ] Nenhum anel ou contorno de foco usa alfa em `index.css` nem em `input.tsx` (ADR-0024, "Foco"; WCAG 2.2 AA).
-- [ ] Campo tem 40 px de altura, raio `--r-6` e borda `--input`; campo com `aria-invalid` tem borda `--failed` opaca (ADR-0024, "Forma" e "Foco").
-- [ ] `vitest-axe` sem violação no campo; foco por teclado mostra o anel de 2 px em `--ring`.
+- [x] Nenhum anel ou contorno de foco usa alfa em `index.css` nem em `input.tsx` (ADR-0024, "Foco"; WCAG 2.2 AA).
+- [x] Campo tem 40 px de altura, raio `--r-6` e borda `--input`; campo com `aria-invalid` tem borda `--failed` opaca (ADR-0024, "Forma" e "Foco").
+- [x] `vitest-axe` sem violação no campo; foco por teclado mostra o anel de 2 px em `--ring`.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components`.
-- [ ] `git grep -nE "ring-ring/50|outline-ring/50" -- frontend/src/index.css frontend/src/components/ui/input.tsx` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components`.
+- [x] `git grep -nE "ring-ring/50|outline-ring/50" -- frontend/src/index.css frontend/src/components/ui/input.tsx` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.3
 
@@ -3322,14 +3322,14 @@
 **Description:** `button.tsx` ganha as variantes `primary`, `accent`, `secondary`, `ghost` e `danger` (tabela do ADR-0024, "Componentes") e os tamanhos `default` 36 px, `sm` 32 px, `icon` 36 px, `icon-sm` 32 px. `link` sai (sem uso). Para o `typecheck` seguir verde enquanto os usos migram, as variantes `default`, `outline`, `destructive` e os tamanhos `xs`, `lg`, `icon-xs`, `icon-lg` ficam como apelidos temporários, removidos na Task 52.9. `defaultVariants` e o padrão `variant = "default"` (linhas 36 a 38 e 45 a 46) passam a `primary`. Sem `transition-colors` nem `ring-ring/50`.
 
 **Acceptance criteria:**
-- [ ] Cada variante tem o visual da tabela: `primary` fundo `--ink` e texto `--canvas`; `accent` fundo `--signal` e texto `--signal-ink`; `secondary` transparente com borda `--input` e hover `--sunken`; `ghost` sem borda e hover `--sunken`; `danger` texto e borda `--failed` e hover `--failed-soft` (ADR-0024, "Componentes").
-- [ ] Botão sem `variant` explícito renderiza `primary`; foco por teclado mostra anel opaco de 2 px em `--ring`; hover troca cor sem transição (ADR-0024, "Foco" e "Movimento").
-- [ ] Espaço e raio seguem a escala (`--r-6`); `vitest-axe` sem violação.
+- [x] Cada variante tem o visual da tabela: `primary` fundo `--ink` e texto `--canvas`; `accent` fundo `--signal` e texto `--signal-ink`; `secondary` transparente com borda `--input` e hover `--sunken`; `ghost` sem borda e hover `--sunken`; `danger` texto e borda `--failed` e hover `--failed-soft` (ADR-0024, "Componentes").
+- [x] Botão sem `variant` explícito renderiza `primary`; foco por teclado mostra anel opaco de 2 px em `--ring`; hover troca cor sem transição (ADR-0024, "Foco" e "Movimento").
+- [x] Espaço e raio seguem a escala (`--r-6`); `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components`.
-- [ ] `cd frontend && npm run typecheck` passa com os nomes antigos ainda aceitos.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components`.
+- [x] `cd frontend && npm run typecheck` passa com os nomes antigos ainda aceitos.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.1, 52.3
 
@@ -3346,14 +3346,14 @@
 **Description:** Troca `outline` por `secondary` em 9 usos de 7 arquivos (conferido por grep em 2026-10-28). `ghost` não muda de nome.
 
 **Acceptance criteria:**
-- [ ] Os 9 usos viram `secondary`: `StoryForm.tsx:207`, `FormDialog.tsx:59`, `ExportButtons.tsx:15` e `:23` (`buttonVariants({ variant })`), `EditableField.tsx:157`, `RenameParticipantDialog.tsx:55`, `CriteriaList.tsx:128`, `RegenerateDialog.tsx:71` e `:76` (ADR-0024, "Componentes").
-- [ ] `backlog-review` 44, 45 e 48 seguem passando, sem mudar asserção.
-- [ ] `npm run typecheck` verde.
+- [x] Os 9 usos viram `secondary`: `StoryForm.tsx:207`, `FormDialog.tsx:59`, `ExportButtons.tsx:15` e `:23` (`buttonVariants({ variant })`), `EditableField.tsx:157`, `RenameParticipantDialog.tsx:55`, `CriteriaList.tsx:128`, `RegenerateDialog.tsx:71` e `:76` (ADR-0024, "Componentes").
+- [x] `backlog-review` 44, 45 e 48 seguem passando, sem mudar asserção.
+- [x] `npm run typecheck` verde.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] `git grep -n 'variant: "outline"\|variant="outline"' -- frontend/src/features/backlog-review` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] `git grep -n 'variant: "outline"\|variant="outline"' -- frontend/src/features/backlog-review` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.5
 
@@ -3370,13 +3370,13 @@
 **Description:** Troca `outline` por `secondary` e `destructive` por `danger` em 8 usos de 5 arquivos. O `secondary` de `ProviderForm.tsx:291` fica como está.
 
 **Acceptance criteria:**
-- [ ] `ProviderForm.tsx:226` e `:274`, `RemoveDialog.tsx:39`, `ConfirmDialog.tsx:52` e `SourceWarningDialog.tsx:45` viram `secondary`.
-- [ ] `RemoveDialog.tsx:42` e `RecordingPanel.tsx:46` viram `danger`; `ConfirmDialog.tsx:56` vira `destructive ? "danger" : "primary"`.
-- [ ] `llm-providers` 34, 35 e 37, `meetings` 42 e 43 e `screen-recording` 8 e 13 seguem passando.
+- [x] `ProviderForm.tsx:226` e `:274`, `RemoveDialog.tsx:39`, `ConfirmDialog.tsx:52` e `SourceWarningDialog.tsx:45` viram `secondary`.
+- [x] `RemoveDialog.tsx:42` e `RecordingPanel.tsx:46` viram `danger`; `ConfirmDialog.tsx:56` vira `destructive ? "danger" : "primary"`.
+- [x] `llm-providers` 34, 35 e 37, `meetings` 42 e 43 e `screen-recording` 8 e 13 seguem passando.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/llm-providers src/features/screen-recording src/features/meetings src/components`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/llm-providers src/features/screen-recording src/features/meetings src/components`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.5
 
@@ -3394,13 +3394,13 @@
 **Description:** Troca `outline` por `secondary` em 4 usos e o ternário de `SpeakerRow` em 1; o tamanho `icon-lg` de `SpeakerRow` passa a `icon`. Com os lotes 1 e 2 fecha os 22 usos de `variant` em 17 arquivos.
 
 **Acceptance criteria:**
-- [ ] `CancelSplitButton.tsx:24`, `Layout.tsx:42` (o `size="sm"` fica), `MeetingListPage.tsx:87` e `TitleEditor.tsx:57` viram `secondary`.
-- [ ] `SpeakerRow.tsx:40` vira `playing ? "primary" : "secondary"` e `SpeakerRow.tsx:41` vira `size="icon"`.
-- [ ] `participants` 26, `transcript-split` 45 e `meetings` 40 e 41 seguem passando.
+- [x] `CancelSplitButton.tsx:24`, `Layout.tsx:42` (o `size="sm"` fica), `MeetingListPage.tsx:87` e `TitleEditor.tsx:57` viram `secondary`.
+- [x] `SpeakerRow.tsx:40` vira `playing ? "primary" : "secondary"` e `SpeakerRow.tsx:41` vira `size="icon"`.
+- [x] `participants` 26, `transcript-split` 45 e `meetings` 40 e 41 seguem passando.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/transcript-split src/features/participants src/features/meetings src/app`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/transcript-split src/features/participants src/features/meetings src/app`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.5
 
@@ -3418,14 +3418,14 @@
 **Description:** `button.tsx` perde os apelidos transitórios (`default`, `outline`, `destructive`, `xs`, `lg`, `icon-xs`, `icon-lg`). `LoginPage.tsx:72` e `RegisterPage.tsx:85` trocam `size="lg"` por `default` (36 px). O `typecheck` passa a recusar nome antigo.
 
 **Acceptance criteria:**
-- [ ] O tipo de `variant` aceita só `primary`, `accent`, `secondary`, `ghost` e `danger`; o de `size` só `default`, `sm`, `icon` e `icon-sm` (ADR-0024, "Componentes").
-- [ ] Nenhum uso antigo resta em `src/` (grep abaixo); os 3 usos de `size` (`LoginPage.tsx:72`, `RegisterPage.tsx:85`, `SpeakerRow.tsx:41`) estão trocados.
-- [ ] `auth` 22 a 26 seguem passando.
+- [x] O tipo de `variant` aceita só `primary`, `accent`, `secondary`, `ghost` e `danger`; o de `size` só `default`, `sm`, `icon` e `icon-sm` (ADR-0024, "Componentes").
+- [x] Nenhum uso antigo resta em `src/` (grep abaixo); os 3 usos de `size` (`LoginPage.tsx:72`, `RegisterPage.tsx:85`, `SpeakerRow.tsx:41`) estão trocados.
+- [x] `auth` 22 a 26 seguem passando.
 
 **Verification:**
-- [ ] `git grep -nE 'variant[=:] ?\{?"(default|outline|destructive|link)"|size="(xs|lg|icon-xs|icon-lg)"' -- frontend/src` sem achado.
-- [ ] `cd frontend && npm test -- --run src/features/auth src/components` e `npm run typecheck`.
-- [ ] Gate frontend.
+- [x] `git grep -nE 'variant[=:] ?\{?"(default|outline|destructive|link)"|size="(xs|lg|icon-xs|icon-lg)"' -- frontend/src` sem achado.
+- [x] `cd frontend && npm test -- --run src/features/auth src/components` e `npm run typecheck`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.6, 52.7, 52.8
 
@@ -3442,14 +3442,14 @@
 **Description:** Troca as classes de `StatusBadge.tsx:19` a `:25` conforme "Classes de cor a trocar" do ADR-0024. Pílula e rótulo ficam para a Task 53.3.
 
 **Acceptance criteria:**
-- [ ] `pending` usa `text-ink-muted`; `processing` e `generating` usam `text-signal`; `transcribed` usa `text-ink`; `needs_split` usa `text-warn`; `done` usa `text-done`; `failed` usa `text-failed`.
-- [ ] Os 7 estados seguem com ícone e texto, nunca só cor (WCAG 2.2 AA; `meetings` 40).
-- [ ] `StatusBadge.test.tsx` passa sem mudar asserção de critério.
+- [x] `pending` usa `text-ink-muted`; `processing` e `generating` usam `text-signal`; `transcribed` usa `text-ink`; `needs_split` usa `text-warn`; `done` usa `text-done`; `failed` usa `text-failed`.
+- [x] Os 7 estados seguem com ícone e texto, nunca só cor (WCAG 2.2 AA; `meetings` 40).
+- [x] `StatusBadge.test.tsx` passa sem mudar asserção de critério.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces/StatusBadge`.
-- [ ] `git grep -nE "highlight|status-(pending|processing|done|failed)" -- frontend/src/components/surfaces/StatusBadge.tsx` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces/StatusBadge`.
+- [x] `git grep -nE "highlight|status-(pending|processing|done|failed)" -- frontend/src/components/surfaces/StatusBadge.tsx` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.1
 
@@ -3466,14 +3466,14 @@
 **Description:** `MergeNotice.tsx:5` e `EditableField.tsx:144` trocam `text-highlight` por `text-signal`.
 
 **Acceptance criteria:**
-- [ ] As duas linhas usam `text-signal`; a dica do campo mantém `role="status"` (`backlog-review` 41 e 40).
-- [ ] `backlog-review` 40 e 41 seguem passando.
-- [ ] Nenhum `highlight` resta nos dois arquivos.
+- [x] As duas linhas usam `text-signal`; a dica do campo mantém `role="status"` (`backlog-review` 41 e 40).
+- [x] `backlog-review` 40 e 41 seguem passando.
+- [x] Nenhum `highlight` resta nos dois arquivos.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] `git grep -n "highlight" -- frontend/src/features/backlog-review/MergeNotice.tsx frontend/src/features/backlog-review/EditableField.tsx` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] `git grep -n "highlight" -- frontend/src/features/backlog-review/MergeNotice.tsx frontend/src/features/backlog-review/EditableField.tsx` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.1
 
@@ -3489,14 +3489,14 @@
 **Description:** `CutControls.tsx:58` troca `border-highlight bg-highlight text-highlight-foreground` por `border-signal bg-signal text-signal-ink`; `CutControls.tsx:71` troca `bg-highlight` por `bg-signal`; `PartSummary.tsx:27` troca `text-status-done` por `text-done` (`text-destructive` segue, é apelido).
 
 **Acceptance criteria:**
-- [ ] Marcador de corte ativo e linha de corte usam `--signal` (`transcript-split` 33).
-- [ ] "Parte cabe" usa `text-done`, e a Parte que não cabe segue com `text-destructive` (`transcript-split` 34).
-- [ ] `transcript-split` 33 e 34 seguem passando.
+- [x] Marcador de corte ativo e linha de corte usam `--signal` (`transcript-split` 33).
+- [x] "Parte cabe" usa `text-done`, e a Parte que não cabe segue com `text-destructive` (`transcript-split` 34).
+- [x] `transcript-split` 33 e 34 seguem passando.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/transcript-split`.
-- [ ] `git grep -nE "highlight|status-done" -- frontend/src/features/transcript-split` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/transcript-split`.
+- [x] `git grep -nE "highlight|status-done" -- frontend/src/features/transcript-split` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.1
 
@@ -3512,14 +3512,14 @@
 **Description:** `ProviderForm.tsx:254`, `:258` e `:260` e `SettingsPage.tsx:14` trocam `text-status-done` por `text-done`.
 
 **Acceptance criteria:**
-- [ ] Sucesso do teste de conexão, "salvo" e provedor ativo usam `text-done` (`llm-providers` 33 a 35).
-- [ ] `llm-providers` 33 a 35 seguem passando.
-- [ ] Nenhum `status-done` resta em `llm-providers`.
+- [x] Sucesso do teste de conexão, "salvo" e provedor ativo usam `text-done` (`llm-providers` 33 a 35).
+- [x] `llm-providers` 33 a 35 seguem passando.
+- [x] Nenhum `status-done` resta em `llm-providers`.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/llm-providers`.
-- [ ] `git grep -n "status-" -- frontend/src/features/llm-providers` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [x] `git grep -n "status-" -- frontend/src/features/llm-providers` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.1
 
@@ -3535,13 +3535,13 @@
 **Description:** `components/surfaces/Notice.tsx` com variantes `info`, `warn`, `error` e `consent`. Régua esquerda de 2 px, texto em `--ink`, ícone na cor da variante. Substitui só alerta de bloco ou de página; as telas passam a usá-lo nas suas tasks (53 a 61). Erro de campo fica no `FormField`.
 
 **Acceptance criteria:**
-- [ ] Fundo e régua por variante: `info` `--signal-soft` e `--signal`; `warn` `--warn-soft` e `--warn`; `error` `--failed-soft` e `--failed`; `consent` `--sunken` e `--ink-muted` (ADR-0024, "Componentes").
-- [ ] `error` tem `role="alert"`; `info` e `warn` têm `role="status"`; `consent` não tem região viva.
-- [ ] A mensagem renderiza só como texto React, inclusive com `<script>` (SEC-12); `vitest-axe` sem violação nas quatro variantes.
+- [x] Fundo e régua por variante: `info` `--signal-soft` e `--signal`; `warn` `--warn-soft` e `--warn`; `error` `--failed-soft` e `--failed`; `consent` `--sunken` e `--ink-muted` (ADR-0024, "Componentes").
+- [x] `error` tem `role="alert"`; `info` e `warn` têm `role="status"`; `consent` não tem região viva.
+- [x] A mensagem renderiza só como texto React, inclusive com `<script>` (SEC-12); `vitest-axe` sem violação nas quatro variantes.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces`.
-- [ ] Gate frontend. SEC-12.
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend. SEC-12.
 
 **Dependencies:** Tasks 52.1, 52.3
 
@@ -3558,14 +3558,14 @@
 **Description:** `ConsentNotice` passa a renderizar `Notice variant="consent"` com `CONSENT_NOTICE_TEXT` intacto. As Tasks 57.2 e 61.2 só posicionam o componente. Mudar o texto é "Perguntar antes".
 
 **Acceptance criteria:**
-- [ ] O componente renderiza `Notice variant="consent"` e o texto é igual a `CONSENT_NOTICE_TEXT`, sem checkbox, sem confirmação e sem bloquear nada (`meetings` 52; `screen-recording` 26; Q71).
-- [ ] O texto continua em um único lugar do código (`messages.ts`); o teste que busca a frase em `src/` acha só esse arquivo (Q72).
-- [ ] `ConsentNotice.test.tsx` afirma `Notice variant="consent"` e a igualdade com a constante (ADR-0024, "Testes a atualizar").
+- [x] O componente renderiza `Notice variant="consent"` e o texto é igual a `CONSENT_NOTICE_TEXT`, sem checkbox, sem confirmação e sem bloquear nada (`meetings` 52; `screen-recording` 26; Q71).
+- [x] O texto continua em um único lugar do código (`messages.ts`); o teste que busca a frase em `src/` acha só esse arquivo (Q72).
+- [x] `ConsentNotice.test.tsx` afirma `Notice variant="consent"` e a igualdade com a constante (ADR-0024, "Testes a atualizar").
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces/ConsentNotice`.
-- [ ] `git diff -- frontend/src/components/surfaces/ConsentNotice/messages.ts` vazio.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces/ConsentNotice`.
+- [x] `git diff -- frontend/src/components/surfaces/ConsentNotice/messages.ts` vazio.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.14
 
@@ -3582,13 +3582,13 @@
 **Description:** `components/surfaces/DialogSurface.tsx`: superfície opaca de diálogo (`--surface`, `--r-10`, `--overlay-shadow`) sobre `--scrim`, sem `backdrop-filter`. `ConfirmDialog` troca `GlassPanel` por ele, o overlay `bg-black/40` por `bg-scrim`, e o comentário da linha 22. Cobre `meetings/DeleteMeetingDialog`, `meetings/RetryButton`, `backlog-review/RetryButton` e `backlog-review/ConfirmDeleteDialog`, que passam por `ConfirmDialog`.
 
 **Acceptance criteria:**
-- [ ] `DialogSurface` é opaco (sem `backdrop-filter`), com `--surface`, raio `--r-10` e `--overlay-shadow`; o overlay usa `--scrim` (ADR-0024, "Componentes" e "Vidro").
-- [ ] `ConfirmDialog` usa `DialogSurface`; `MeetingDetailPage.test.tsx` e `meetings/RetryButton.test.tsx` afirmam `DialogSurface` em vez de `data-slot="glass-panel"`, com as mesmas asserções de `meetings` 42 e 43.
-- [ ] `vitest-axe` sem violação; foco entra no diálogo e volta ao gatilho.
+- [x] `DialogSurface` é opaco (sem `backdrop-filter`), com `--surface`, raio `--r-10` e `--overlay-shadow`; o overlay usa `--scrim` (ADR-0024, "Componentes" e "Vidro").
+- [x] `ConfirmDialog` usa `DialogSurface`; `MeetingDetailPage.test.tsx` e `meetings/RetryButton.test.tsx` afirmam `DialogSurface` em vez de `data-slot="glass-panel"`, com as mesmas asserções de `meetings` 42 e 43.
+- [x] `vitest-axe` sem violação; foco entra no diálogo e volta ao gatilho.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces src/features/meetings src/features/backlog-review`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces src/features/meetings src/features/backlog-review`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.3, 52.5
 
@@ -3605,14 +3605,14 @@
 **Description:** `FormDialog` (e, por ele, `RenameParticipantDialog` e `MoveStoryDialog`) e `RegenerateDialog` trocam `GlassPanel` por `DialogSurface` e o overlay por `bg-scrim`. Comentário de `FormDialog.tsx:21` atualizado.
 
 **Acceptance criteria:**
-- [ ] Os dois diálogos usam `DialogSurface`, sem `GlassPanel`; `RegenerateDialog.test.tsx` afirma `DialogSurface` em vez de `glass-panel` (ADR-0024, "Testes a atualizar").
-- [ ] `backlog-review` 43, 44 e 48 seguem passando.
-- [ ] Nenhum `rounded-xl` nos dois arquivos.
+- [x] Os dois diálogos usam `DialogSurface`, sem `GlassPanel`; `RegenerateDialog.test.tsx` afirma `DialogSurface` em vez de `glass-panel` (ADR-0024, "Testes a atualizar").
+- [x] `backlog-review` 43, 44 e 48 seguem passando.
+- [x] Nenhum `rounded-xl` nos dois arquivos.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] `git grep -n "GlassPanel" -- frontend/src/features/backlog-review` só acha comentário ou nada (nenhum import).
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] `git grep -n "GlassPanel" -- frontend/src/features/backlog-review` só acha comentário ou nada (nenhum import).
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.16
 
@@ -3629,13 +3629,13 @@
 **Description:** `SourceWarningDialog` (aviso de fontes da gravação) troca `GlassPanel` por `DialogSurface`.
 
 **Acceptance criteria:**
-- [ ] O diálogo usa `DialogSurface`, sem `GlassPanel` nem `rounded-xl`.
-- [ ] `screen-recording` 4, 5 e 7 (aviso de fonte ausente, "Cancelar" encerra a captura) seguem passando.
-- [ ] `vitest-axe` sem violação.
+- [x] O diálogo usa `DialogSurface`, sem `GlassPanel` nem `rounded-xl`.
+- [x] `screen-recording` 4, 5 e 7 (aviso de fonte ausente, "Cancelar" encerra a captura) seguem passando.
+- [x] `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/screen-recording`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/screen-recording`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.16
 
@@ -3652,13 +3652,13 @@
 **Description:** `RemoveDialog` (e, por ele, `ProviderForm`) troca `GlassPanel` por `DialogSurface`. Comentário de `RemoveDialog.tsx:14` atualizado. Fecha o critério reaberto da Task 17.2.
 
 **Acceptance criteria:**
-- [ ] O diálogo de remoção usa `DialogSurface`; `ProviderForm.test.tsx` afirma `DialogSurface` em vez de `glass-panel` (ADR-0024, "Testes a atualizar").
-- [ ] "Remover" pede confirmação antes de chamar a API (`llm-providers` 37).
-- [ ] Nenhum `rounded-xl` no arquivo.
+- [x] O diálogo de remoção usa `DialogSurface`; `ProviderForm.test.tsx` afirma `DialogSurface` em vez de `glass-panel` (ADR-0024, "Testes a atualizar").
+- [x] "Remover" pede confirmação antes de chamar a API (`llm-providers` 37).
+- [x] Nenhum `rounded-xl` no arquivo.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/llm-providers`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/llm-providers`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.16
 
@@ -3675,14 +3675,14 @@
 **Description:** `glass.css` lê `--surface` e `--ink` em vez de `--card` e `--card-foreground` (linhas 5, 6 e 16) e usa `box-shadow: var(--overlay-shadow)` em vez de `var(--elevation-2)` (linha 8). Comentários de `GlassPanel.tsx:11` e `glass.css:1` deixam de citar diálogo. `GlassPanel.test.tsx` passa a `--surface`, `--ink` e `--signal` (linha 145).
 
 **Acceptance criteria:**
-- [ ] Texto sobre o painel mantém 4,5:1 contra o pior fundo, nos temas claro e escuro, com os tokens novos (ADR-0024, "Vidro"; `02-architecture.md`, "Contraste sobre vidro").
-- [ ] Fallback opaco continua em `@supports not`, `prefers-reduced-transparency` e `forced-colors`.
-- [ ] `no-stray-backdrop.test.ts` passa sem mudar regra.
+- [x] Texto sobre o painel mantém 4,5:1 contra o pior fundo, nos temas claro e escuro, com os tokens novos (ADR-0024, "Vidro"; `02-architecture.md`, "Contraste sobre vidro").
+- [x] Fallback opaco continua em `@supports not`, `prefers-reduced-transparency` e `forced-colors`.
+- [x] `no-stray-backdrop.test.ts` passa sem mudar regra.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces/GlassPanel src/styles`.
-- [ ] `git grep -nE "elevation|--card" -- frontend/src/styles/glass.css` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces/GlassPanel src/styles`.
+- [x] `git grep -nE "elevation|--card" -- frontend/src/styles/glass.css` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.1
 
@@ -3699,13 +3699,13 @@
 **Description:** Teste estático varre `src/**/*.tsx` (sem testes): todo arquivo que importa `AlertDialog` ou `Dialog` de `radix-ui` importa `DialogSurface` e não importa `GlassPanel`.
 
 **Acceptance criteria:**
-- [ ] O teste falha se um diálogo importar `GlassPanel` (ADR-0024, "Testes novos"; `02-architecture.md`, "Verificação").
-- [ ] O teste falha se um diálogo não usar `DialogSurface`.
-- [ ] O teste passa com os 5 diálogos diretos migrados (`ConfirmDialog`, `FormDialog`, `RegenerateDialog`, `SourceWarningDialog`, `RemoveDialog`).
+- [x] O teste falha se um diálogo importar `GlassPanel` (ADR-0024, "Testes novos"; `02-architecture.md`, "Verificação").
+- [x] O teste falha se um diálogo não usar `DialogSurface`.
+- [x] O teste passa com os 5 diálogos diretos migrados (`ConfirmDialog`, `FormDialog`, `RegenerateDialog`, `SourceWarningDialog`, `RemoveDialog`).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.17, 52.18, 52.19
 
@@ -3721,13 +3721,13 @@
 **Description:** `components/surfaces/PageHeader.tsx`: título `h1` em serif, descrição em `--ink-muted`, ações à direita. Sem card.
 
 **Acceptance criteria:**
-- [ ] Renderiza um `h1` com `font-heading` (Source Serif 4), descrição opcional em `--ink-muted` e área de ações à direita (ADR-0024, "Componentes").
-- [ ] Usa só tamanhos da escala e espaço da escala; nenhum `text-[`.
-- [ ] `vitest-axe` sem violação.
+- [x] Renderiza um `h1` com `font-heading` (Source Serif 4), descrição opcional em `--ink-muted` e área de ações à direita (ADR-0024, "Componentes").
+- [x] Usa só tamanhos da escala e espaço da escala; nenhum `text-[`.
+- [x] `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.2, 52.3
 
@@ -3744,13 +3744,13 @@
 **Description:** `components/surfaces/Skeleton.tsx` único (hoje há cópias nas páginas). Fundo `--sunken`, raio `--r-4`, respiração lenta de opacidade em `motion.css`.
 
 **Acceptance criteria:**
-- [ ] Anima só `opacity` e fica parado com `prefers-reduced-motion: reduce`; CSS e hook `useReducedMotion` concordam (ADR-0024, "Movimento"; `02-architecture.md`, "Restrições obrigatórias").
-- [ ] Usa `--sunken` e `--r-4`; o contêiner de carregamento anuncia por `aria-busy` ou região `role="status"`.
-- [ ] `vitest-axe` sem violação.
+- [x] Anima só `opacity` e fica parado com `prefers-reduced-motion: reduce`; CSS e hook `useReducedMotion` concordam (ADR-0024, "Movimento"; `02-architecture.md`, "Restrições obrigatórias").
+- [x] Usa `--sunken` e `--r-4`; o contêiner de carregamento anuncia por `aria-busy` ou região `role="status"`.
+- [x] `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces src/styles`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces src/styles`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.1, 52.3
 
@@ -3767,13 +3767,13 @@
 **Description:** `components/surfaces/EmptyState.tsx` único: título, descrição e ação opcional, sem card.
 
 **Acceptance criteria:**
-- [ ] Mostra título e descrição, e a ação só quando for passada (ADR-0024, "Componentes").
-- [ ] Sem card, sem sombra e sem raio acima de 10 px; usa espaço da escala.
-- [ ] `vitest-axe` sem violação.
+- [x] Mostra título e descrição, e a ação só quando for passada (ADR-0024, "Componentes").
+- [x] Sem card, sem sombra e sem raio acima de 10 px; usa espaço da escala.
+- [x] `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.3, 52.5
 
@@ -3790,14 +3790,14 @@
 **Description:** `theme-provider.tsx` perde o `keydown` (linhas 160 a 177 hoje). A leitura e a escrita em `localStorage` e a sincronização entre abas ficam.
 
 **Acceptance criteria:**
-- [ ] O `theme-provider` não registra listener de `keydown`; apertar `d` não muda o tema (WCAG 2.2, critério 2.1.4; ADR-0024, "Tema").
-- [ ] A preferência de tema segue em `localStorage` e a sessão nunca vai a `localStorage` nem `sessionStorage` (`03-security.md`, "Never").
-- [ ] O tema escolhido continua aplicado depois de recarregar.
+- [x] O `theme-provider` não registra listener de `keydown`; apertar `d` não muda o tema (WCAG 2.2, critério 2.1.4; ADR-0024, "Tema").
+- [x] A preferência de tema segue em `localStorage` e a sessão nunca vai a `localStorage` nem `sessionStorage` (`03-security.md`, "Never").
+- [x] O tema escolhido continua aplicado depois de recarregar.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components`.
-- [ ] `git grep -n "keydown" -- frontend/src/components/theme-provider.tsx` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components`.
+- [x] `git grep -n "keydown" -- frontend/src/components/theme-provider.tsx` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.1
 
@@ -3814,13 +3814,13 @@
 **Description:** `components/surfaces/ThemeToggle.tsx` com claro, escuro e sistema, ligado ao `useTheme`. O `AppShell` (Task 53.1) e o auth (Task 55.1) o encaixam.
 
 **Acceptance criteria:**
-- [ ] Oferece claro, escuro e sistema; o escolhido aparece marcado e é gravado em `localStorage` pelo `theme-provider` (ADR-0024, "Tema").
-- [ ] Opera por teclado, tem nome acessível e alvo de pelo menos 24 px; sem atalho de tecla.
-- [ ] `vitest-axe` sem violação nos dois temas.
+- [x] Oferece claro, escuro e sistema; o escolhido aparece marcado e é gravado em `localStorage` pelo `theme-provider` (ADR-0024, "Tema").
+- [x] Opera por teclado, tem nome acessível e alvo de pelo menos 24 px; sem atalho de tecla.
+- [x] `vitest-axe` sem violação nos dois temas.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.5, 52.25
 
@@ -3837,13 +3837,13 @@
 **Description:** `index.html:6-7` troca `#ffffff` e `#0a0a0a` pelo hex equivalente ao `oklch` de `--canvas` claro (`oklch(0.985 0.004 85)`) e escuro (`oklch(0.175 0.009 220)`).
 
 **Acceptance criteria:**
-- [ ] O `theme-color` claro e o escuro são o hex de `--canvas` de cada tema (ADR-0024, "Tema").
-- [ ] Teste converte o `oklch` de `tokens.css` (com `src/test/color.ts`) e compara com o `content` de cada meta, com tolerância de um nível por canal.
-- [ ] O preload de fontes da Task 52.2 segue intacto.
+- [x] O `theme-color` claro e o escuro são o hex de `--canvas` de cada tema (ADR-0024, "Tema").
+- [x] Teste converte o `oklch` de `tokens.css` (com `src/test/color.ts`) e compara com o `content` de cada meta, com tolerância de um nível por canal.
+- [x] O preload de fontes da Task 52.2 segue intacto.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/styles`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/styles`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 52.1
 
@@ -3860,13 +3860,13 @@
 **Description:** `eslint.config.js` ganha `no-restricted-imports` para `src/components/**` barrando `@/features/*`. Hoje não há import desse tipo em `components/` (grep de 2026-10-28), então o lint segue verde.
 
 **Acceptance criteria:**
-- [ ] `npm run lint` falha com import de `@/features/*` dentro de `components/**` (`AGENTS.md`, "Regras de código"; ADR-0024, "Componentes").
-- [ ] `npm run lint` passa no repo atual.
-- [ ] A regra de SEC-12 (`dangerouslySetInnerHTML`) continua ativa.
+- [x] `npm run lint` falha com import de `@/features/*` dentro de `components/**` (`AGENTS.md`, "Regras de código"; ADR-0024, "Componentes").
+- [x] `npm run lint` passa no repo atual.
+- [x] A regra de SEC-12 (`dangerouslySetInnerHTML`) continua ativa.
 
 **Verification:**
-- [ ] Manual: criar `frontend/src/components/surfaces/tmp-lint.tsx` com `import "@/features/auth/useSession"`, rodar `cd frontend && npx eslint src/components/surfaces/tmp-lint.tsx` e ver `no-restricted-imports`; apagar o arquivo antes do commit.
-- [ ] `cd frontend && npm run lint`.
+- [x] Manual: criar `frontend/src/components/surfaces/tmp-lint.tsx` com `import "@/features/auth/useSession"`, rodar `cd frontend && npx eslint src/components/surfaces/tmp-lint.tsx` e ver `no-restricted-imports`; apagar o arquivo antes do commit.
+- [x] `cd frontend && npm run lint`.
 
 **Dependencies:** None (dentro da Task 52)
 
@@ -3882,14 +3882,14 @@
 **Description:** `app/SamplePage.tsx` refeita: lista os tokens da tabela "Tokens" (linha 20 hoje cita `highlight`), mostra `Button` (cinco variantes), `Notice` (quatro variantes), `StatusBadge` (sete estados), `PageHeader`, `Skeleton`, `EmptyState` e `ThemeToggle`. O vidro aparece só como exemplo do painel da gravação, sem gradiente (a linha 55 hoje usa `bg-gradient-to-br from-highlight to-foreground`; vira `rounded-lg bg-signal`).
 
 **Acceptance criteria:**
-- [ ] A amostra lista os tokens Ata e usa os componentes novos (ADR-0024, "Testes a atualizar").
-- [ ] Nenhum `GlassPanel` de diálogo e nenhum gradiente na amostra.
-- [ ] `SamplePage.test.tsx` passa `vitest-axe` sem violação nos dois temas.
+- [x] A amostra lista os tokens Ata e usa os componentes novos (ADR-0024, "Testes a atualizar").
+- [x] Nenhum `GlassPanel` de diálogo e nenhum gradiente na amostra.
+- [x] `SamplePage.test.tsx` passa `vitest-axe` sem violação nos dois temas.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/app`.
-- [ ] `git grep -nE "highlight|gradient" -- frontend/src/app/SamplePage.tsx` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/app`.
+- [x] `git grep -nE "highlight|gradient" -- frontend/src/app/SamplePage.tsx` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.14, 52.16, 52.20, 52.22, 52.23, 52.24, 52.26
 
@@ -3906,13 +3906,13 @@
 **Description:** `tokens.css` perde `--highlight`, `--highlight-foreground`, `--status-*`, `--sidebar-*`, `--chart-*`, `--elevation-1`, `--elevation-2` e `--radius`. `index.css` perde `--color-highlight*`, `--color-status-*` (linhas 33 a 38), `--color-chart-*` e `--color-sidebar-*` (linhas 43 a 55). `spotlight.css:18` troca `var(--highlight)` por `var(--signal)`. `tokens.test.ts` perde os pares e nomes antigos (linhas 47 a 60 e 93; `--sidebar-foreground` na 52). Teste novo trava o retorno dos nomes.
 
 **Acceptance criteria:**
-- [ ] Em `components/`, `styles/`, `index.css` e `app/SamplePage.tsx`, nenhum resultado para `highlight|status-(pending|processing|done|failed)|sidebar|chart-`, na forma de variável e na de classe (checkpoint da Task 52).
-- [ ] Em todo o `src/`, nenhuma das classes da tabela "Classes de cor a trocar" resta (`text-highlight`, `bg-highlight`, `border-highlight`, `text-highlight-foreground`, `text-status-*`).
-- [ ] `spotlight.css` lê `--signal`; a Task 57.1 recorta o realce para a borda.
+- [x] Em `components/`, `styles/`, `index.css` e `app/SamplePage.tsx`, nenhum resultado para `highlight|status-(pending|processing|done|failed)|sidebar|chart-`, na forma de variável e na de classe (checkpoint da Task 52).
+- [x] Em todo o `src/`, nenhuma das classes da tabela "Classes de cor a trocar" resta (`text-highlight`, `bg-highlight`, `border-highlight`, `text-highlight-foreground`, `text-status-*`).
+- [x] `spotlight.css` lê `--signal`; a Task 57.1 recorta o realce para a borda.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run` (teste novo `removed-tokens.test.ts`, que se exclui da própria busca).
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run` (teste novo `removed-tokens.test.ts`, que se exclui da própria busca).
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.10, 52.11, 52.12, 52.13, 52.20, 52.29
 
@@ -3926,20 +3926,20 @@
 
 ### Checkpoint: Tokens e primitivos
 
-- [ ] `cd frontend && npm test -- --run`, `npm run lint`, `npm run typecheck` e `npm run build` passam
-- [ ] `tokens.test.ts` com todos os pares de contraste do ADR-0024, nos dois temas; pares marcados "a conferir" confirmados ou fundos `-soft` ajustados
-- [ ] Nenhum diálogo renderiza `GlassPanel`; `no-stray-backdrop.test.ts` passa
-- [ ] Grep em `components/`, `styles/`, `index.css` e `app/SamplePage.tsx` sem resultado para `highlight|status-(pending|processing|done|failed)|sidebar|chart-` (forma de variável e forma de classe)
-- [ ] Usos em `features/` da tabela "Classes de cor a trocar" do ADR-0024 trocados, conferidos linha a linha no PR
-- [ ] `git grep -nE 'variant[=:] ?\{?"(default|outline|destructive|link)"|size="(xs|lg|icon-xs|icon-lg)"' -- frontend/src` sem achado (22 usos de `variant` em 17 arquivos e 3 de `size` trocados)
-- [ ] `ConsentNotice` renderiza `Notice variant="consent"`; teste de igualdade com `CONSENT_NOTICE_TEXT` passa
-- [ ] `npm run lint` falha com import de `@/features/*` dentro de `components/**` (conferido com arquivo de teste temporário, fora do commit)
-- [ ] `index.html`: `theme-color` claro e escuro iguais a `--canvas` de cada tema
-- [ ] `theme-provider` sem listener de `keydown`; `ThemeToggle` operável por teclado
+- [x] `cd frontend && npm test -- --run`, `npm run lint`, `npm run typecheck` e `npm run build` passam
+- [x] `tokens.test.ts` com todos os pares de contraste do ADR-0024, nos dois temas; pares marcados "a conferir" confirmados ou fundos `-soft` ajustados
+- [x] Nenhum diálogo renderiza `GlassPanel`; `no-stray-backdrop.test.ts` passa
+- [x] Grep em `components/`, `styles/`, `index.css` e `app/SamplePage.tsx` sem resultado para `highlight|status-(pending|processing|done|failed)|sidebar|chart-` (forma de variável e forma de classe)
+- [x] Usos em `features/` da tabela "Classes de cor a trocar" do ADR-0024 trocados, conferidos linha a linha no PR
+- [x] `git grep -nE 'variant[=:] ?\{?"(default|outline|destructive|link)"|size="(xs|lg|icon-xs|icon-lg)"' -- frontend/src` sem achado (22 usos de `variant` em 17 arquivos e 3 de `size` trocados)
+- [x] `ConsentNotice` renderiza `Notice variant="consent"`; teste de igualdade com `CONSENT_NOTICE_TEXT` passa
+- [x] `npm run lint` falha com import de `@/features/*` dentro de `components/**` (conferido com arquivo de teste temporário, fora do commit)
+- [x] `index.html`: `theme-color` claro e escuro iguais a `--canvas` de cada tema
+- [x] `theme-provider` sem listener de `keydown`; `ThemeToggle` operável por teclado
 - [ ] Fontes: quatro `.woff2` e licenças em `public/fonts/`; CSP `default-src 'self'` sem mudança; LCP do login (NFR-03) e CLS (NFR-05) medidos; contingência do `h1` aplicada se LCP passar de 2,5 s
-- [ ] JS inicial e total dentro de NFR-01 e NFR-02
+- [x] JS inicial e total dentro de NFR-01 e NFR-02
 - [ ] Checagem de UI na página de amostra
-- [ ] `/security-review` sobre o diff
+- [x] `/security-review` sobre o diff
 - [ ] Revisão humana antes de seguir
 
 ### Task 53.1: `AppShell`
