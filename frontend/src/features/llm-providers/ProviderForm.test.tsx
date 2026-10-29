@@ -96,8 +96,27 @@ it("teste que falha mostra o motivo da API e mantém Salvar desabilitado (llm-pr
   const openai = within(await openSection("OpenAI"))
   await user.type(openai.getByLabelText("Chave de API"), "sk-errada-123456")
   await user.click(openai.getByRole("button", { name: "Testar conexão" }))
-  expect(await openai.findByRole("alert")).toHaveTextContent(REJECTED)
+  const alert = await openai.findByRole("alert")
+  expect(alert).toHaveTextContent(REJECTED)
+  expect(alert).toHaveAttribute("data-variant", "error")
   expect(openai.getByRole("button", { name: "Salvar" })).toBeDisabled()
+})
+
+it("Salvar é o botão accent; campos com foco opaco (ADR-0024)", async () => {
+  listReturns(NOT_CONFIGURED)
+  renderWithProviders(<SettingsPage />)
+
+  const openai = within(await openSection("OpenAI"))
+  expect(openai.getByRole("button", { name: "Salvar" })).toHaveAttribute(
+    "data-variant",
+    "accent"
+  )
+  expect(
+    openai.getByRole("button", { name: "Testar conexão" })
+  ).toHaveAttribute("data-variant", "secondary")
+  const model = openai.getByLabelText("Modelo")
+  expect(model).toHaveClass("focus-visible:ring-2", "focus-visible:ring-ring")
+  expect(model.className).not.toMatch(/ring-ring\/|ring-3/)
 })
 
 it("erro 422 do teste aparece no campo (llm-providers 35, 38)", async () => {

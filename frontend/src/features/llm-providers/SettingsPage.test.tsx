@@ -88,7 +88,25 @@ it("mostra erro da API ao listar", async () => {
     )
   )
   renderWithProviders(<SettingsPage />)
-  expect(await screen.findByRole("alert")).toHaveTextContent("erro interno")
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveTextContent("erro interno")
+  expect(alert).toHaveAttribute("data-variant", "error")
+})
+
+it("provedores em linhas com régua, sem card; ativo em --done (ADR-0024)", async () => {
+  listReturns(CONFIGURED)
+  renderWithProviders(<SettingsPage />)
+
+  const openai = await screen.findByRole("region", { name: "OpenAI" })
+  for (const name of ["OpenAI", "Anthropic", "DeepSeek", "Ollama"])
+    expect(section(name).className).not.toMatch(
+      /\b(bg-|rounded|shadow|border\b)/
+    )
+  expect(openai.parentElement).toHaveClass("divide-hairline", "border-t-ink")
+  expect(within(openai).getByText("Ativo")).toHaveClass("text-done")
+  expect(within(openai).getByRole("heading", { name: "OpenAI" })).toHaveClass(
+    "font-heading"
+  )
 })
 
 it("passa no axe sem erro", async () => {

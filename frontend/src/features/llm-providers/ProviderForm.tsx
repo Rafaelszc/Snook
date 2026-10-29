@@ -1,6 +1,7 @@
 import { useId, useState, type ChangeEvent, type FormEvent } from "react"
 
 import { FormField } from "@/components/forms/FormField"
+import { Notice } from "@/components/surfaces/Notice"
 import { Button } from "@/components/ui/button"
 import type { ApiError, FieldErrors } from "@/lib/api/errors"
 
@@ -260,13 +261,11 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
           <p className="motion-enter text-done">{MESSAGES.saved}</p>
         ) : null}
       </div>
-      <div role="alert" className="empty:hidden">
-        {apiError ? (
-          <p className="motion-enter rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {apiError}
-          </p>
-        ) : null}
-      </div>
+      {apiError ? (
+        <Notice variant="error" className="motion-enter">
+          {apiError}
+        </Notice>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
         <Button
@@ -279,6 +278,7 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
         </Button>
         <Button
           type="submit"
+          variant="accent"
           disabled={!canSave || busy}
           aria-describedby={canSave ? undefined : `${formId}-save-hint`}
         >
@@ -310,7 +310,7 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
         ) : null}
       </div>
       {canSave ? null : (
-        <p id={`${formId}-save-hint`} className="text-sm text-muted-foreground">
+        <p id={`${formId}-save-hint`} className="text-sm text-ink-muted">
           {MESSAGES.saveHint}
         </p>
       )}
