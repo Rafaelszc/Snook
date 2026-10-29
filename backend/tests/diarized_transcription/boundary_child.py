@@ -80,3 +80,12 @@ def run_guarded(engines: Engines, job: Job) -> dict[str, Any]:
             name for name in sys.modules if name.startswith(("fastapi", "snook.main"))
         ),
     }
+
+
+def log_failure(secret: str) -> None:
+    """Log com `extra` e um segredo, como `pyannote.load_failed` no filho."""
+    import logging
+
+    logging.getLogger("snook.transcription.pyannote").warning(
+        "pyannote.load_failed", extra={"error": "LocalEntryNotFoundError", "detail": secret}
+    )

@@ -3,7 +3,9 @@ em revisão fixa (SEC-22): o `config.yaml` da revisão fixa é reescrito com `no
 carregar. `HF_TOKEN` nunca vai a log nem à mensagem (SEC-20). Bibliotecas só no subprocesso."""
 
 import logging
+import re
 import tempfile
+import traceback
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -26,6 +28,8 @@ SUBMODEL_REVISIONS = {
     "pyannote/wespeaker-voxceleb-resnet34-LM": "837717ddb9ff5507820346191109dc79c958d614",
 }
 _SUBMODEL_PARAMS = ("segmentation", "embedding")
+# Classe que o `weights_only` recusou: nome qualificado, sem dado do usuário.
+_REFUSED_GLOBAL = re.compile(r"GLOBAL ([\w.]+)")
 
 
 class _Segment(Protocol):
@@ -53,13 +57,23 @@ def pin_config(config: dict[str, Any]) -> dict[str, Any]:
     return config
 
 
+def _where(exc: BaseException, depth: int = 5) -> list[str]:
+    """Últimos quadros do traceback (`arquivo:linha função`): só código, sem valores."""
+    frames = traceback.extract_tb(exc.__traceback__)[-depth:]
+    return [f"{Path(f.filename).name}:{f.lineno} {f.name}" for f in frames]
+
+
 def _access_failure(exc: Exception) -> EngineFailure:
     """Token ausente, inválido ou sem aceite dos termos: mensagem que cita `HF_TOKEN`
     (`diarized` 15). Offline sem cache: modelos ausentes."""
     from huggingface_hub.errors import LocalEntryNotFoundError, RepositoryNotFoundError
     from huggingface_hub.utils import HfHubHTTPError
 
-    logger.warning("pyannote.load_failed", extra={"error": type(exc).__name__})
+    refused = _REFUSED_GLOBAL.search(str(exc))
+    extra: dict[str, Any] = {"error": type(exc).__name__, "where": _where(exc)}
+    if refused is not None:
+        extra["refused_global"] = refused.group(1)
+    logger.warning("pyannote.load_failed", extra=extra)
     if isinstance(exc, LocalEntryNotFoundError):
         return EngineFailure(messages.MODELS_UNAVAILABLE)
     if isinstance(exc, RepositoryNotFoundError):  # inclui GatedRepoError
@@ -70,11 +84,23 @@ def _access_failure(exc: Exception) -> EngineFailure:
     return EngineFailure(messages.DIARIZATION_FAILED)
 
 
+def allow_checkpoint_classes() -> None:
+    """torch >= 2.6 carrega checkpoint com `weights_only=True`. Os do pyannote 3.x trazem estas
+    classes; liberar só elas mantém a recusa a qualquer outro objeto no pickle."""
+    from pyannote.audio.core.task import Problem, Resolution, Specifications
+    from torch.serialization import add_safe_globals
+    from torch.torch_version import TorchVersion
+
+    add_safe_globals([TorchVersion, Specifications, Problem, Resolution])
+
+
 def load_pipeline(source: hub.ModelSource, token: SecretStr | None) -> _Pipeline:
     import torch
     import yaml
     from huggingface_hub import hf_hub_download
     from pyannote.audio import Pipeline
+
+    allow_checkpoint_classes()
 
     secret = token.get_secret_value() if token is not None else None
     try:
@@ -150,6 +176,8 @@ class PyannoteDiarizer:
                 for segment, _track, label in annotation.itertracks(yield_label=True)
             ]
         except Exception as exc:
-            logger.warning("pyannote.failed", extra={"error": type(exc).__name__})
+            logger.warning(
+                "pyannote.failed", extra={"error": type(exc).__name__, "where": _where(exc)}
+            )
             raise EngineFailure(messages.DIARIZATION_FAILED) from None
         return turns

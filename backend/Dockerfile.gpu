@@ -6,11 +6,12 @@ COPY --from=ghcr.io/astral-sh/uv@sha256:538e0b39736e7feae937a65983e49d2ab75e1559
 
 ENV DEBIAN_FRONTEND=noninteractive
 # A imagem Ubuntu 24.04 já traz o usuário `ubuntu` com UID 1000; troca por `snook`.
+# HOME gravável: matplotlib, fontconfig e caches do torch escrevem em ~/.config e ~/.cache.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends python3.12 ffmpeg \
     && rm -rf /var/lib/apt/lists/* \
     && userdel --remove ubuntu \
-    && useradd --uid 1000 --user-group --no-create-home --shell /usr/sbin/nologin snook \
+    && useradd --uid 1000 --user-group --create-home --shell /usr/sbin/nologin snook \
     && mkdir -p /data /audios /models /app \
     && chown 1000:1000 /data /audios /models /app
 
