@@ -52,7 +52,7 @@ export function RenameParticipantDialog({
         rename.reset()
       }}
       trigger={
-        <Button variant="outline" disabled={participants.length === 0}>
+        <Button variant="secondary" disabled={participants.length === 0}>
           <UserPen aria-hidden="true" />
           {MESSAGES.renameParticipant}
         </Button>

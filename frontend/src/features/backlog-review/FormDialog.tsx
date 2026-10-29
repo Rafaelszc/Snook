@@ -56,7 +56,7 @@ export function FormDialog({
               {children}
               <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <Dialog.Close asChild>
-                  <Button type="button" variant="outline">
+                  <Button type="button" variant="secondary">
                     {MESSAGES.cancel}
                   </Button>
                 </Dialog.Close>

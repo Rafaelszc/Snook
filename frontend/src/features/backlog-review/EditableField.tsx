@@ -154,7 +154,7 @@ export function EditableField({
         <Button disabled={saving} onClick={() => void save()}>
           {saving ? MESSAGES.saving : MESSAGES.save}
         </Button>
-        <Button variant="outline" disabled={saving} onClick={close}>
+        <Button variant="secondary" disabled={saving} onClick={close}>
           {MESSAGES.cancel}
         </Button>
       </div>

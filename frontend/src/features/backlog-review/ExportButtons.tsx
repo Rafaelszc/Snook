@@ -12,7 +12,7 @@ export function ExportButtons({ meetingId }: { meetingId: string }) {
       <a
         href={exportUrl(meetingId, "md")}
         download
-        className={buttonVariants({ variant: "outline" })}
+        className={buttonVariants({ variant: "secondary" })}
       >
         <FileDown aria-hidden="true" />
         {MESSAGES.exportMd}
@@ -20,7 +20,7 @@ export function ExportButtons({ meetingId }: { meetingId: string }) {
       <a
         href={exportUrl(meetingId, "json")}
         download
-        className={buttonVariants({ variant: "outline" })}
+        className={buttonVariants({ variant: "secondary" })}
       >
         <Braces aria-hidden="true" />
         {MESSAGES.exportJson}

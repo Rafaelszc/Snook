@@ -68,12 +68,12 @@ export function RegenerateDialog({ meetingId }: { meetingId: string }) {
             ) : null}
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <AlertDialog.Cancel asChild>
-                <Button variant="outline">{MESSAGES.cancel}</Button>
+                <Button variant="secondary">{MESSAGES.cancel}</Button>
               </AlertDialog.Cancel>
               {split.data ? (
                 <>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     disabled={regenerate.isPending}
                     onClick={() => run("adjust_cuts")}
                   >
