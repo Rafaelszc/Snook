@@ -37,8 +37,8 @@ export function SpeakerRow({
     <li className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-2 border-b border-border py-4 last:border-b-0">
       <Button
         type="button"
-        variant={playing ? "default" : "outline"}
-        size="icon-lg"
+        variant={playing ? "primary" : "secondary"}
+        size="icon"
         aria-label={playing ? MESSAGES.pause(label) : MESSAGES.play(label)}
         aria-pressed={playing}
         onClick={onTogglePlay}

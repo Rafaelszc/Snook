@@ -54,7 +54,7 @@ export function TitleEditor({ id, title }: { id: string; title: string }) {
         <Button type="submit" disabled={rename.isPending}>
           {rename.isPending ? MESSAGES.savingTitle : MESSAGES.saveTitle}
         </Button>
-        <Button variant="outline" type="button" onClick={() => setDraft(null)}>
+        <Button variant="secondary" type="button" onClick={() => setDraft(null)}>
           {MESSAGES.cancel}
         </Button>
       </div>

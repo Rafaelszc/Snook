@@ -21,7 +21,7 @@ export function CancelSplitButton({
   return (
     <div className="flex flex-col items-start gap-1 sm:items-end">
       <Button
-        variant="outline"
+        variant="secondary"
         disabled={disabled || cancel.isPending}
         aria-describedby="split-cancel-hint"
         onClick={() =>
