@@ -137,30 +137,6 @@
   --border: var(--hairline);
   --ring: var(--signal);
 
-  /* Transitórios: saem na Task 52.30. */
-  --highlight: oklch(0.48 0.2 264);
-  --highlight-foreground: oklch(0.985 0 0);
-
-  /* Estados: sempre acompanhados de texto ou ícone, nunca só cor. */
-  --status-pending: oklch(0.5 0 0);
-  --status-processing: oklch(0.48 0.2 264);
-  --status-done: oklch(0.45 0.12 150);
-  --status-failed: oklch(0.53 0.22 27);
-
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.48 0.2 264);
-
   /* Tipografia: escala 12, 14, 16, 20, 24, 32, 40 px. */
   /* Serif no conteúdo, sans nos controles, mono em ids e instantes (ADR-0024). */
   --font-family-serif:
@@ -183,9 +159,6 @@
   --r-10: 0.625rem;
   --shell: 72rem;
   --reading: 44rem;
-  --radius: 0.625rem;
-  --elevation-1: 0 1px 2px oklch(0 0 0 / 6%);
-  --elevation-2: 0 8px 24px oklch(0 0 0 / 10%);
 
   /* Movimento: 120 a 240 ms, só transform e opacity (motion.css). */
   --motion-fast: 120ms;
@@ -215,24 +188,4 @@
   --scrim: oklch(0.1 0.008 220 / 50%);
   --overlay-shadow:
     0 1px 2px oklch(0 0 0 / 40%), 0 12px 32px oklch(0 0 0 / 45%);
-
-  --highlight: oklch(0.78 0.13 264);
-  --highlight-foreground: oklch(0.145 0 0);
-
-  --status-pending: oklch(0.75 0 0);
-  --status-processing: oklch(0.78 0.13 264);
-  --status-done: oklch(0.78 0.15 150);
-  --status-failed: oklch(0.72 0.19 22);
-
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.78 0.13 264);
-  --sidebar-primary-foreground: oklch(0.145 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.35 0 0);
-  --sidebar-ring: oklch(0.78 0.13 264);
-
-  --elevation-1: 0 1px 2px oklch(0 0 0 / 40%);
-  --elevation-2: 0 8px 24px oklch(0 0 0 / 50%);
 }

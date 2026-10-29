@@ -82,20 +82,8 @@ const textPairs: [string, string][] = [
   ["--muted-foreground", "--muted"],
   ["--muted-foreground", "--card"],
   ["--accent-foreground", "--accent"],
-  ["--highlight-foreground", "--highlight"],
-  ["--highlight", "--background"],
-  ["--highlight", "--card"],
   ["--destructive", "--background"],
   ["--destructive", "--card"],
-  ["--sidebar-foreground", "--sidebar"],
-  ["--status-pending", "--background"],
-  ["--status-pending", "--card"],
-  ["--status-processing", "--background"],
-  ["--status-processing", "--card"],
-  ["--status-done", "--background"],
-  ["--status-done", "--card"],
-  ["--status-failed", "--background"],
-  ["--status-failed", "--card"],
 ]
 
 // Componentes de UI (borda de campo, foco): 3:1 (WCAG 1.4.11).
@@ -182,7 +170,6 @@ describe("tipografia", () => {
     expect(css).toMatch(/--text-base:\s*var\(--fs-16\)/)
     expect(css).toMatch(/--font-sans:\s*var\(--font-family-sans\)/)
     expect(css).toMatch(/--color-background:\s*var\(--background\)/)
-    expect(css).toMatch(/--color-highlight:\s*var\(--highlight\)/)
   })
 })
 

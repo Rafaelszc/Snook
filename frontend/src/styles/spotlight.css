@@ -15,7 +15,7 @@
   opacity: 0;
   background: radial-gradient(
     480px circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
-    color-mix(in oklch, var(--highlight) 22%, transparent),
+    color-mix(in oklch, var(--signal) 22%, transparent),
     transparent 70%
   );
   transition: opacity var(--motion-slow) var(--motion-ease);
