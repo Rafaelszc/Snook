@@ -175,7 +175,7 @@ it("renomear participante com nome de outro avisa da união e mostra erro do cam
   expect(calls).toEqual([{ name: "bruno" }])
 })
 
-it("diálogos usam GlassPanel (NFR-06: um vidro por vez)", async () => {
+it("diálogo usa DialogSurface opaco, sem vidro (ADR-0024)", async () => {
   serve(meeting())
   split("not_split")
   renderReview()
@@ -184,5 +184,8 @@ it("diálogos usam GlassPanel (NFR-06: um vidro por vez)", async () => {
     await screen.findByRole("button", { name: "Regenerar" })
   )
   await screen.findByRole("alertdialog")
-  expect(document.querySelectorAll('[data-slot="glass-panel"]')).toHaveLength(1)
+  expect(
+    document.querySelectorAll('[data-slot="dialog-surface"]')
+  ).toHaveLength(1)
+  expect(document.querySelector('[data-slot="glass-panel"]')).toBeNull()
 })
