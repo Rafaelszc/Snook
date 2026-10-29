@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 
 import type { MeetingDetail } from "./api"
 import { ConfirmDialog } from "@/components/surfaces/ConfirmDialog"
+import { Notice } from "@/components/surfaces/Notice"
 import { MESSAGES } from "./messages"
 import { useRetryMeeting } from "./useMeetings"
 
@@ -36,9 +37,7 @@ export function RetryButton({ meeting }: { meeting: MeetingDetail }) {
         button
       )}
       {retry.error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {retry.error.message}
-        </p>
+        <Notice variant="error">{retry.error.message}</Notice>
       ) : null}
     </div>
   )

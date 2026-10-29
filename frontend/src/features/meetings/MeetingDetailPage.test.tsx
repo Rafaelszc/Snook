@@ -230,3 +230,28 @@ it("com nomes confirmados ou em outro status, não oferece nomeação", async ()
     screen.queryByRole("link", { name: "Nomear participantes" })
   ).not.toBeInTheDocument()
 })
+
+it("falha em Notice error, título serif no PageHeader e no máximo um accent (ADR-0024)", async () => {
+  detailSequence(
+    detail({
+      status: "failed",
+      failed_stage: "generation",
+      error_message: "O provedor recusou a chave.",
+      has_backlog: true,
+    })
+  )
+  const { container } = renderMeetings(PATH)
+
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveAttribute("data-variant", "error")
+  expect(alert).toHaveTextContent("O provedor recusou a chave.")
+  expect(screen.getByRole("heading", { level: 1 })).toHaveClass("font-heading")
+  expect(
+    container.querySelector('[data-slot="page-header"] [role="status"]')
+  ).toHaveTextContent("Falhou")
+  expect(
+    container.querySelectorAll('[data-variant="accent"]').length
+  ).toBeLessThanOrEqual(1)
+  expect(container.innerHTML).not.toMatch(/rounded-xl|bg-muted/)
+  expect(await axe(container)).toHaveNoViolations()
+})

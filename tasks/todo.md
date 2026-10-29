@@ -4314,13 +4314,13 @@
 **Description:** `spotlight.css` recorta o `::before` para a faixa da borda com `mask-composite: exclude` (e `-webkit-mask-composite: xor`), em gradiente radial `--signal`, com o miolo transparente. Sem suporte a `mask-composite`, o realce não aparece. Comentário da linha 1 (cita login) atualizado. É o único gradiente permitido.
 
 **Acceptance criteria:**
-- [ ] O realce cobre só a faixa da borda; o fundo e o texto do miolo não mudam com o ponteiro sobre a área (ADR-0024, "Mouse-tracking").
-- [ ] O CSS só liga com `(hover: hover) and (pointer: fine)`, fica desligado com `prefers-reduced-motion`, `forced-colors` e sem suporte a `mask-composite` (`02-architecture.md`, "Restrições obrigatórias").
-- [ ] Teste lê `spotlight.css` e confere `mask-composite`, a cor `--signal`, a ausência de `--highlight` e o comentário sem "login".
+- [x] O realce cobre só a faixa da borda; o fundo e o texto do miolo não mudam com o ponteiro sobre a área (ADR-0024, "Mouse-tracking").
+- [x] O CSS só liga com `(hover: hover) and (pointer: fine)`, fica desligado com `prefers-reduced-motion`, `forced-colors` e sem suporte a `mask-composite` (`02-architecture.md`, "Restrições obrigatórias").
+- [x] Teste lê `spotlight.css` e confere `mask-composite`, a cor `--signal`, a ausência de `--highlight` e o comentário sem "login".
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/styles src/lib/ui`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/styles src/lib/ui`.
+- [x] Gate frontend.
 
 **Dependencies:** Checkpoint: Tokens e primitivos
 
@@ -4337,14 +4337,14 @@
 **Description:** `UploadPage` com `PageHeader`, área de soltar arquivo com borda fixa `--input` e realce da Task 57.1, foco opaco, `transition-colors` removido (linha 63), `Notice variant="error"` no lugar da caixa das linhas 187 e 188, envio como `accent` (único da tela) e `ConsentNotice` posicionado junto do botão de envio. Não mexe no componente nem no texto.
 
 **Acceptance criteria:**
-- [ ] A tela aceita arquivo, título e número de participantes, recusa antes de enviar extensão fora da lista ou mais de 524.288.000 bytes, mostra erros da API e leva ao detalhe (`meetings` 35 a 39).
-- [ ] O aviso mostra exatamente `CONSENT_NOTICE_TEXT` junto do botão de envio (`meetings` 52).
-- [ ] O mouse-tracking só liga com `(hover: hover) and (pointer: fine)` e sem movimento reduzido, e nenhum listener de `pointermove` entra em toque; grep local sem achado.
+- [x] A tela aceita arquivo, título e número de participantes, recusa antes de enviar extensão fora da lista ou mais de 524.288.000 bytes, mostra erros da API e leva ao detalhe (`meetings` 35 a 39).
+- [x] O aviso mostra exatamente `CONSENT_NOTICE_TEXT` junto do botão de envio (`meetings` 52).
+- [x] O mouse-tracking só liga com `(hover: hover) and (pointer: fine)` e sem movimento reduzido, e nenhum listener de `pointermove` entra em toque; grep local sem achado.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/meetings`.
-- [ ] Grep local em `UploadPage.tsx`. Manual: quadros do spotlight abaixo de 16 ms no DevTools Performance (NFR-08).
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/meetings`.
+- [ ] Grep local em `UploadPage.tsx` (feito). Manual pendente: quadros do spotlight abaixo de 16 ms no DevTools Performance (NFR-08).
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 53.1, 53.2, 57.1
 
@@ -4361,14 +4361,14 @@
 **Description:** `MeetingDetailPage` com `PageHeader`, `StatusBadge` novo, links `buttonVariants()` (padrão `primary`), `Notice` no lugar das caixas das linhas 58 e 128 a 129, instantes e durações em Geist Mono. `TitleEditor` perde classes proibidas.
 
 **Acceptance criteria:**
-- [ ] O detalhe atualiza o status sem recarregar enquanto a Reunião está em `pending`, `processing`, `generating`, ou `transcribed` com `participants_confirmed` verdadeiro (`meetings` 40) e permite editar o título (`meetings` 41).
-- [ ] Mudança de status anunciada em `aria-live`; no máximo um `accent` na tela.
-- [ ] Grep local sem achado em `MeetingDetailPage.tsx` e `TitleEditor.tsx`; `vitest-axe` sem violação.
+- [x] O detalhe atualiza o status sem recarregar enquanto a Reunião está em `pending`, `processing`, `generating`, ou `transcribed` com `participants_confirmed` verdadeiro (`meetings` 40) e permite editar o título (`meetings` 41).
+- [x] Mudança de status anunciada em `aria-live`; no máximo um `accent` na tela.
+- [x] Grep local sem achado em `MeetingDetailPage.tsx` e `TitleEditor.tsx`; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/meetings`.
-- [ ] Grep local nos dois arquivos.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/meetings`.
+- [x] Grep local nos dois arquivos.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 53.3, 57.2
 
@@ -4385,14 +4385,14 @@
 **Description:** `RetryButton` e `DeleteMeetingDialog` da pasta `meetings` usam `Notice variant="error"` para o erro de diálogo. Os diálogos já usam `DialogSurface` (Task 52.16).
 
 **Acceptance criteria:**
-- [ ] Em `failed`, mostra o motivo e "Tentar novamente"; com `has_backlog` verdadeiro, pede confirmação com o aviso de perda das edições (`meetings` 42).
-- [ ] Excluir pede confirmação e avisa que o áudio e o backlog serão apagados (`meetings` 43).
-- [ ] Grep local sem achado; `vitest-axe` sem violação.
+- [x] Em `failed`, mostra o motivo e "Tentar novamente"; com `has_backlog` verdadeiro, pede confirmação com o aviso de perda das edições (`meetings` 42).
+- [x] Excluir pede confirmação e avisa que o áudio e o backlog serão apagados (`meetings` 43).
+- [x] Grep local sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/meetings`.
-- [ ] Grep local nos dois arquivos.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/meetings`.
+- [x] Grep local nos dois arquivos.
+- [x] Gate frontend.
 
 **Dependencies:** Task 57.3
 

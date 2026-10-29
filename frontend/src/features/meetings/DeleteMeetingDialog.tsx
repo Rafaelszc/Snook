@@ -1,9 +1,10 @@
 import { Trash2 } from "lucide-react"
 import { useNavigate } from "react-router"
 
+import { ConfirmDialog } from "@/components/surfaces/ConfirmDialog"
+import { Notice } from "@/components/surfaces/Notice"
 import { Button } from "@/components/ui/button"
 
-import { ConfirmDialog } from "@/components/surfaces/ConfirmDialog"
 import { MESSAGES } from "./messages"
 import { useDeleteMeeting } from "./useMeetings"
 
@@ -32,9 +33,7 @@ export function DeleteMeetingDialog({ meetingId }: { meetingId: string }) {
         }
       />
       {remove.error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {remove.error.message}
-        </p>
+        <Notice variant="error">{remove.error.message}</Notice>
       ) : null}
     </div>
   )

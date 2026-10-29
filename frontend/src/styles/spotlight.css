@@ -1,5 +1,7 @@
-/* ADR-0022: mouse-tracking só no login/cadastro e no upload. usePointerSpotlight grava
-   --pointer-x/--pointer-y; sem hover fino ou com movimento reduzido, o brilho não aparece. */
+/* ADR-0024, "Mouse-tracking": só no realce da borda da área de upload. usePointerSpotlight
+   grava --pointer-x/--pointer-y; o ::before pinta um radial em --signal recortado à faixa
+   da borda por mask-composite, com o miolo transparente. Único gradiente permitido.
+   Sem hover fino, com movimento reduzido, forced-colors ou sem mask-composite: sem realce. */
 
 .spotlight {
   position: relative;
@@ -7,23 +9,38 @@
 }
 
 .spotlight::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(
-    480px circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
-    color-mix(in oklch, var(--signal) 22%, transparent),
-    transparent 70%
-  );
-  transition: opacity var(--motion-slow) var(--motion-ease);
+  display: none;
 }
 
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .spotlight:hover::before {
-    opacity: 1;
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .spotlight::before {
+      content: "";
+      display: block;
+      position: absolute;
+      inset: 0;
+      padding: 2px;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(
+        240px circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+        var(--signal),
+        transparent 70%
+      );
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask:
+        linear-gradient(#000 0 0) content-box exclude,
+        linear-gradient(#000 0 0);
+      transition: opacity var(--motion-slow) var(--motion-ease);
+    }
+
+    .spotlight:hover::before {
+      opacity: 1;
+    }
   }
 }
 

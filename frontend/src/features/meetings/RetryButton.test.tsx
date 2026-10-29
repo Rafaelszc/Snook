@@ -113,7 +113,12 @@ it("409 da API aparece na tela", async () => {
   await userEvent.click(
     await screen.findByRole("button", { name: "Tentar novamente" })
   )
-  expect(await screen.findByRole("alert")).toHaveTextContent(
-    "Só uma reunião com falha pode ser tentada de novo."
-  )
+  // A falha da Reunião também é alerta; acha o erro do retry pelo texto.
+  const notice = (
+    await screen.findByText(
+      "Só uma reunião com falha pode ser tentada de novo."
+    )
+  ).closest('[data-slot="notice"]')
+  expect(notice).toHaveAttribute("role", "alert")
+  expect(notice).toHaveAttribute("data-variant", "error")
 })
