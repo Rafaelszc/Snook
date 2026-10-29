@@ -34,9 +34,12 @@ describe("StatusBadge", () => {
     ["generating", "text-signal"],
     ["done", "text-done"],
     ["failed", "text-failed"],
-  ] as const)("%s usa %s", (status, color) => {
+  ] as const)("%s: ícone em %s, sem pílula", (status, color) => {
     render(<StatusBadge status={status} />)
-    expect(screen.getByRole("status")).toHaveClass(color)
+    const badge = screen.getByRole("status")
+    expect(badge.querySelector("svg")).toHaveClass(color)
+    expect(badge).toHaveClass(status === "failed" ? "text-failed" : "text-ink")
+    expect(badge.className).not.toMatch(/\b(border|rounded|bg-)/)
   })
 
   it("cobre exatamente os 7 status", () => {
