@@ -30,8 +30,15 @@ function isTheme(value: string | null): value is Theme {
   return THEME_VALUES.includes(value as Theme)
 }
 
+// Sem matchMedia (jsdom, navegador antigo): tema claro.
+function systemQuery(): MediaQueryList | null {
+  return typeof window.matchMedia === "function"
+    ? window.matchMedia(COLOR_SCHEME_QUERY)
+    : null
+}
+
 function getSystemTheme(): ResolvedTheme {
-  if (window.matchMedia(COLOR_SCHEME_QUERY).matches) {
+  if (systemQuery()?.matches) {
     return "dark"
   }
 
@@ -107,7 +114,10 @@ export function ThemeProvider({
       return undefined
     }
 
-    const mediaQuery = window.matchMedia(COLOR_SCHEME_QUERY)
+    const mediaQuery = systemQuery()
+    if (!mediaQuery) {
+      return undefined
+    }
     const handleChange = () => {
       applyTheme("system")
     }
