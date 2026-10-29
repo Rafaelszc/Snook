@@ -83,7 +83,10 @@ it("mostra o erro de login da API (auth 25)", async () => {
   )
   const { container } = renderLogin()
   await fill("ana", "senha-errada-1")
-  expect(await screen.findByRole("alert")).toHaveTextContent(INVALID)
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveTextContent(INVALID)
+  expect(alert).toHaveAttribute("data-variant", "error")
+  expect(alert).toHaveAttribute("aria-live", "assertive")
   expect(screen.getByRole("heading", { name: "Entrar" })).toBeVisible()
   expect(await axe(container)).toHaveNoViolations()
 })
@@ -102,4 +105,34 @@ it("não grava sessão em Web Storage (03-security.md, Never)", async () => {
 it("passa no axe sem erro", async () => {
   const { container } = renderLogin()
   expect(await axe(container)).toHaveNoViolations()
+})
+
+it("card opaco, sem vidro nem sombra, entrada só por opacidade (ADR-0024, Q3)", () => {
+  const { container } = renderLogin()
+  const card = container.querySelector('[data-slot="auth-card"]')!
+  expect(card).toHaveClass("bg-surface", "border-hairline", "motion-fade-in")
+  expect(card.className).not.toMatch(/shadow|backdrop|motion-enter/)
+  expect(container.querySelector('[data-slot="glass-panel"]')).toBeNull()
+  expect(container.querySelector(".spotlight")).toBeNull()
+})
+
+it("não registra pointermove no auth (NFR-08)", () => {
+  const add = vi.spyOn(EventTarget.prototype, "addEventListener")
+  const { container } = renderLogin()
+  // React delega eventos no container raiz; conta só listener fora dele.
+  const direct = add.mock.calls.filter(
+    ([type], i) => type === "pointermove" && add.mock.contexts[i] !== container
+  )
+  expect(direct).toEqual([])
+})
+
+it("ThemeToggle visível e operável por teclado", async () => {
+  const user = userEvent.setup()
+  renderLogin()
+  const group = screen.getByRole("group", { name: "Tema" })
+  expect(group).toBeVisible()
+  const dark = screen.getByRole("button", { name: "Escuro" })
+  dark.focus()
+  await user.keyboard("{Enter}")
+  expect(dark).toHaveAttribute("aria-pressed", "true")
 })
