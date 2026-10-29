@@ -44,7 +44,7 @@ it("o texto existe num único lugar do código (Q72)", () => {
   expect(found).toEqual(["components/surfaces/ConsentNotice/messages.ts"])
 })
 
-it('renderiza Notice variant="consent" (ADR-0024)', () => {
+it("renderiza Notice variant=\"consent\" (ADR-0024)", () => {
   render(<ConsentNotice />)
   const notice = screen.getByTestId("consent-notice")
   expect(notice).toHaveAttribute("data-slot", "notice")
