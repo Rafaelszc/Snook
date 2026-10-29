@@ -5,6 +5,7 @@ carregar. `HF_TOKEN` nunca vai a log nem à mensagem (SEC-20). Bibliotecas só n
 import logging
 import re
 import tempfile
+import traceback
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -56,6 +57,12 @@ def pin_config(config: dict[str, Any]) -> dict[str, Any]:
     return config
 
 
+def _where(exc: BaseException, depth: int = 5) -> list[str]:
+    """Últimos quadros do traceback (`arquivo:linha função`): só código, sem valores."""
+    frames = traceback.extract_tb(exc.__traceback__)[-depth:]
+    return [f"{Path(f.filename).name}:{f.lineno} {f.name}" for f in frames]
+
+
 def _access_failure(exc: Exception) -> EngineFailure:
     """Token ausente, inválido ou sem aceite dos termos: mensagem que cita `HF_TOKEN`
     (`diarized` 15). Offline sem cache: modelos ausentes."""
@@ -63,7 +70,7 @@ def _access_failure(exc: Exception) -> EngineFailure:
     from huggingface_hub.utils import HfHubHTTPError
 
     refused = _REFUSED_GLOBAL.search(str(exc))
-    extra = {"error": type(exc).__name__}
+    extra: dict[str, Any] = {"error": type(exc).__name__, "where": _where(exc)}
     if refused is not None:
         extra["refused_global"] = refused.group(1)
     logger.warning("pyannote.load_failed", extra=extra)
@@ -169,6 +176,8 @@ class PyannoteDiarizer:
                 for segment, _track, label in annotation.itertracks(yield_label=True)
             ]
         except Exception as exc:
-            logger.warning("pyannote.failed", extra={"error": type(exc).__name__})
+            logger.warning(
+                "pyannote.failed", extra={"error": type(exc).__name__, "where": _where(exc)}
+            )
             raise EngineFailure(messages.DIARIZATION_FAILED) from None
         return turns

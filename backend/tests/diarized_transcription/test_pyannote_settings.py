@@ -75,6 +75,24 @@ def test_pipeline_error_is_diarization_failure(settings: Settings) -> None:
     assert caught.value.message == messages.DIARIZATION_FAILED
 
 
+def test_pipeline_error_logs_where_without_message(
+    settings: Settings, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Onde quebrou (arquivo:linha função), sem a mensagem: ela pode trazer dado do áudio."""
+
+    class Broken(FakePipeline):
+        def __call__(self, audio: dict[str, Any], **options: Any) -> Annotation:
+            raise TypeError("dado sensível 0.123")
+
+    with caplog.at_level(logging.WARNING), pytest.raises(EngineFailure):
+        diarizer(settings, Broken()).diarize(AUDIO, None)
+    record = next(r for r in caplog.records if r.getMessage() == "pyannote.failed")
+    where = record.__dict__["where"]
+    assert where[-1].startswith("test_pyannote_settings.py:")
+    assert where[-1].endswith(" __call__")
+    assert "sensível" not in str(record.__dict__)
+
+
 def test_pin_config_fixes_every_submodel() -> None:
     """SEC-22: os submodelos do `config.yaml` também ficam em revisão fixa."""
     pinned = pin_config(json.loads(json.dumps(CONFIG)))["pipeline"]["params"]
