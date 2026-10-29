@@ -28,13 +28,51 @@ function vars(css: string, selector: string): Record<string, string> {
   )
 }
 
-const themes = {
-  claro: vars(tokensCss, ":root"),
-  escuro: { ...vars(tokensCss, ":root"), ...vars(tokensCss, ".dark") },
+// Apelidos (var(--x)) resolvem no próprio tema.
+function resolved(t: Record<string, string>): Record<string, string> {
+  const get = (v: string, depth = 0): string => {
+    const ref = v.match(/^var\((--[\w-]+)\)$/)
+    if (!ref || depth > 8) return v
+    return get(t[ref[1]] ?? v, depth + 1)
+  }
+  return Object.fromEntries(Object.entries(t).map(([k, v]) => [k, get(v)]))
 }
 
-// Texto normal: 4,5:1 (WCAG 1.4.3).
+const themes = {
+  claro: resolved(vars(tokensCss, ":root")),
+  escuro: resolved({
+    ...vars(tokensCss, ":root"),
+    ...vars(tokensCss, ".dark"),
+  }),
+}
+
+// Texto normal: 4,5:1 (WCAG 1.4.3). Tabelas "Contraste" do ADR-0024.
+const softs = ["--warn-soft", "--failed-soft", "--signal-soft"]
 const textPairs: [string, string][] = [
+  ...[
+    "--ink",
+    "--ink-muted",
+    "--signal",
+    "--done",
+    "--warn",
+    "--failed",
+  ].flatMap((fg): [string, string][] => [
+    [fg, "--canvas"],
+    [fg, "--surface"],
+    [fg, "--sunken"],
+  ]),
+  ["--signal-ink", "--signal"],
+  ["--primary-foreground", "--primary"],
+  ...["--ink", "--ink-muted"].flatMap((fg) =>
+    softs.map((bg): [string, string] => [fg, bg])
+  ),
+  ["--warn", "--warn-soft"],
+  ["--failed", "--failed-soft"],
+  ["--signal", "--signal-soft"],
+  ...["--done", "--warn", "--failed"].map((fg): [string, string] => [
+    fg,
+    "--signal-soft",
+  ]),
   ["--foreground", "--background"],
   ["--card-foreground", "--card"],
   ["--popover-foreground", "--popover"],
@@ -62,6 +100,10 @@ const textPairs: [string, string][] = [
 
 // Componentes de UI (borda de campo, foco): 3:1 (WCAG 1.4.11).
 const uiPairs: [string, string][] = [
+  ["--input", "--canvas"],
+  ["--input", "--surface"],
+  ["--ring", "--canvas"],
+  ["--ring", "--surface"],
   ["--input", "--background"],
   ["--input", "--card"],
   ["--ring", "--background"],
@@ -74,6 +116,56 @@ describe.each(Object.entries(themes))("contraste, tema %s", (_name, t) => {
   })
   it.each(uiPairs)("%s sobre %s >= 3:1", (fg, bg) => {
     expect(contrast(t[fg], t[bg])).toBeGreaterThanOrEqual(3)
+  })
+})
+
+describe("apelidos shadcn (ADR-0024)", () => {
+  const aliases: Record<string, string> = {
+    "--background": "--canvas",
+    "--foreground": "--ink",
+    "--card": "--surface",
+    "--card-foreground": "--ink",
+    "--popover": "--surface",
+    "--popover-foreground": "--ink",
+    "--primary": "--ink",
+    "--primary-foreground": "--canvas",
+    "--secondary": "--sunken",
+    "--secondary-foreground": "--ink",
+    "--muted": "--sunken",
+    "--muted-foreground": "--ink-muted",
+    "--accent": "--sunken",
+    "--accent-foreground": "--ink",
+    "--destructive": "--failed",
+    "--border": "--hairline",
+    "--ring": "--signal",
+  }
+  const raw = vars(tokensCss, ":root")
+
+  it.each(Object.entries(aliases))("%s = var(%s)", (alias, token) => {
+    expect(raw[alias]).toBe(`var(${token})`)
+  })
+
+  it("o @theme expõe as cores Ata", () => {
+    const css = stripComments(indexCss)
+    for (const name of [
+      "canvas",
+      "surface",
+      "sunken",
+      "hairline",
+      "ink",
+      "ink-muted",
+      "signal",
+      "signal-ink",
+      "signal-soft",
+      "done",
+      "warn",
+      "warn-soft",
+      "failed",
+      "failed-soft",
+      "scrim",
+    ]) {
+      expect(css).toMatch(new RegExp(`--color-${name}:\\s*var\\(--${name}\\);`))
+    }
   })
 })
 

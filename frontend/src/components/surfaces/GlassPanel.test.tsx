@@ -138,10 +138,8 @@ describe("glass.css: contraste sobre o pior fundo", () => {
     it.each(worstBackdrops)(
       "texto sobre vidro com fundo %s >= 4,5:1",
       (backdrop) => {
-        const glass = over(t["--card"], backdrop, alpha)
-        expect(contrast(t["--card-foreground"], glass)).toBeGreaterThanOrEqual(
-          4.5
-        )
+        const glass = over(t["--surface"], backdrop, alpha)
+        expect(contrast(t["--ink"], glass)).toBeGreaterThanOrEqual(4.5)
         expect(contrast(t["--highlight"], glass)).toBeGreaterThanOrEqual(4.5)
       }
     )

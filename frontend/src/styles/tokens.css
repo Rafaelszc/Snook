@@ -28,27 +28,48 @@
 :root {
   color-scheme: light;
 
-  /* Cores: neutras e uma de destaque (--highlight). Pares testados em tokens.test.ts. */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.5 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* Ata (ADR-0024): papel quente, tinta fria, um acento --signal. Pares em tokens.test.ts. */
+  --canvas: oklch(0.985 0.004 85);
+  --surface: oklch(0.998 0.002 85);
+  --sunken: oklch(0.963 0.006 85);
+  --hairline: oklch(0.9 0.007 85);
+  --ink: oklch(0.22 0.015 220);
+  --ink-muted: oklch(0.5 0.014 220);
+  --input: oklch(0.62 0.012 220);
+  --signal: oklch(0.47 0.08 210);
+  --signal-ink: oklch(0.985 0.004 85);
+  --signal-soft: oklch(0.95 0.022 210);
+  --done: oklch(0.47 0.1 150);
+  --warn: oklch(0.52 0.11 65);
+  --warn-soft: oklch(0.96 0.03 75);
+  --failed: oklch(0.52 0.18 28);
+  --failed-soft: oklch(0.96 0.025 28);
+  --scrim: oklch(0.22 0.015 220 / 40%);
+  --overlay-shadow:
+    0 1px 2px oklch(0 0 0 / 6%), 0 12px 32px oklch(0 0 0 / 10%);
+
+  /* Apelidos shadcn: leem só tokens Ata. --accent é fundo de hover, não destaque. */
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--canvas);
+  --secondary: var(--sunken);
+  --secondary-foreground: var(--ink);
+  --muted: var(--sunken);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--sunken);
+  --accent-foreground: var(--ink);
+  --destructive: var(--failed);
+  --border: var(--hairline);
+  --ring: var(--signal);
+
+  /* Transitórios: saem na Task 52.30. */
   --highlight: oklch(0.48 0.2 264);
   --highlight-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.53 0.22 27);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.6 0 0);
-  --ring: oklch(0.48 0.2 264);
 
   /* Estados: sempre acompanhados de texto ou ícone, nunca só cor. */
   --status-pending: oklch(0.5 0 0);
@@ -99,26 +120,27 @@
 .dark {
   color-scheme: dark;
 
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.75 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --canvas: oklch(0.175 0.009 220);
+  --surface: oklch(0.215 0.011 220);
+  --sunken: oklch(0.15 0.008 220);
+  --hairline: oklch(0.3 0.012 220);
+  --ink: oklch(0.94 0.006 85);
+  --ink-muted: oklch(0.72 0.012 220);
+  --input: oklch(0.56 0.012 220);
+  --signal: oklch(0.76 0.09 205);
+  --signal-ink: oklch(0.175 0.009 220);
+  --signal-soft: oklch(0.27 0.035 210);
+  --done: oklch(0.77 0.12 150);
+  --warn: oklch(0.8 0.12 75);
+  --warn-soft: oklch(0.26 0.035 70);
+  --failed: oklch(0.72 0.15 25);
+  --failed-soft: oklch(0.26 0.04 25);
+  --scrim: oklch(0.1 0.008 220 / 50%);
+  --overlay-shadow:
+    0 1px 2px oklch(0 0 0 / 40%), 0 12px 32px oklch(0 0 0 / 45%);
+
   --highlight: oklch(0.78 0.13 264);
   --highlight-foreground: oklch(0.145 0 0);
-  --destructive: oklch(0.72 0.19 22);
-  --border: oklch(0.35 0 0);
-  --input: oklch(0.6 0 0);
-  --ring: oklch(0.78 0.13 264);
 
   --status-pending: oklch(0.75 0 0);
   --status-processing: oklch(0.78 0.13 264);
