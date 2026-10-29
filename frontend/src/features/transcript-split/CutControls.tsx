@@ -55,7 +55,7 @@ export function CutButton({
           className={cn(
             "motion-press inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-md border px-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97] disabled:opacity-50",
             active
-              ? "border-highlight bg-highlight text-highlight-foreground"
+              ? "border-signal bg-signal text-signal-ink"
               : "-ml-2.5 border-transparent text-muted-foreground hover:border-border hover:text-foreground"
           )}
         >
@@ -68,7 +68,7 @@ export function CutButton({
         <span
           aria-hidden="true"
           className={cn(
-            "motion-fade h-px flex-1 bg-highlight",
+            "motion-fade h-px flex-1 bg-signal",
             active ? "opacity-100" : "opacity-0"
           )}
         />
