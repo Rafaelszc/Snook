@@ -41,20 +41,23 @@ const VISUAL: Record<
   },
 }
 
+// `role` troca a região viva da variante: aviso que bloqueia o passo pode ser "alert".
 function Notice({
   variant,
+  role: roleOverride,
   children,
   className,
   ...props
 }: {
   variant: NoticeVariant
+  role?: "alert" | "status"
   children: ReactNode
 } & Omit<React.ComponentProps<"div">, "children" | "role">) {
   const { icon: Icon, box, iconColor, role } = VISUAL[variant]
 
   return (
     <div
-      role={role}
+      role={roleOverride ?? role}
       data-slot="notice"
       data-variant={variant}
       className={cn(
