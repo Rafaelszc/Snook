@@ -15,6 +15,7 @@ import { STATUS_LABELS, type Status } from "./messages"
 export type { Status }
 
 // Texto e ícone sempre presentes: a cor nunca carrega o estado sozinha.
+// Cor do ícone por estado; rótulo em --ink, exceto failed (ADR-0024, "Estados").
 const VISUAL: Record<Status, { icon: LucideIcon; color: string }> = {
   pending: { icon: Clock, color: "text-ink-muted" },
   processing: { icon: Loader, color: "text-signal" },
@@ -32,6 +33,7 @@ function StatusBadge({
   ...props
 }: { status: Status } & Omit<React.ComponentProps<"span">, "children">) {
   const { icon: Icon, color } = VISUAL[status]
+  const label = status === "failed" ? "text-failed" : "text-ink"
 
   return (
     <span
@@ -40,13 +42,13 @@ function StatusBadge({
       data-slot="status-badge"
       data-status={status}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border border-border px-2 py-0.5 text-sm font-medium whitespace-nowrap",
-        color,
+        "inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap",
+        label,
         className
       )}
       {...props}
     >
-      <Icon aria-hidden="true" className="size-3.5 shrink-0" />
+      <Icon aria-hidden="true" className={cn("size-4 shrink-0", color)} />
       {STATUS_LABELS[status]}
     </span>
   )
