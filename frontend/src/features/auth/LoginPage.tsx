@@ -2,6 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react"
 import { Link, useLocation, useNavigate } from "react-router"
 
 import { FormField } from "@/components/forms/FormField"
+import { Notice } from "@/components/surfaces/Notice"
 import { Button } from "@/components/ui/button"
 
 import { AuthShell } from "./AuthShell"
@@ -41,13 +42,12 @@ export function LoginPage() {
     <AuthShell title="Entrar" description="Acesse suas reuniões e backlogs.">
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4">
         {/* Falha de login é sempre genérica (SEC-05): alerta geral, não por campo. */}
-        <div role="alert" aria-live="assertive" className="empty:hidden">
-          {login.error ? (
-            <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {login.error.message}
-            </p>
-          ) : null}
-        </div>
+        {/* role="alert" do Notice error já é região viva assertiva; aria-live explícito reforça. */}
+        {login.error ? (
+          <Notice variant="error" aria-live="assertive">
+            {login.error.message}
+          </Notice>
+        ) : null}
         <FormField
           label="Email ou nome de usuário"
           name="identifier"
@@ -69,17 +69,18 @@ export function LoginPage() {
         />
         <Button
           type="submit"
-          className="mt-2 h-10"
+          variant="accent"
+          className="mt-2"
           disabled={login.isPending}
         >
           {login.isPending ? "Entrando…" : "Entrar"}
         </Button>
       </form>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-ink-muted">
         Não tem conta?{" "}
         <Link
           to="/register"
-          className="font-medium text-foreground underline underline-offset-4"
+          className="rounded-sm font-medium text-ink underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           Criar conta
         </Link>

@@ -2,6 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router"
 
 import { FormField } from "@/components/forms/FormField"
+import { Notice } from "@/components/surfaces/Notice"
 import { Button } from "@/components/ui/button"
 
 import { AuthShell } from "./AuthShell"
@@ -39,13 +40,12 @@ export function RegisterPage() {
       description="Transcreva reuniões e gere backlog na sua máquina."
     >
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4">
-        <div role="alert" aria-live="assertive" className="empty:hidden">
-          {generalError ? (
-            <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {generalError}
-            </p>
-          ) : null}
-        </div>
+        {/* role="alert" do Notice error já é região viva assertiva; aria-live explícito reforça. */}
+        {generalError ? (
+          <Notice variant="error" aria-live="assertive">
+            {generalError}
+          </Notice>
+        ) : null}
         <FormField
           label="Email"
           name="email"
@@ -82,17 +82,18 @@ export function RegisterPage() {
         />
         <Button
           type="submit"
-          className="mt-2 h-10"
+          variant="accent"
+          className="mt-2"
           disabled={register.isPending}
         >
           {register.isPending ? "Criando conta…" : "Criar conta"}
         </Button>
       </form>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-ink-muted">
         Já tem conta?{" "}
         <Link
           to="/login"
-          className="font-medium text-foreground underline underline-offset-4"
+          className="rounded-sm font-medium text-ink underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           Entrar
         </Link>

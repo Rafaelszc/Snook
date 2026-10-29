@@ -94,7 +94,9 @@ it("mostra erro geral devolvido pela API (auth 25)", async () => {
   )
   renderRegister()
   await fill("ana@x.com", "ana", "senha-forte-1")
-  expect(await screen.findByRole("alert")).toHaveTextContent("erro interno")
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveTextContent("erro interno")
+  expect(alert).toHaveAttribute("data-variant", "error")
   expect(screen.getByRole("heading", { name: "Criar conta" })).toBeVisible()
 })
 
