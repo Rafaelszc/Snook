@@ -2,6 +2,10 @@ import { useId } from "react"
 import { Circle, CircleCheck, CircleDot, type LucideIcon } from "lucide-react"
 import { cn } from "cn"
 
+import { Notice } from "@/components/surfaces/Notice"
+import { PageHeader } from "@/components/surfaces/PageHeader"
+import { Skeleton, SkeletonGroup } from "@/components/surfaces/Skeleton"
+
 import type { ConfigState, LlmConfig } from "./api"
 import { MESSAGES, PROVIDER_LABELS, STATE_LABELS } from "./messages"
 import { ProviderForm } from "./ProviderForm"
@@ -9,8 +13,8 @@ import { useLlmConfigs } from "./useLlmConfigs"
 
 // Texto e ícone sempre juntos: a cor nunca carrega o estado sozinha.
 const STATE_VISUAL: Record<ConfigState, { icon: LucideIcon; color: string }> = {
-  not_configured: { icon: Circle, color: "text-muted-foreground" },
-  configured: { icon: CircleDot, color: "text-foreground" },
+  not_configured: { icon: Circle, color: "text-ink-muted" },
+  configured: { icon: CircleDot, color: "text-ink" },
   active: { icon: CircleCheck, color: "text-done" },
 }
 
@@ -19,11 +23,11 @@ function StateLabel({ state }: { state: ConfigState }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 text-sm font-medium",
+        "inline-flex items-center gap-2 text-sm font-medium",
         color
       )}
     >
-      <Icon aria-hidden="true" className="size-3.5 shrink-0" />
+      <Icon aria-hidden="true" className="size-4 shrink-0" />
       {STATE_LABELS[state]}
     </span>
   )
@@ -51,7 +55,7 @@ function Summary({ config }: { config: LlmConfig }) {
     <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-sm">
       {rows.map(({ term, value }) => (
         <div key={term} className="contents">
-          <dt className="text-muted-foreground">{term}</dt>
+          <dt className="text-ink-muted">{term}</dt>
           <dd
             translate="no"
             title={value}
@@ -65,24 +69,28 @@ function Summary({ config }: { config: LlmConfig }) {
   )
 }
 
+// Provedor como linha com régua --hairline, sem card (ADR-0024, "Profundidade").
+// Em tela larga, resumo à esquerda e formulário à direita.
 function ProviderSection({ config }: { config: LlmConfig }) {
   const headingId = useId()
   return (
     <section
       aria-labelledby={headingId}
       data-state={config.state}
-      className={cn(
-        "flex flex-col gap-5 rounded-xl border bg-card p-5 text-card-foreground sm:p-6",
-        config.state === "active" ? "border-foreground/40" : "border-border"
-      )}
+      className="grid gap-6 py-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:gap-12"
     >
-      <header className="flex items-center justify-between gap-3">
-        <h2 id={headingId} className="text-base font-semibold">
-          {PROVIDER_LABELS[config.provider]}
-        </h2>
-        <StateLabel state={config.state} />
-      </header>
-      {config.state === "not_configured" ? null : <Summary config={config} />}
+      <div className="flex min-w-0 flex-col gap-4">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <h2
+            id={headingId}
+            className="font-heading text-base font-semibold text-ink"
+          >
+            {PROVIDER_LABELS[config.provider]}
+          </h2>
+          <StateLabel state={config.state} />
+        </header>
+        {config.state === "not_configured" ? null : <Summary config={config} />}
+      </div>
       <ProviderForm config={config} />
     </section>
   )
@@ -93,31 +101,19 @@ export function SettingsPage() {
   const { data, error, isPending } = useLlmConfigs()
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 py-4">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-balance">
-          {MESSAGES.title}
-        </h1>
-        <p className="text-sm text-muted-foreground">{MESSAGES.description}</p>
-      </header>
+    <div className="flex flex-col gap-8">
+      <PageHeader title={MESSAGES.title} description={MESSAGES.description} />
       {error ? (
-        <p
-          role="alert"
-          className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-        >
-          {error.message || MESSAGES.loadError}
-        </p>
+        <Notice variant="error">{error.message || MESSAGES.loadError}</Notice>
       ) : isPending ? (
-        <div aria-busy="true" className="grid gap-4 lg:grid-cols-2">
-          <span role="status" className="sr-only">
-            {MESSAGES.loading}
-          </span>
+        <SkeletonGroup label={MESSAGES.loading}>
           {Array.from({ length: 4 }, (_, i) => (
-            <div key={i} className="h-72 rounded-xl bg-muted" />
+            <Skeleton key={i} className="h-40" />
           ))}
-        </div>
+        </SkeletonGroup>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
+        // Régua forte em --ink no topo da lista (ADR-0024).
+        <div className="divide-y divide-hairline border-t border-b border-t-ink border-b-hairline">
           {data.map((config) => (
             <ProviderSection key={config.provider} config={config} />
           ))}
