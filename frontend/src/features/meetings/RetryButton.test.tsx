@@ -77,7 +77,7 @@ it("com backlog gravado, confirma antes com o aviso de perda das edições (meet
   )
   const dialog = screen.getByRole("alertdialog", { name: "Tentar novamente?" })
   expect(dialog).toHaveAccessibleDescription(/edições manuais se perdem/)
-  expect(dialog).toHaveAttribute("data-slot", "glass-panel")
+  expect(dialog).toHaveAttribute("data-slot", "dialog-surface")
   expect(await axe(dialog)).toHaveNoViolations()
   expect(calls).toHaveLength(0)
 
