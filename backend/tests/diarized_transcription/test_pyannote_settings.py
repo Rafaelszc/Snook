@@ -26,7 +26,11 @@ from tests.diarized_transcription.fake_libs import (
     HfHubHTTPError,
     Hub,
     LocalEntryNotFoundError,
+    Problem,
     RepositoryNotFoundError,
+    Resolution,
+    Specifications,
+    TorchVersion,
     install,
 )
 
@@ -128,6 +132,29 @@ def test_downloads_pipeline_and_submodels_at_fixed_revisions(hub: Hub, settings:
     params = hub.loaded[0]["config"]["pipeline"]["params"]
     assert all("@" in params[key] for key in ("segmentation", "embedding"))
     assert hub.pipeline is not None and hub.pipeline.calls == [{"num_speakers": 2}]
+
+
+def test_checkpoint_classes_allowed_before_load(hub: Hub, settings: Settings) -> None:
+    """torch >= 2.6 carrega com `weights_only=True`: os checkpoints do pyannote 3.x trazem
+    estas classes e falhavam com `UnpicklingError`. Só elas entram na lista, antes da carga."""
+    real_diarizer(settings).diarize(AUDIO, None)
+    expected = {TorchVersion, Specifications, Problem, Resolution}
+    assert set(hub.safe_globals) == expected
+    assert set(hub.safe_at_load) == expected
+
+
+def test_unpickling_error_logs_refused_class(
+    hub: Hub, settings: Settings, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Classe fora da lista: o log diz qual, para incluí-la (nome de classe, sem segredo)."""
+    hub.error = RuntimeError(
+        "Weights only load failed. Unsupported global: GLOBAL omegaconf.listconfig.ListConfig "
+        "was not an allowed global by default."
+    )
+    with caplog.at_level(logging.WARNING), pytest.raises(EngineFailure):
+        real_diarizer(settings).diarize(AUDIO, None)
+    record = next(r for r in caplog.records if r.getMessage() == "pyannote.load_failed")
+    assert record.__dict__["refused_global"] == "omegaconf.listconfig.ListConfig"
 
 
 def test_offline_mode_reads_only_cache(

@@ -76,6 +76,8 @@ class Hub:
         self.loaded: list[dict[str, Any]] = []
         self.pipeline: FakePipeline | None = FakePipeline()
         self.whisper: list[dict[str, Any]] = []
+        self.safe_globals: list[type] = []
+        self.safe_at_load: list[type] = []
 
     def hf_hub_download(self, repo_id: str, filename: str, **options: Any) -> str:
         self.downloads.append({"repo": repo_id, "file": filename, **options})
@@ -85,7 +87,11 @@ class Hub:
         path.write_text(json.dumps(CONFIG))
         return str(path)
 
+    def add_safe_globals(self, classes: list[type]) -> None:
+        self.safe_globals.extend(classes)
+
     def from_pretrained(self, path: Path, use_auth_token: str | None) -> FakePipeline | None:
+        self.safe_at_load = list(self.safe_globals)
         self.loaded.append({"config": json.loads(Path(path).read_text()), "token": use_auth_token})
         return self.pipeline
 
@@ -95,10 +101,28 @@ class Hub:
         return str(self.tmp / "whisper")
 
 
+class TorchVersion(str):
+    pass
+
+
+class Specifications:
+    pass
+
+
+class Problem:
+    pass
+
+
+class Resolution:
+    pass
+
+
 def install(monkeypatch: pytest.MonkeyPatch, tmp: Path) -> Hub:
     fake = Hub(tmp)
     modules: dict[str, Any] = {
         "torch": types.SimpleNamespace(cuda=types.SimpleNamespace(is_available=lambda: False)),
+        "torch.serialization": types.SimpleNamespace(add_safe_globals=fake.add_safe_globals),
+        "torch.torch_version": types.SimpleNamespace(TorchVersion=TorchVersion),
         "yaml": types.SimpleNamespace(safe_load=json.loads, safe_dump=json.dumps),
         "huggingface_hub": types.SimpleNamespace(hf_hub_download=fake.hf_hub_download),
         "huggingface_hub.errors": types.SimpleNamespace(
@@ -109,6 +133,9 @@ def install(monkeypatch: pytest.MonkeyPatch, tmp: Path) -> Hub:
         "pyannote": types.SimpleNamespace(),
         "pyannote.audio": types.SimpleNamespace(
             Pipeline=types.SimpleNamespace(from_pretrained=fake.from_pretrained)
+        ),
+        "pyannote.audio.core.task": types.SimpleNamespace(
+            Problem=Problem, Resolution=Resolution, Specifications=Specifications
         ),
         "faster_whisper": types.SimpleNamespace(download_model=fake.download_model),
     }
