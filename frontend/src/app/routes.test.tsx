@@ -55,6 +55,25 @@ it("navega entre as telas pelo layout", async () => {
   expect(await axe(container)).toHaveNoViolations()
 })
 
+it("nav mostra Reuniões e Configurações, com a rota atual marcada", async () => {
+  signedIn()
+  renderAt("/settings")
+  const settings = await screen.findByRole("link", { name: "Configurações" })
+  expect(settings).toHaveAttribute("aria-current", "page")
+  expect(screen.getByRole("link", { name: "Reuniões" })).not.toHaveAttribute(
+    "aria-current"
+  )
+})
+
+it("sessão nunca vai a localStorage nem sessionStorage (SEC-03)", async () => {
+  signedIn()
+  localStorage.clear()
+  renderAt("/")
+  await screen.findByText("ana")
+  expect(Object.keys(localStorage).filter((k) => k !== "theme")).toEqual([])
+  expect(sessionStorage.length).toBe(0)
+})
+
 it("página protegida sem sessão leva ao login (auth 24)", async () => {
   signedOut()
   renderAt("/settings")
