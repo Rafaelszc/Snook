@@ -2,7 +2,7 @@
 export function MergeNotice({ id, message }: { id: string; message?: string }) {
   if (!message) return null
   return (
-    <p id={id} role="status" className="text-sm text-highlight">
+    <p id={id} role="status" className="text-sm text-signal">
       {message}
     </p>
   )

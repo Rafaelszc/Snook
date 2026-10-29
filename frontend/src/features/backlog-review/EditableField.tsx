@@ -141,7 +141,7 @@ export function EditableField({
         />
       )}
       {hint ? (
-        <p id={hintId} role="status" className="text-sm text-highlight">
+        <p id={hintId} role="status" className="text-sm text-signal">
           {hint}
         </p>
       ) : null}
