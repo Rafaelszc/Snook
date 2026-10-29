@@ -35,11 +35,11 @@ function CriterionItem({
   const remove = useBacklogMutation(meetingId, () => api.delete(url))
 
   return (
-    <li className="flex items-start gap-2 border-t border-border py-2 first:border-t-0">
+    <li className="flex items-start gap-2 border-t border-hairline py-2 first:border-t-0">
       <dl className="grid min-w-0 flex-1 grid-cols-[4.5rem_minmax(0,1fr)] gap-x-2 gap-y-1 text-sm">
         {PARTS.map((part) => (
           <div key={part} className="contents">
-            <dt className="pt-1 text-muted-foreground">{LABELS[part]}</dt>
+            <dt className="pt-1 text-ink-muted">{LABELS[part]}</dt>
             <dd>
               <EditableField
                 label={`${LABELS[part]} do critério`}
@@ -92,7 +92,7 @@ function NewCriterion({ story }: { story: UserStory }) {
 
   return (
     <form
-      className="flex flex-col gap-3 rounded-lg border border-border p-3"
+      className="flex flex-col gap-3 border-t border-hairline pt-3"
       onSubmit={(event) => {
         event.preventDefault()
         add.mutate(draft, {
@@ -117,7 +117,7 @@ function NewCriterion({ story }: { story: UserStory }) {
         />
       ))}
       {add.error && !PARTS.some((p) => add.error?.fields[p]) ? (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-sm text-failed">
           {add.error.message}
         </p>
       ) : null}
@@ -125,7 +125,11 @@ function NewCriterion({ story }: { story: UserStory }) {
         <Button type="submit" disabled={add.isPending}>
           {add.isPending ? MESSAGES.saving : MESSAGES.createCriterion}
         </Button>
-        <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => setOpen(false)}
+        >
           {MESSAGES.cancel}
         </Button>
       </div>

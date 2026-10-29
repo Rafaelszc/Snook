@@ -4040,14 +4040,14 @@
 **Description:** `ReviewPage` com `PageHeader`, `Skeleton` e `EmptyState`. A constante `ALERT` (linha 19) e os blocos de erro (linhas 33 e 160) viram `Notice`: `error` para falha, `warn` para a última geração com falha, `info` para só leitura.
 
 **Acceptance criteria:**
-- [ ] Em `failed` com backlog, a tela mostra só leitura, aviso de que a última geração falhou, o motivo e "Tentar novamente"; em `transcribed`, `generating` e `needs_split` com backlog, só leitura com o status atual (`backlog-review` 46).
-- [ ] Texto de US e de Epic renderiza escapado, inclusive `<script>` (SEC-12; `backlog-review` 39).
-- [ ] Grep local em `ReviewPage.tsx` sem achado; `vitest-axe` sem violação.
+- [x] Em `failed` com backlog, a tela mostra só leitura, aviso de que a última geração falhou, o motivo e "Tentar novamente"; em `transcribed`, `generating` e `needs_split` com backlog, só leitura com o status atual (`backlog-review` 46).
+- [x] Texto de US e de Epic renderiza escapado, inclusive `<script>` (SEC-12; `backlog-review` 39).
+- [x] Grep local em `ReviewPage.tsx` sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] Grep local em `ReviewPage.tsx`. SEC-12.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] Grep local em `ReviewPage.tsx`. SEC-12.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 53.1, 53.2, 53.3, 53.4
 
@@ -4064,14 +4064,14 @@
 **Description:** `EpicSection` sem card: régua forte em `--ink` no topo de cada Epic, título em serif, abrir e fechar animado só com `transform` e `opacity` (120 a 240 ms).
 
 **Acceptance criteria:**
-- [ ] A Epic não tem fundo de card nem borda em volta; a régua `--ink` fica no topo (ADR-0024, "Profundidade" e "Componentes").
-- [ ] Abrir e fechar anima só `transform` e `opacity`, desligado com `prefers-reduced-motion` (ADR-0024, "Movimento").
+- [x] A Epic não tem fundo de card nem borda em volta; a régua `--ink` fica no topo (ADR-0024, "Profundidade" e "Componentes").
+- [x] Abrir e fechar anima só `transform` e `opacity`, desligado com `prefers-reduced-motion` (ADR-0024, "Movimento").
 - [ ] Com backlog de fixture de 30 Epics e 200 US o INP fica até 200 ms (NFR-04; medição manual no checkpoint).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review src/styles`.
-- [ ] Grep local em `EpicSection.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review src/styles`.
+- [x] Grep local em `EpicSection.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 54.1
 
@@ -4088,14 +4088,14 @@
 **Description:** `StoryCard` deixa de ser card: linha com régua `--hairline`, nome da US em serif, `US-id` e instante em Geist Mono tabular, demais campos em Geist.
 
 **Acceptance criteria:**
-- [ ] A US aparece como linha com régua, sem card, com todos os campos do formato, solicitante e instante (`backlog-review` 39).
-- [ ] `US-id` e instante usam `font-mono` com algarismos tabulares; nome da US usa `font-serif` (ADR-0024, "Tipografia").
-- [ ] Texto da US renderiza escapado (SEC-12); grep local sem achado.
+- [x] A US aparece como linha com régua, sem card, com todos os campos do formato, solicitante e instante (`backlog-review` 39).
+- [x] `US-id` e instante usam `font-mono` com algarismos tabulares; nome da US usa `font-serif` (ADR-0024, "Tipografia").
+- [x] Texto da US renderiza escapado (SEC-12); grep local sem achado.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] Grep local em `StoryCard.tsx`. SEC-12.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] Grep local em `StoryCard.tsx`. SEC-12.
+- [x] Gate frontend.
 
 **Dependencies:** Task 54.2
 
@@ -4112,14 +4112,14 @@
 **Description:** `EditableField`, `StoryForm`, `CriteriaList` e `NewEpicForm` no Ata: campos de 40 px, foco opaco, erro 422 inline junto do campo (sem `Notice`), espaço e raio da escala, sem `ring-ring/50` nem `text-[`.
 
 **Acceptance criteria:**
-- [ ] Cada campo de Epic, US e critério segue editável na tela, com prioridade, story points, solicitante e instante; erro 422 aparece junto ao campo (`backlog-review` 40).
-- [ ] Teclado em tudo e anel de foco opaco de 2 px (ADR-0024, "Foco").
-- [ ] Grep local sem achado nos quatro arquivos; `vitest-axe` sem violação.
+- [x] Cada campo de Epic, US e critério segue editável na tela, com prioridade, story points, solicitante e instante; erro 422 aparece junto ao campo (`backlog-review` 40).
+- [x] Teclado em tudo e anel de foco opaco de 2 px (ADR-0024, "Foco").
+- [x] Grep local sem achado nos quatro arquivos; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] Grep local nos quatro arquivos.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] Grep local nos quatro arquivos.
+- [x] Gate frontend.
 
 **Dependencies:** Task 54.3
 
@@ -4137,14 +4137,14 @@
 **Description:** Os diálogos já usam `DialogSurface` (Tasks 52.16 e 52.17). Aqui o conteúdo vai ao Ata: erro de diálogo vira `Notice variant="error"`, `MergeNotice` vira `Notice variant="info"`, e saem as classes proibidas de `RenameParticipantDialog`, `MoveStoryDialog`, `ConfirmDeleteDialog`, `FormDialog` e `RegenerateDialog`.
 
 **Acceptance criteria:**
-- [ ] Renomear ou criar Epic, ou renomear Participante, com nome que já existe mostra, antes de salvar, que os dois serão juntados (`backlog-review` 41).
-- [ ] Excluir US, Epic ou critério pede confirmação, e excluir Epic com US fica desabilitado (`backlog-review` 42); mover US abre a escolha de Epic (`backlog-review` 43); regenerar avisa da perda das edições (`backlog-review` 44).
-- [ ] Grep local sem achado nos arquivos; `vitest-axe` sem violação.
+- [x] Renomear ou criar Epic, ou renomear Participante, com nome que já existe mostra, antes de salvar, que os dois serão juntados (`backlog-review` 41).
+- [x] Excluir US, Epic ou critério pede confirmação, e excluir Epic com US fica desabilitado (`backlog-review` 42); mover US abre a escolha de Epic (`backlog-review` 43); regenerar avisa da perda das edições (`backlog-review` 44).
+- [x] Grep local sem achado nos arquivos; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] Grep local nos arquivos da task.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] Grep local nos arquivos da task.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 52.17, 54.4
 
@@ -4162,14 +4162,14 @@
 **Description:** `RetryButton` do backlog usa `Notice variant="error"` para o erro; `ExportButtons` sai de classes proibidas, com `secondary` já trocado na Task 52.6.
 
 **Acceptance criteria:**
-- [ ] "Tentar novamente" repete o aviso de perda das edições (`backlog-review` 46).
-- [ ] "Exportar Markdown" e "Exportar JSON" baixam o arquivo (`backlog-review` 45).
-- [ ] Grep local sem achado; `vitest-axe` sem violação.
+- [x] "Tentar novamente" repete o aviso de perda das edições (`backlog-review` 46).
+- [x] "Exportar Markdown" e "Exportar JSON" baixam o arquivo (`backlog-review` 45).
+- [x] Grep local sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/backlog-review`.
-- [ ] Grep local nos dois arquivos.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/backlog-review`.
+- [x] Grep local nos dois arquivos.
+- [x] Gate frontend.
 
 **Dependencies:** Task 54.5
 

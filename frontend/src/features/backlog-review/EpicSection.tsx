@@ -15,7 +15,8 @@ import { useBacklogMutation } from "./useBacklog"
 
 export const EPIC_NAME_MAX = 200
 
-// Epic recolhível; abrir e fechar animam só `transform` e `opacity` (ADR-0022).
+// Epic sem card: régua forte em --ink no topo, título serif (ADR-0024, "Profundidade").
+// Abrir e fechar animam só `transform` e `opacity`; motion.css desliga com reduced-motion.
 export const EpicSection = memo(function EpicSection({ epic }: { epic: Epic }) {
   const { meetingId, readOnly } = useReview()
   const epics = useEpics()
@@ -32,9 +33,10 @@ export const EpicSection = memo(function EpicSection({ epic }: { epic: Epic }) {
   return (
     <section
       aria-labelledby={`epic-${epic.id}`}
-      className="flex flex-col gap-3"
+      data-slot="epic"
+      className="flex flex-col gap-3 border-t border-ink pt-3"
     >
-      <header className="flex items-start gap-2 border-b border-border pb-2">
+      <header className="flex items-start gap-2">
         <Button
           variant="ghost"
           size="icon-sm"
@@ -44,9 +46,11 @@ export const EpicSection = memo(function EpicSection({ epic }: { epic: Epic }) {
           onClick={() => setOpen(!open)}
           className="mt-0.5 shrink-0"
         >
+          {/* transform, não `rotate-90`: no Tailwind 4 ele usa `rotate`, fora da transição. */}
           <ChevronRight
             aria-hidden="true"
-            className={`motion-rise ${open ? "rotate-90" : ""}`}
+            className="motion-rise"
+            style={{ transform: open ? "rotate(90deg)" : "none" }}
           />
         </Button>
         <EditableField
@@ -66,11 +70,11 @@ export const EpicSection = memo(function EpicSection({ epic }: { epic: Epic }) {
             id={`epic-${epic.id}`}
             className="flex flex-wrap items-baseline gap-x-3 pt-0.5"
           >
-            <span className="text-base font-semibold">
+            <span className="font-heading text-base font-semibold text-ink">
               <span className="sr-only">{MESSAGES.epic}: </span>
               {epic.name}
             </span>
-            <span className="text-sm text-muted-foreground">
+            <span className="font-mono text-sm text-ink-muted tabular-nums">
               {MESSAGES.stories(count)}
             </span>
           </h2>
@@ -86,10 +90,7 @@ export const EpicSection = memo(function EpicSection({ epic }: { epic: Epic }) {
         )}
       </header>
       {open ? (
-        <div
-          id={contentId}
-          className="motion-enter flex flex-col gap-3 sm:pl-10"
-        >
+        <div id={contentId} className="motion-enter flex flex-col sm:pl-10">
           {epic.user_stories.map((story) => (
             <StoryCard key={story.id} story={story} epicId={epic.id} />
           ))}
@@ -98,7 +99,7 @@ export const EpicSection = memo(function EpicSection({ epic }: { epic: Epic }) {
           ) : (
             <Button
               variant="ghost"
-              className="self-start"
+              className="mt-3 self-start"
               onClick={() => setAdding(true)}
             >
               <Plus aria-hidden="true" />

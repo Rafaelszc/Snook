@@ -1,6 +1,7 @@
 import { RotateCcw } from "lucide-react"
 
 import { ConfirmDialog } from "@/components/surfaces/ConfirmDialog"
+import { Notice } from "@/components/surfaces/Notice"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api/client"
 
@@ -27,9 +28,7 @@ export function RetryButton({ meetingId }: { meetingId: string }) {
         onConfirm={() => retry.mutate(undefined)}
       />
       {retry.error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {retry.error.message}
-        </p>
+        <Notice variant="error">{retry.error.message}</Notice>
       ) : null}
     </div>
   )

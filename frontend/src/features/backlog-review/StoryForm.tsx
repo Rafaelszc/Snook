@@ -6,7 +6,7 @@ import { api } from "@/lib/api/client"
 
 import { PRIORITIES, STORY_POINTS } from "./api"
 import { useReview } from "./context"
-import { TEXTAREA } from "./EditableField"
+import { SELECT, TEXTAREA } from "./EditableField"
 import { MESSAGES } from "./messages"
 import { useBacklogMutation } from "./useBacklog"
 
@@ -24,9 +24,6 @@ const EMPTY = {
   then: "",
 }
 type Draft = typeof EMPTY
-
-const SELECT =
-  "h-10 rounded-lg border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
 
 function body(draft: Draft) {
   return {
@@ -66,7 +63,7 @@ export function StoryForm({
   const known = Object.keys(fields).length > 0
 
   const text = (key: "as_a" | "i_want" | "so_that", label: string) => (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       <label htmlFor={`${id}-${key}`} className="text-sm font-medium">
         {label}
       </label>
@@ -80,7 +77,7 @@ export function StoryForm({
         className={TEXTAREA}
       />
       {fields[key] ? (
-        <p id={`${id}-${key}-error`} className="text-sm text-destructive">
+        <p id={`${id}-${key}-error`} className="text-sm text-failed">
           {fields[key]}
         </p>
       ) : null}
@@ -90,7 +87,7 @@ export function StoryForm({
   return (
     <form
       aria-label={MESSAGES.newStory}
-      className="motion-enter flex flex-col gap-4 rounded-xl border border-border p-4 sm:p-5"
+      className="motion-enter flex flex-col gap-4 border-t border-hairline py-4"
       onSubmit={(event) => {
         event.preventDefault()
         create.mutate(draft, { onSuccess: onDone })
@@ -108,7 +105,7 @@ export function StoryForm({
       {text("i_want", MESSAGES.iWant)}
       {text("so_that", MESSAGES.soThat)}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <label htmlFor={`${id}-priority`} className="text-sm font-medium">
             {MESSAGES.priority}
           </label>
@@ -123,7 +120,7 @@ export function StoryForm({
             ))}
           </select>
         </div>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <label htmlFor={`${id}-points`} className="text-sm font-medium">
             {MESSAGES.storyPoints}
           </label>
@@ -138,7 +135,7 @@ export function StoryForm({
             ))}
           </select>
         </div>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <label htmlFor={`${id}-requester`} className="text-sm font-medium">
             {MESSAGES.requester}
           </label>
@@ -156,7 +153,7 @@ export function StoryForm({
             ))}
           </select>
           {fields.requested_by ? (
-            <p className="text-sm text-destructive">{fields.requested_by}</p>
+            <p className="text-sm text-failed">{fields.requested_by}</p>
           ) : null}
         </div>
         <FormField
@@ -196,7 +193,7 @@ export function StoryForm({
         />
       </fieldset>
       {create.error && !known ? (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-sm text-failed">
           {create.error.message}
         </p>
       ) : null}

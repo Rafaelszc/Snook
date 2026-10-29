@@ -154,3 +154,22 @@ it("nome da Epic editável com Tab e Enter (backlog-review 40)", async () => {
 
   await waitFor(() => expect(calls).toEqual([{ name: "Cadastro de clientes" }]))
 })
+
+it("campos com 40 px e anel de foco opaco de 2 px (ADR-0024, Foco)", async () => {
+  const { card, container } = await firstStory()
+
+  await userEvent.click(
+    within(card).getByRole("button", { name: "Editar Para" })
+  )
+  const fields = [
+    within(card).getByRole("textbox", { name: "Para" }),
+    within(card).getByLabelText("Prioridade"),
+    within(card).getByLabelText("Story Points"),
+  ]
+  for (const field of fields) {
+    expect(field).toHaveClass("focus-visible:ring-2", "focus-visible:ring-ring")
+    expect(field.className).not.toMatch(/ring-ring\/|ring-3/)
+  }
+  expect(fields[1]).toHaveClass("h-10")
+  expect(container.querySelector('[data-slot="notice"]')).toBeNull()
+})

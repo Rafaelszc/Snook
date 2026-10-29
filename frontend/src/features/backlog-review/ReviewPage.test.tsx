@@ -81,7 +81,12 @@ it("em failed mostra só leitura, motivo e Tentar novamente com aviso (backlog-r
   )
   const { container } = renderReview()
 
-  const alert = await screen.findByRole("alert")
+  // Notice warn tem role="status" (ADR-0024, "Componentes").
+  const alert = (await screen.findByText(/A última geração falhou/)).closest(
+    '[data-slot="notice"]'
+  ) as HTMLElement
+  expect(alert).toHaveAttribute("data-variant", "warn")
+  expect(alert).toHaveAttribute("role", "status")
   expect(alert).toHaveTextContent("A última geração falhou")
   expect(alert).toHaveTextContent("O provedor recusou a chave.")
   expect(
@@ -102,6 +107,32 @@ it("em failed mostra só leitura, motivo e Tentar novamente com aviso (backlog-r
     within(dialog).getByRole("button", { name: "Tentar novamente" })
   )
   expect(retry).toHaveLength(1)
+})
+
+it("erro do Tentar novamente aparece em Notice error (ADR-0024)", async () => {
+  serve(
+    meeting({ status: "failed", failed_stage: "generation" }),
+    backlog(TWO_EPICS, { read_only: true, last_generation_failed: true })
+  )
+  record("post", "/retry", () =>
+    HttpResponse.json(
+      { error: { code: "conflict", message: "Já está em andamento." } },
+      { status: 409 }
+    )
+  )
+  const { container } = renderReview()
+
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Tentar novamente" })
+  )
+  const dialog = await screen.findByRole("alertdialog")
+  await userEvent.click(
+    within(dialog).getByRole("button", { name: "Tentar novamente" })
+  )
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveTextContent("Já está em andamento.")
+  expect(alert).toHaveAttribute("data-variant", "error")
+  expect(await axe(container)).toHaveNoViolations()
 })
 
 it.each([
@@ -164,6 +195,50 @@ it("recolhe e expande a Epic pelo teclado (ADR-0022)", async () => {
   expect(
     screen.queryByRole("article", { name: "Cadastrar cliente" })
   ).not.toBeInTheDocument()
+})
+
+it("Epic sem card, régua --ink no topo e título serif (ADR-0024)", async () => {
+  serve(meeting())
+  renderReview()
+
+  const epic = await screen.findByRole("region", { name: /Cadastro/ })
+  expect(epic).toHaveClass("border-t", "border-ink")
+  expect(epic.className).not.toMatch(
+    /\b(bg-|rounded|shadow|border-(x|b|l|r)\b)/
+  )
+  expect(within(epic).getByText("Cadastro")).toHaveClass("font-heading")
+})
+
+it("abrir e fechar a Epic anima só por classes de motion.css (ADR-0024)", async () => {
+  serve(meeting())
+  renderReview()
+
+  const toggle = await screen.findByRole("button", {
+    name: "Recolher Epic Cadastro",
+  })
+  expect(toggle.querySelector("svg")).toHaveClass("motion-rise")
+  expect(toggle.querySelector("svg")).toHaveStyle({
+    transform: "rotate(90deg)",
+  })
+  expect(
+    document.getElementById(toggle.getAttribute("aria-controls")!)
+  ).toHaveClass("motion-enter")
+  await userEvent.click(toggle)
+  expect(toggle.querySelector("svg")).toHaveStyle({ transform: "none" })
+})
+
+it("US como linha com régua, nome serif, US-id e instante em mono (ADR-0024)", async () => {
+  serve(meeting())
+  renderReview()
+
+  const us = await screen.findByRole("article", { name: "Cadastrar cliente" })
+  expect(us).toHaveClass("border-t", "border-hairline")
+  expect(us.className).not.toMatch(/\b(bg-|rounded|shadow|p-\d)/)
+  expect(
+    within(us).getByRole("heading", { name: "Cadastrar cliente" })
+  ).toHaveClass("font-heading")
+  for (const text of ["US-01", "00:01:05"])
+    expect(within(us).getByText(text)).toHaveClass("font-mono", "tabular-nums")
 })
 
 it("renderiza o backlog de fixture de 30 Epics e 200 US (NFR-04)", async () => {
