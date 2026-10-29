@@ -35,6 +35,16 @@ describe("Notice", () => {
     expect(box).not.toHaveAttribute("aria-live")
   })
 
+  it("role explícito troca a região viva da variante", () => {
+    render(
+      <Notice variant="warn" role="alert">
+        x
+      </Notice>
+    )
+    const box = screen.getByRole("alert")
+    expect(box).toHaveAttribute("data-variant", "warn")
+  })
+
   it("mensagem é só texto, mesmo com <script> (SEC-12)", () => {
     const evil = '<script>alert(1)</script><img src=x onerror="alert(2)">'
     const { container } = render(<Notice variant="error">{evil}</Notice>)

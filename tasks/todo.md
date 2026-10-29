@@ -4442,14 +4442,14 @@
 **Description:** `NamingPage` com `PageHeader`, largura `--reading`, `Notice` no lugar da constante `ALERT` (linha 21) e dos blocos das linhas 26, 135, 144 e 195 (`error`, e `warn` para falta de provedor), e "Confirmar" como `accent` (único da tela).
 
 **Acceptance criteria:**
-- [ ] Mostra o provedor ativo e o modelo da geração (`participants` 28); sem provedor ativo, mostra a mensagem com link para configurações e desabilita confirmar (`participants` 29).
-- [ ] O botão de confirmar fica desabilitado enquanto algum speaker está sem nome (`participants` 30); depois de confirmar, leva ao detalhe (`participants` 31).
-- [ ] Grep local sem achado; `vitest-axe` sem violação.
+- [x] Mostra o provedor ativo e o modelo da geração (`participants` 28); sem provedor ativo, mostra a mensagem com link para configurações e desabilita confirmar (`participants` 29).
+- [x] O botão de confirmar fica desabilitado enquanto algum speaker está sem nome (`participants` 30); depois de confirmar, leva ao detalhe (`participants` 31).
+- [x] Grep local sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/participants`.
-- [ ] Grep local em `NamingPage.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/participants`.
+- [x] Grep local em `NamingPage.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 53.1, 53.2
 
@@ -4466,14 +4466,14 @@
 **Description:** `SpeakerRow` como linha com régua: botão de amostra (`primary` tocando, `secondary` parado, tamanho `icon`), tempo de fala em Geist Mono, campo de nome de 40 px, erro inline no campo e indicação de junção por nome igual com `transform` e `opacity`.
 
 **Acceptance criteria:**
-- [ ] Cada speaker mostra o botão para tocar a amostra, o tempo total de fala e um campo de nome (`participants` 26); foco e teclado funcionam no botão de amostra.
-- [ ] Dois ou mais speakers com o mesmo nome mostram que serão juntados num só Participante (`participants` 27).
-- [ ] Grep local sem achado; `vitest-axe` sem violação; movimento desligado com `prefers-reduced-motion`.
+- [x] Cada speaker mostra o botão para tocar a amostra, o tempo total de fala e um campo de nome (`participants` 26); foco e teclado funcionam no botão de amostra.
+- [x] Dois ou mais speakers com o mesmo nome mostram que serão juntados num só Participante (`participants` 27).
+- [x] Grep local sem achado; `vitest-axe` sem violação; movimento desligado com `prefers-reduced-motion`.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/participants`.
-- [ ] Grep local em `SpeakerRow.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/participants`.
+- [x] Grep local em `SpeakerRow.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 59.1
 

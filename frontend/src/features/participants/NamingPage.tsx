@@ -1,7 +1,10 @@
-import { ArrowLeft, CircleAlert } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { useRef, useState, type FormEvent } from "react"
 import { Link, useNavigate, useParams } from "react-router"
 
+import { Notice } from "@/components/surfaces/Notice"
+import { PageHeader } from "@/components/surfaces/PageHeader"
+import { Skeleton, SkeletonGroup } from "@/components/surfaces/Skeleton"
 import { Button } from "@/components/ui/button"
 
 import {
@@ -17,27 +20,23 @@ import { SpeakerRow } from "./SpeakerRow"
 import { useConfirmParticipants } from "./useConfirmParticipants"
 import { useActiveProvider, useNamingMeeting, useSpeakers } from "./useSpeakers"
 
-const ALERT =
-  "rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-
 function ProviderNote({ active }: { active: LlmConfigState | null }) {
   if (!active)
     return (
-      <div role="alert" className={`flex flex-col gap-2 ${ALERT}`}>
-        <p className="flex items-start gap-2">
-          <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          {MESSAGES.noProvider}
-        </p>
-        <Link
-          to="/settings"
-          className="self-start font-medium underline underline-offset-4"
-        >
-          {MESSAGES.openSettings}
-        </Link>
-      </div>
+      <Notice variant="warn" role="alert">
+        <div className="flex flex-col gap-2">
+          <p>{MESSAGES.noProvider}</p>
+          <Link
+            to="/settings"
+            className="self-start rounded-sm font-medium text-ink underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {MESSAGES.openSettings}
+          </Link>
+        </div>
+      </Notice>
     )
   return (
-    <p className="text-sm text-muted-foreground">
+    <p className="text-sm text-ink-muted">
       {MESSAGES.providerUsed(
         PROVIDER_LABELS[active.provider] ?? active.provider,
         active.model ?? ""
@@ -132,22 +131,21 @@ function NamingForm({
         ))}
       </ul>
       {sampleError ? (
-        <p role="alert" className={ALERT}>
-          {MESSAGES.sampleError}
-        </p>
+        <Notice variant="error">{MESSAGES.sampleError}</Notice>
       ) : null}
-      <section className="flex flex-col gap-2 border-t border-border pt-5">
-        <h2 className="text-sm font-medium">{MESSAGES.providerTitle}</h2>
+      <section className="flex flex-col gap-2 border-t border-ink pt-4">
+        <h2 className="text-sm font-medium text-ink">
+          {MESSAGES.providerTitle}
+        </h2>
         <ProviderNote active={active} />
       </section>
       {confirm.error ? (
-        <p role="alert" className={ALERT}>
-          {confirm.error.message}
-        </p>
+        <Notice variant="error">{confirm.error.message}</Notice>
       ) : null}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <Button
           type="submit"
+          variant="accent"
           disabled={!allNamed || !active || confirm.isPending}
           aria-describedby="naming-status"
         >
@@ -156,7 +154,7 @@ function NamingForm({
         <p
           id="naming-status"
           aria-live="polite"
-          className="text-sm text-muted-foreground"
+          className="text-sm text-ink-muted"
         >
           {allNamed
             ? MESSAGES.summary(speakers.length, participantCount)
@@ -177,34 +175,26 @@ export function NamingPage() {
   const available = meeting.data !== undefined && canName(meeting.data)
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 py-4">
+    <div className="flex w-full max-w-reading flex-col gap-6">
       <Link
         to={`/meetings/${id}`}
-        className="inline-flex items-center gap-1.5 self-start text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-2 self-start rounded-sm text-sm text-ink-muted outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-ring"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
         {MESSAGES.back}
       </Link>
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">{MESSAGES.title}</h1>
-        <p className="text-base text-muted-foreground">
-          {MESSAGES.description}
-        </p>
-      </header>
+      <PageHeader title={MESSAGES.title} description={MESSAGES.description} />
       {error ? (
-        <p role="alert" className={ALERT}>
+        <Notice variant="error">
           {error.status === 404 ? MESSAGES.notFound : error.message}
-        </p>
+        </Notice>
       ) : meeting.data && !available ? (
-        <p className="text-sm text-muted-foreground">{MESSAGES.notAvailable}</p>
+        <p className="text-sm text-ink-muted">{MESSAGES.notAvailable}</p>
       ) : !speakers.data || provider.isPending ? (
-        <div aria-busy="true" className="flex flex-col gap-3">
-          <span role="status" className="sr-only">
-            {MESSAGES.loading}
-          </span>
-          <div className="h-16 rounded-xl bg-muted" />
-          <div className="h-16 rounded-xl bg-muted" />
-        </div>
+        <SkeletonGroup label={MESSAGES.loading}>
+          <Skeleton className="h-16" />
+          <Skeleton className="h-16" />
+        </SkeletonGroup>
       ) : (
         <NamingForm
           meetingId={id}

@@ -34,7 +34,7 @@ export function SpeakerRow({
   const note = error ?? (mergedWith ? MESSAGES.mergedWith(mergedWith) : null)
 
   return (
-    <li className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-2 border-b border-border py-4 last:border-b-0">
+    <li className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-2 border-b border-hairline py-4 first:border-t">
       <Button
         type="button"
         variant={playing ? "primary" : "secondary"}
@@ -47,13 +47,13 @@ export function SpeakerRow({
         {playing ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
       </Button>
       <div className="col-start-2 flex items-baseline justify-between gap-3 text-sm">
-        <label htmlFor={inputId} className="font-medium">
+        <label htmlFor={inputId} className="font-medium text-ink">
           <span className="sr-only">{MESSAGES.namePrefix}</span>
           <span translate="no" className="font-mono">
             {label}
           </span>
         </label>
-        <span className="text-muted-foreground">
+        <span className="text-ink-muted">
           <span className="sr-only">{MESSAGES.speechTime}: </span>
           <span className="font-mono tabular-nums">
             {formatSpeech(speaker.total_seconds)}
@@ -76,10 +76,11 @@ export function SpeakerRow({
         {note ? (
           <p
             id={noteId}
+            key={error ? "error" : "merged"}
             className={
               error
-                ? "text-sm text-destructive"
-                : "text-sm text-muted-foreground"
+                ? "motion-enter text-sm text-failed"
+                : "motion-enter text-sm text-signal"
             }
           >
             {note}
