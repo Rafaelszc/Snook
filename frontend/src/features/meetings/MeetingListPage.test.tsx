@@ -38,6 +38,36 @@ it("lista título, data, duração e status, com link ao detalhe", async () => {
   expect(await axe(container)).toHaveNoViolations()
 })
 
+it("linhas por régua, sem card; data e duração em mono tabular (ADR-0024)", async () => {
+  listSequence([{ ...SUMMARY, status: "done" }])
+  renderMeetings("/")
+  const link = await screen.findByRole("link", { name: SUMMARY.title })
+  const row = link.closest("li") as HTMLElement
+  const list = row.closest("ul") as HTMLElement
+  expect(list).toHaveClass("divide-y", "divide-hairline", "border-t-ink")
+  expect(row.className).not.toMatch(/rounded|shadow|bg-card|bg-surface/)
+  expect(within(row).getByText(/1:02:05/)).toHaveClass(
+    "font-mono",
+    "tabular-nums"
+  )
+  expect(link).toHaveClass("font-heading")
+})
+
+it("erro ao carregar vira Notice error", async () => {
+  server.use(
+    http.get("/api/meetings", () =>
+      HttpResponse.json(
+        { error: { code: "internal", message: "Falhou." } },
+        { status: 500 }
+      )
+    )
+  )
+  renderMeetings("/")
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveAttribute("data-slot", "notice")
+  expect(alert).toHaveAttribute("data-variant", "error")
+})
+
 it("lista vazia convida a enviar", async () => {
   listSequence([])
   renderMeetings("/")

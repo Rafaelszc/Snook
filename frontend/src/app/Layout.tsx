@@ -1,6 +1,6 @@
-import { NavLink, Outlet, useNavigate } from "react-router"
+import { Outlet, useNavigate } from "react-router"
 
-import { Button } from "@/components/ui/button"
+import { AppShell } from "@/components/surfaces/AppShell"
 import { useLogout, useSession } from "@/features/auth/useSession"
 
 const links = [
@@ -8,6 +8,7 @@ const links = [
   { to: "/settings", label: "Configurações" },
 ]
 
+// Guarda sessão, logout e links; o AppShell só desenha (ADR-0024).
 export function Layout() {
   const navigate = useNavigate()
   const { data: user } = useSession()
@@ -20,37 +21,13 @@ export function Layout() {
   }
 
   return (
-    <div className="min-h-svh">
-      <header className="flex items-center justify-between gap-4 p-4">
-        <nav aria-label="Principal" className="flex gap-4">
-          {links.map(({ to, label }) => (
-            <NavLink key={to} to={to} end>
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3">
-          {user ? (
-            <span
-              translate="no"
-              className="max-w-40 truncate text-sm text-muted-foreground"
-            >
-              {user.username}
-            </span>
-          ) : null}
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onLogout}
-            disabled={logout.isPending}
-          >
-            Sair
-          </Button>
-        </div>
-      </header>
-      <main className="p-4">
-        <Outlet />
-      </main>
-    </div>
+    <AppShell
+      links={links}
+      userName={user?.username}
+      onLogout={onLogout}
+      logoutPending={logout.isPending}
+    >
+      <Outlet />
+    </AppShell>
   )
 }
