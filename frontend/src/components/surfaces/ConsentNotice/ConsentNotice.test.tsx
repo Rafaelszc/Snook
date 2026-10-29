@@ -31,6 +31,7 @@ it("mostra só o texto, sem checkbox nem confirmação (Q71)", async () => {
   const { container } = render(<ConsentNotice />)
   const notice = screen.getByTestId("consent-notice")
   expect(notice).toHaveTextContent(CONSENT_NOTICE_TEXT)
+  expect(notice.textContent).toBe(CONSENT_NOTICE_TEXT)
   expect(notice).toBeVisible()
   expect(container.querySelector("input, button, [role=checkbox]")).toBeNull()
   expect(await axe(container)).toHaveNoViolations()
@@ -41,4 +42,11 @@ it("o texto existe num único lugar do código (Q72)", () => {
     .filter((path) => readFileSync(path, "utf8").includes(PHRASE))
     .map((path) => relative(SRC, path))
   expect(found).toEqual(["components/surfaces/ConsentNotice/messages.ts"])
+})
+
+it("renderiza Notice variant=\"consent\" (ADR-0024)", () => {
+  render(<ConsentNotice />)
+  const notice = screen.getByTestId("consent-notice")
+  expect(notice).toHaveAttribute("data-slot", "notice")
+  expect(notice).toHaveAttribute("data-variant", "consent")
 })
