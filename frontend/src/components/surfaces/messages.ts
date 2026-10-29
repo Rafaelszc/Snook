@@ -25,3 +25,10 @@ export const THEME_LABELS = {
   dark: "Escuro",
   system: "Sistema",
 } as const
+
+export const SHELL_LABELS = {
+  brand: "Snook",
+  home: "Snook, início",
+  nav: "Principal",
+  logout: "Sair",
+} as const
