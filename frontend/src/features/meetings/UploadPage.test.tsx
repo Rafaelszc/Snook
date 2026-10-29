@@ -1,10 +1,12 @@
 import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { http, HttpResponse } from "msw"
-import { expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest"
 import { axe } from "vitest-axe"
 
 import { CONSENT_NOTICE_TEXT } from "@/components/surfaces/ConsentNotice/messages"
+import { CAN_HOVER_QUERY, REDUCED_MOTION_QUERY } from "@/lib/ui/media"
+import { stubMatchMedia } from "@/lib/ui/matchMediaStub"
 import { server } from "@/test/server"
 
 import { detail, MEETING_ID, SUMMARY } from "./fixtures"
@@ -184,4 +186,58 @@ it("o aviso de consentimento fica junto do botão, só texto (meetings 52, Q71)"
   const send = screen.getByRole("button", { name: "Enviar" })
   expect(notice.parentElement).toContainElement(send)
   expect(send).toBeEnabled()
+})
+
+it("erro geral da API aparece em Notice error; Enviar é o accent", async () => {
+  server.use(
+    http.post("/api/meetings", () =>
+      HttpResponse.json(
+        { error: { code: "internal_error", message: "erro interno" } },
+        { status: 500 }
+      )
+    )
+  )
+  renderMeetings("/meetings/new")
+  const send = screen.getByRole("button", { name: "Enviar" })
+  expect(send).toHaveAttribute("data-variant", "accent")
+
+  await user().upload(screen.getByLabelText("Arquivo da reunião"), audio())
+  await user().click(send)
+  const alert = await screen.findByRole("alert")
+  expect(alert).toHaveTextContent("erro interno")
+  expect(alert).toHaveAttribute("data-variant", "error")
+})
+
+it("área de upload: borda fixa --input, realce spotlight e foco opaco (ADR-0024)", () => {
+  renderMeetings("/meetings/new")
+  const zone = screen.getByLabelText("Arquivo da reunião").closest("label")!
+  expect(zone).toHaveClass("spotlight", "border-input", "bg-surface")
+  expect(zone).toHaveClass("has-[:focus-visible]:ring-2")
+  expect(zone.className).not.toMatch(/transition-colors|ring-ring\/|ring-3/)
+})
+
+describe("mouse-tracking da área de upload (NFR-08)", () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  const moves = (spy: MockInstance<EventTarget["addEventListener"]>) =>
+    spy.mock.calls.filter(
+      ([type], i) =>
+        type === "pointermove" &&
+        (spy.mock.contexts[i] as Element).classList?.contains("spotlight")
+    )
+
+  it.each([
+    ["hover fino", { [CAN_HOVER_QUERY]: true }, 1],
+    ["toque", { [CAN_HOVER_QUERY]: false }, 0],
+    [
+      "movimento reduzido",
+      { [CAN_HOVER_QUERY]: true, [REDUCED_MOTION_QUERY]: true },
+      0,
+    ],
+  ])("%s", (_, media, expected) => {
+    stubMatchMedia(media)
+    const add = vi.spyOn(EventTarget.prototype, "addEventListener")
+    renderMeetings("/meetings/new")
+    expect(moves(add)).toHaveLength(expected)
+  })
 })

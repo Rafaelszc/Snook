@@ -5,6 +5,8 @@ import { cn } from "cn"
 
 import { FormField } from "@/components/forms/FormField"
 import { ConsentNotice } from "@/components/surfaces/ConsentNotice/ConsentNotice"
+import { Notice } from "@/components/surfaces/Notice"
+import { PageHeader } from "@/components/surfaces/PageHeader"
 import { Button } from "@/components/ui/button"
 import { usePointerSpotlight } from "@/lib/ui/usePointerSpotlight"
 
@@ -23,7 +25,8 @@ function formatBytes(bytes: number): string {
   return `${mb.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}\u00a0MB`
 }
 
-// Área de soltar com mouse-tracking (ADR-0022, "Mapa de superfícies").
+// Área de soltar: borda fixa --input; o realce do spotlight.css fica só na faixa da borda,
+// miolo sem mudança com o ponteiro (ADR-0024, "Mouse-tracking").
 function DropZone({
   file,
   error,
@@ -49,7 +52,7 @@ function DropZone({
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       <label
         ref={ref}
         htmlFor={inputId}
@@ -60,20 +63,19 @@ function DropZone({
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={cn(
-          "spotlight flex min-h-44 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border border-dashed px-4 py-8 text-center transition-colors has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
-          dragging ? "border-foreground" : "border-border",
-          error && "border-destructive"
+          "spotlight flex min-h-44 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border border-dashed bg-surface px-4 py-8 text-center text-ink has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background",
+          error ? "border-failed" : dragging ? "border-ink" : "border-input"
         )}
       >
         {file ? (
-          <FileAudio aria-hidden="true" className="size-6" />
+          <FileAudio aria-hidden="true" className="size-6 text-signal" />
         ) : (
-          <Upload aria-hidden="true" className="size-6 text-muted-foreground" />
+          <Upload aria-hidden="true" className="size-6 text-ink-muted" />
         )}
-        <span className="text-base font-medium">
+        <span className="text-base font-medium break-all">
           {file ? file.name : MESSAGES.dropTitle}
         </span>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-ink-muted">
           {file ? (
             <span className="font-mono tabular-nums">
               {formatBytes(file.size)}
@@ -98,7 +100,7 @@ function DropZone({
         />
       </label>
       {error ? (
-        <p id={errorId} className="text-sm text-destructive">
+        <p id={errorId} className="text-sm text-failed">
           {error}
         </p>
       ) : null}
@@ -144,16 +146,16 @@ export function UploadPage() {
   const percent = Math.round(upload.progress * 100)
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 py-4">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-balance">
-          {MESSAGES.uploadTitle}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {MESSAGES.uploadDescription}
-        </p>
-      </header>
-      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5">
+    <div className="flex flex-col gap-8">
+      <PageHeader
+        title={MESSAGES.uploadTitle}
+        description={MESSAGES.uploadDescription}
+      />
+      <form
+        noValidate
+        onSubmit={onSubmit}
+        className="flex w-full max-w-reading flex-col gap-6"
+      >
         <DropZone
           file={file}
           error={fileError}
@@ -182,18 +184,11 @@ export function UploadPage() {
           onChange={(e) => setSpeakers(e.target.value)}
           className="sm:max-w-40"
         />
-        {generalError ? (
-          <p
-            role="alert"
-            className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-          >
-            {generalError}
-          </p>
-        ) : null}
-        <div className="flex flex-col gap-3 border-t border-border pt-5">
+        {generalError ? <Notice variant="error">{generalError}</Notice> : null}
+        <div className="flex flex-col gap-3 border-t border-hairline pt-6">
           <ConsentNotice />
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button type="submit" disabled={upload.isPending}>
+            <Button type="submit" variant="accent" disabled={upload.isPending}>
               {upload.isPending ? MESSAGES.sending : MESSAGES.send}
             </Button>
             {upload.isPending ? (
@@ -202,11 +197,11 @@ export function UploadPage() {
                   aria-label={MESSAGES.progress}
                   max={100}
                   value={percent}
-                  className="h-1.5 flex-1 accent-foreground"
+                  className="h-1.5 flex-1 accent-signal"
                 />
                 <span
                   role="status"
-                  className="font-mono text-sm text-muted-foreground tabular-nums"
+                  className="font-mono text-sm text-ink-muted tabular-nums"
                 >
                   {percent}%
                 </span>
