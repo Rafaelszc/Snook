@@ -1,6 +1,6 @@
 import { AlertDialog } from "radix-ui"
 
-import { GlassPanel } from "@/components/surfaces/GlassPanel"
+import { DialogSurface } from "@/components/surfaces/DialogSurface"
 import { Button } from "@/components/ui/button"
 
 import { MESSAGES } from "./messages"
@@ -11,7 +11,7 @@ interface RemoveDialogProps {
   onConfirm: () => void
 }
 
-// Confirmação antes de chamar a API (llm-providers 37). Vidro só no diálogo (02-architecture.md, "Mapa de superfícies").
+// Confirmação antes de chamar a API (llm-providers 37). Diálogo opaco (ADR-0024, "Vidro").
 export function RemoveDialog({
   providerLabel,
   disabled,
@@ -25,9 +25,9 @@ export function RemoveDialog({
         </Button>
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
-        <AlertDialog.Overlay className="motion-fade-in fixed inset-0 z-50 bg-black/40" />
+        <AlertDialog.Overlay className="motion-fade-in fixed inset-0 z-50 bg-scrim" />
         <AlertDialog.Content asChild>
-          <GlassPanel className="motion-enter fixed top-1/2 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-xl p-6">
+          <DialogSurface className="motion-enter fixed top-1/2 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 p-6">
             <AlertDialog.Title className="text-base font-semibold">
               {MESSAGES.removeTitle(providerLabel)}
             </AlertDialog.Title>
@@ -44,7 +44,7 @@ export function RemoveDialog({
                 </Button>
               </AlertDialog.Action>
             </div>
-          </GlassPanel>
+          </DialogSurface>
         </AlertDialog.Content>
       </AlertDialog.Portal>
     </AlertDialog.Root>

@@ -226,7 +226,7 @@ it("remover pede confirmação antes de chamar a API (llm-providers 37)", async 
   const dialog = await screen.findByRole("alertdialog", {
     name: "Remover Anthropic?",
   })
-  expect(dialog.closest("[data-slot=glass-panel]")).not.toBeNull()
+  expect(dialog).toHaveAttribute("data-slot", "dialog-surface")
   expect(deleted).toBe(0)
 
   await user.click(within(dialog).getByRole("button", { name: "Cancelar" }))
