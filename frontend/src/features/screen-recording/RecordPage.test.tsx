@@ -94,6 +94,21 @@ describe("RecordPage", () => {
     expect(screen.queryByText(MESSAGES.unsupported)).not.toBeInTheDocument()
   })
 
+  it("Ata: fora de contexto seguro é Notice warn; PageHeader; sem vidro parado", async () => {
+    const { container } = renderRecord({
+      env: fakeBrowserEnv({ secure: false, displayMedia: false }),
+    })
+    const notice = screen
+      .getByText(MESSAGES.insecure)
+      .closest('[data-slot="notice"]')
+    expect(notice).toHaveAttribute("data-variant", "warn")
+    expect(
+      container.querySelector('[data-slot="page-header"] h1')
+    ).toHaveTextContent(MESSAGES.recordTitle)
+    expect(container.querySelector(GLASS)).toBeNull()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it("sem as APIs desabilita e indica Chrome ou Edge (screen-recording 22)", () => {
     renderRecord({ env: fakeBrowserEnv({ webm: false }) })
     expect(recordButton()).toBeDisabled()

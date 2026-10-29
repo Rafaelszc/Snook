@@ -169,6 +169,26 @@ describe("SendRecordingPage", () => {
     expect(bodies[1]).toContain(`filename="${NAME}"`)
   })
 
+  it("Ata: Enviar é o único accent; Tentar de novo é secondary; erro em Notice", async () => {
+    server.use(http.post("/api/meetings", () => HttpResponse.error()))
+    const { container } = renderSend()
+
+    const send = screen.getByRole("button", { name: MESSAGES.send })
+    expect(send).toHaveAttribute("data-variant", "accent")
+    expect(container.querySelectorAll('[data-variant="accent"]')).toHaveLength(
+      1
+    )
+    await userEvent.click(send)
+
+    const alert = await screen.findByRole("alert")
+    expect(alert).toHaveAttribute("data-slot", "notice")
+    expect(alert).toHaveAttribute("data-variant", "error")
+    expect(
+      screen.getByRole("button", { name: MESSAGES.retry })
+    ).toHaveAttribute("data-variant", "secondary")
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
   it("parada no limite mostra o aviso (screen-recording 10)", () => {
     renderSend(recording({ limitReached: true }))
     expect(screen.getByText(MESSAGES.limitReached)).toBeInTheDocument()

@@ -183,6 +183,30 @@ describe("RecordingPanel", () => {
     ).toBeDisabled()
   })
 
+  it("Ata: único vidro, raio 10, cronômetro mono, Parar danger, pulso", () => {
+    const { container } = render(
+      <RecordingPanel
+        startedAt={Date.now()}
+        clock={systemClock}
+        stopping={false}
+        onStop={() => {}}
+      />
+    )
+    const glass = container.querySelectorAll('[data-slot="glass-panel"]')
+    expect(glass).toHaveLength(1)
+    expect(glass[0]).toHaveClass("rounded-lg", "fixed")
+    expect(screen.getByRole("timer")).toHaveClass("font-mono", "tabular-nums")
+    expect(screen.getByRole("button", { name: MESSAGES.stop })).toHaveAttribute(
+      "data-variant",
+      "danger"
+    )
+    // motion.css desliga motion-pulse com prefers-reduced-motion.
+    expect(screen.getByTestId("recording-indicator")).toHaveClass(
+      "motion-pulse",
+      "bg-failed"
+    )
+  })
+
   it.each([
     [0, "0:00:00"],
     [59, "0:00:59"],
