@@ -2,6 +2,7 @@ import { Trash2 } from "lucide-react"
 import { useId, useState } from "react"
 
 import { ConfirmDialog } from "@/components/surfaces/ConfirmDialog"
+import { Notice } from "@/components/surfaces/Notice"
 import { Button } from "@/components/ui/button"
 
 import { MESSAGES } from "./messages"
@@ -36,7 +37,7 @@ export function ConfirmDeleteDialog({
       title={blockedReason ?? label}
       disabled={Boolean(blockedReason) || pending}
       aria-describedby={blockedReason ? reasonId : undefined}
-      className="text-muted-foreground"
+      className="text-ink-muted"
     >
       <Trash2 aria-hidden="true" />
     </Button>
@@ -71,11 +72,7 @@ export function ConfirmDeleteDialog({
           }}
         />
       )}
-      {error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
+      {error ? <Notice variant="error">{error}</Notice> : null}
     </>
   )
 }

@@ -45,11 +45,11 @@ export function FormDialog({
         >
           <DialogSurface className="motion-enter fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-y-auto p-6">
             <form onSubmit={submit} className="flex flex-col gap-4">
-              <Dialog.Title className="text-base font-semibold">
+              <Dialog.Title className="font-heading text-base font-semibold text-ink">
                 {title}
               </Dialog.Title>
               {description ? (
-                <Dialog.Description className="text-sm text-muted-foreground">
+                <Dialog.Description className="text-sm text-ink-muted">
                   {description}
                 </Dialog.Description>
               ) : null}

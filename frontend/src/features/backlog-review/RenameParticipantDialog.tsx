@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api/client"
 
 import { mergeTarget, type Participant } from "./api"
+import { SELECT } from "./EditableField"
 import { fieldError } from "./fieldError"
 import { FormDialog } from "./FormDialog"
 import { MergeNotice } from "./MergeNotice"
@@ -68,7 +69,7 @@ export function RenameParticipantDialog({
           )
       }}
     >
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         <label htmlFor={`${id}-who`} className="text-sm font-medium">
           {MESSAGES.participant}
         </label>
@@ -82,7 +83,7 @@ export function RenameParticipantDialog({
             setParticipantId(chosen?.id)
             setName(chosen?.name ?? "")
           }}
-          className="h-10 rounded-lg border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+          className={SELECT}
         >
           {participants.map((p) => (
             <option key={p.id} value={p.id}>
@@ -91,7 +92,7 @@ export function RenameParticipantDialog({
           ))}
         </select>
       </div>
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         <label htmlFor={`${id}-name`} className="text-sm font-medium">
           {MESSAGES.newName}
         </label>
@@ -108,11 +109,7 @@ export function RenameParticipantDialog({
           message={target && MESSAGES.mergeParticipant(target.name)}
         />
         {error ? (
-          <p
-            id={`${id}-error`}
-            role="alert"
-            className="text-sm text-destructive"
-          >
+          <p id={`${id}-error`} role="alert" className="text-sm text-failed">
             {error}
           </p>
         ) : null}

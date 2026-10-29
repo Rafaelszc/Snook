@@ -113,10 +113,13 @@ it("renomear Epic para nome existente avisa da junção antes de salvar (backlog
   await userEvent.clear(input)
   await userEvent.type(input, "  cadastro ")
 
+  // Notice info: role no contêiner do aviso (ADR-0024, "Componentes").
   expect(
-    screen.getByText(
-      'Já existe a Epic "Cadastro". Ao salvar, as duas serão juntadas.'
-    )
+    screen
+      .getByText(
+        'Já existe a Epic "Cadastro". Ao salvar, as duas serão juntadas.'
+      )
+      .closest('[data-slot="notice"]')
   ).toHaveAttribute("role", "status")
   expect(input).toHaveAccessibleDescription(/as duas serão juntadas/)
   expect(calls).toEqual([])

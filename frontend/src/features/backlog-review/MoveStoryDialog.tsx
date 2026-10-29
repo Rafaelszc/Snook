@@ -1,6 +1,7 @@
 import { ArrowRightLeft } from "lucide-react"
 import { useId, useState } from "react"
 
+import { Notice } from "@/components/surfaces/Notice"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api/client"
 
@@ -63,16 +64,14 @@ export function MoveStoryDialog({
               value={epic.id}
               checked={target === epic.id}
               onChange={() => setTarget(epic.id)}
-              className="size-4 accent-foreground"
+              className="size-4 accent-signal"
             />
             <span className="break-words">{epic.name}</span>
           </label>
         ))}
       </fieldset>
       {move.error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {move.error.message}
-        </p>
+        <Notice variant="error">{move.error.message}</Notice>
       ) : null}
     </FormDialog>
   )

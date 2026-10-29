@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { fieldError } from "./fieldError"
+import { MergeNotice } from "./MergeNotice"
 import { MESSAGES } from "./messages"
 
 // Mesma borda, fundo e anel opaco de 2 px do `Input` (ADR-0024, "Foco").
@@ -143,11 +144,7 @@ export function EditableField({
           className={mono ? "font-mono tabular-nums" : undefined}
         />
       )}
-      {hint ? (
-        <p id={hintId} role="status" className="text-sm text-signal">
-          {hint}
-        </p>
-      ) : null}
+      <MergeNotice id={hintId} message={hint} />
       {error ? (
         <p id={errorId} role="alert" className="text-sm text-failed">
           {error}
