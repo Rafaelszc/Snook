@@ -3,6 +3,8 @@ import { Mic, Upload } from "lucide-react"
 import { Link, useNavigate } from "react-router"
 
 import { ConsentNotice } from "@/components/surfaces/ConsentNotice/ConsentNotice"
+import { Notice } from "@/components/surfaces/Notice"
+import { PageHeader } from "@/components/surfaces/PageHeader"
 import { Button } from "@/components/ui/button"
 
 import type {
@@ -91,38 +93,28 @@ export function RecordPage({ deps = {} }: { deps?: Partial<RecordDeps> }) {
         : null
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 py-4 pb-32">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-balance">
-          {MESSAGES.recordTitle}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {MESSAGES.recordDescription}
-        </p>
-      </header>
-      <section className="flex flex-col gap-4 rounded-xl border border-border p-5">
-        <p className="text-base">{MESSAGES.recordHowTo}</p>
+    // Folga no rodapé para o painel flutuante não cobrir os botões.
+    <div className="flex flex-col gap-8 pb-32">
+      <PageHeader
+        title={MESSAGES.recordTitle}
+        description={MESSAGES.recordDescription}
+      />
+      <section className="flex max-w-reading flex-col gap-4 border-t border-ink pt-4">
+        <p className="font-serif text-base text-ink">{MESSAGES.recordHowTo}</p>
         {support.blocked ? (
-          <p id={supportId} className="text-sm text-muted-foreground">
+          <Notice id={supportId} variant="warn">
             {support.message}
-          </p>
+          </Notice>
         ) : support.warning ? (
-          <p id={supportId} className="text-sm text-muted-foreground">
+          <p id={supportId} className="text-sm text-ink-muted">
             {support.warning}
           </p>
         ) : null}
-        {refusal ? (
-          <p
-            role="alert"
-            className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-          >
-            {refusal}
-          </p>
-        ) : null}
+        {refusal ? <Notice variant="error">{refusal}</Notice> : null}
         {pending ? (
-          <p className="text-sm text-muted-foreground">{MESSAGES.keepOpen}</p>
+          <p className="text-sm text-ink-muted">{MESSAGES.keepOpen}</p>
         ) : null}
-        <div className="flex flex-col gap-3 border-t border-border pt-4">
+        <div className="flex flex-col gap-3 border-t border-hairline pt-4">
           <ConsentNotice />
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button
