@@ -56,7 +56,7 @@ export function CutButton({
             "motion-press inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-md border px-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97] disabled:opacity-50",
             active
               ? "border-signal bg-signal text-signal-ink"
-              : "-ml-2.5 border-transparent text-muted-foreground hover:border-border hover:text-foreground"
+              : "-ml-2.5 border-transparent text-ink-muted hover:border-hairline hover:text-ink"
           )}
         >
           <Scissors aria-hidden="true" className="size-3.5" />

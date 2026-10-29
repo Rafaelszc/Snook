@@ -152,3 +152,13 @@ it("não oferece corte no meio de um segmento (33)", async () => {
   // Uma fronteira por segmento, menos o último: 3 botões para 4 falas.
   expect(within(region).getAllByRole("button")).toHaveLength(3)
 })
+
+it("Ata: Parte que cabe em --done; corte ativo em --signal com transform", async () => {
+  serveRefresh(smallSplit())
+  renderSplit()
+
+  await screen.findByRole("list", { name: "Partes" })
+  expect(within(partRows()[0]).getByText("Cabe")).toHaveClass("text-done")
+  const active = screen.getAllByRole("button", { pressed: true })[0]
+  expect(active).toHaveClass("bg-signal", "motion-press")
+})
