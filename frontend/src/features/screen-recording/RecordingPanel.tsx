@@ -8,7 +8,7 @@ import { MESSAGES } from "./messages"
 import { RecordingIndicator } from "./RecordingIndicator"
 import { formatElapsed, useElapsed } from "./useElapsed"
 
-// Painel flutuante da gravação (ADR-0022, "Mapa de superfícies"). Tamanhos de texto: sm, 2xl.
+// Único vidro do app: painel flutuante da gravação (ADR-0024, "Vidro"). Tamanhos de texto: sm, 2xl.
 export function RecordingPanel({
   startedAt,
   clock,
@@ -25,12 +25,12 @@ export function RecordingPanel({
     <GlassPanel
       role="region"
       aria-label={MESSAGES.panel}
-      className="motion-enter fixed inset-x-4 bottom-4 z-40 mx-auto flex max-w-md items-center gap-4 rounded-xl px-5 py-4"
+      className="motion-enter fixed inset-x-4 bottom-4 z-40 mx-auto flex max-w-md items-center gap-4 rounded-lg p-4"
     >
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p
           role="status"
-          className="flex items-center gap-2 text-sm font-medium"
+          className="flex items-center gap-2 text-sm font-medium text-ink"
         >
           <RecordingIndicator />
           {MESSAGES.recording}
@@ -38,7 +38,7 @@ export function RecordingPanel({
         <p
           role="timer"
           aria-label={MESSAGES.elapsed}
-          className="font-mono text-2xl font-semibold tabular-nums"
+          className="font-mono text-2xl font-semibold text-ink tabular-nums"
         >
           {formatElapsed(elapsed)}
         </p>
