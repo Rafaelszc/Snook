@@ -251,13 +251,13 @@ export function ProviderForm({ config }: { config: LlmConfig }) {
 
       <div aria-live="polite" className="text-sm empty:hidden">
         {listModels.data?.ok ? (
-          <p className="motion-enter text-status-done">
+          <p className="motion-enter text-done">
             {MESSAGES.modelsLoaded(listModels.data.models.length)}
           </p>
         ) : test.data?.ok ? (
-          <p className="motion-enter text-status-done">{MESSAGES.testOk}</p>
+          <p className="motion-enter text-done">{MESSAGES.testOk}</p>
         ) : save.isSuccess ? (
-          <p className="motion-enter text-status-done">{MESSAGES.saved}</p>
+          <p className="motion-enter text-done">{MESSAGES.saved}</p>
         ) : null}
       </div>
       <div role="alert" className="empty:hidden">
