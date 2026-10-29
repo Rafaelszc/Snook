@@ -3947,13 +3947,13 @@
 **Description:** `components/surfaces/AppShell.tsx` só desenha: barra opaca com marca em serif, nav, nome do usuário, `ThemeToggle`, botão de sair, e a área de conteúdo na largura `--shell`. Recebe links, nome do usuário e `onLogout` por props e não importa `features/`.
 
 **Acceptance criteria:**
-- [ ] O item ativo da nav tem `aria-current="page"` e sublinhado de 2 px em `--signal`; a nav opera por teclado (ADR-0024, "Componentes").
-- [ ] A barra é opaca (sem `backdrop-filter`) e o conteúdo tem largura `--shell` (`02-architecture.md`, "Mapa de superfícies").
-- [ ] `ThemeToggle` presente; `vitest-axe` sem violação nos dois temas.
+- [x] O item ativo da nav tem `aria-current="page"` e sublinhado de 2 px em `--signal`; a nav opera por teclado (ADR-0024, "Componentes").
+- [x] A barra é opaca (sem `backdrop-filter`) e o conteúdo tem largura `--shell` (`02-architecture.md`, "Mapa de superfícies").
+- [x] `ThemeToggle` presente; `vitest-axe` sem violação nos dois temas.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces src/styles`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces src/styles`.
+- [x] Gate frontend.
 
 **Dependencies:** Checkpoint: Tokens e primitivos
 
@@ -3970,13 +3970,13 @@
 **Description:** `Layout` segue em `app/` e guarda sessão (`useSession`), logout e links; passa tudo ao `AppShell` e coloca o `Outlet` como conteúdo.
 
 **Acceptance criteria:**
-- [ ] Depois do logout o frontend volta ao login (`auth` 26); página protegida sem sessão leva ao login (`auth` 24).
-- [ ] A nav mostra "Reuniões" e "Configurações", com o item da rota atual marcado por `aria-current="page"`.
-- [ ] A sessão nunca vai a `localStorage` nem `sessionStorage` (`03-security.md`, "Never"; SEC-03).
+- [x] Depois do logout o frontend volta ao login (`auth` 26); página protegida sem sessão leva ao login (`auth` 24).
+- [x] A nav mostra "Reuniões" e "Configurações", com o item da rota atual marcado por `aria-current="page"`.
+- [x] A sessão nunca vai a `localStorage` nem `sessionStorage` (`03-security.md`, "Never"; SEC-03).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/app src/features/auth`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/app src/features/auth`.
+- [x] Gate frontend.
 
 **Dependencies:** Task 53.1
 
@@ -3993,13 +3993,13 @@
 **Description:** `StatusBadge` perde a pílula com borda: ícone mais rótulo, com as cores da tabela "Estados" (ícone por estado; rótulo `--ink`, e `--failed` em `failed`). Mantém a região `aria-live` de mudança de status.
 
 **Acceptance criteria:**
-- [ ] Os 7 estados mostram ícone e texto, sem borda e sem fundo de pílula, com as cores da tabela "Estados" (ADR-0024, "Estados").
-- [ ] A mudança de status segue anunciada em região `aria-live` (`meetings` 40).
-- [ ] `vitest-axe` sem violação; contraste do rótulo 4,5:1 nos dois temas.
+- [x] Os 7 estados mostram ícone e texto, sem borda e sem fundo de pílula, com as cores da tabela "Estados" (ADR-0024, "Estados").
+- [x] A mudança de status segue anunciada em região `aria-live` (`meetings` 40).
+- [x] `vitest-axe` sem violação; contraste do rótulo 4,5:1 nos dois temas.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/components/surfaces/StatusBadge`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/components/surfaces/StatusBadge`.
+- [x] Gate frontend.
 
 **Dependencies:** Checkpoint: Tokens e primitivos
 
@@ -4016,14 +4016,14 @@
 **Description:** `MeetingListPage` com `PageHeader`, linhas com régua `--hairline` e régua forte `--ink` no topo da lista (sem card), datas e durações em Geist Mono tabular, `Skeleton`, `EmptyState` e `Notice variant="error"` no lugar da caixa inline (linhas 40 a 41). Polling não muda.
 
 **Acceptance criteria:**
-- [ ] A lista atualiza o status sem recarregar enquanto a Reunião está em `pending`, `processing`, `generating`, ou `transcribed` com `participants_confirmed` verdadeiro, e não faz polling fora disso (`meetings` 40).
-- [ ] Linhas separadas por régua, sem card; datas e durações em `font-mono` com algarismos tabulares (ADR-0024, "Profundidade" e "Tipografia").
-- [ ] Grep local sem achado; `vitest-axe` sem violação.
+- [x] A lista atualiza o status sem recarregar enquanto a Reunião está em `pending`, `processing`, `generating`, ou `transcribed` com `participants_confirmed` verdadeiro, e não faz polling fora disso (`meetings` 40).
+- [x] Linhas separadas por régua, sem card; datas e durações em `font-mono` com algarismos tabulares (ADR-0024, "Profundidade" e "Tipografia").
+- [x] Grep local sem achado; `vitest-axe` sem violação.
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/features/meetings`.
-- [ ] Grep local em `MeetingListPage.tsx`.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/features/meetings`.
+- [x] Grep local em `MeetingListPage.tsx`.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 53.1, 53.2, 53.3
 
