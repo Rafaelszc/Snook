@@ -20,8 +20,10 @@ dependencies = [
 # Sem extra, `uv sync` fica sem torch: testes padrão e CI usam fakes (transversal 18).
 # torch < 2.9: pyannote.audio 3.x usa APIs de I/O removidas do torchaudio 2.9.
 # huggingface-hub < 1.0: pyannote.audio 3.x passa `use_auth_token`, removido no 1.0.
+# av < 19: faster-whisper passa `metadata_errors` a `av.open`, removido no 19.0.0.
 [project.optional-dependencies]
 cpu = [
+    "av>=11,<19",
     "faster-whisper>=1.1",
     "huggingface-hub>=0.24,<1.0",
     "pyannote.audio>=3.3,<4",
@@ -30,6 +32,7 @@ cpu = [
     "torchaudio>=2.5,<2.9",
 ]
 gpu = [
+    "av>=11,<19",
     "faster-whisper>=1.1",
     "huggingface-hub>=0.24,<1.0",
     "pyannote.audio>=3.3,<4",
