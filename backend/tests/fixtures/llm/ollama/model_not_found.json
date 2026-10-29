@@ -1,0 +1,9 @@
+{
+  "status": 404,
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "error": "model \"llama-inexistente\" not found, try pulling it first"
+  }
+}

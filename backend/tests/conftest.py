@@ -1,0 +1,100 @@
+import base64
+import os
+from collections.abc import Iterator
+from pathlib import Path
+
+import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+from snook.core.settings import Settings, load_settings
+from snook.main import create_app
+
+VALID_MASTER_KEY = base64.urlsafe_b64encode(bytes(range(32))).decode()
+
+_ENV_PREFIXES = (
+    "SNOOK_",
+    "ALLOWED_",
+    "SESSION_",
+    "LOGIN_",
+    "LLM_",
+    "TRANSCRIPTION_",
+    "GENERATION_",
+    "WHISPER_",
+    "PYANNOTE_",
+)
+_ENV_NAMES = {
+    "HF_TOKEN",
+    "BCRYPT_ROUNDS",
+    "TRUSTED_PROXY_IPS",
+    "UPLOAD_MAX_BYTES",
+    "MAX_AUDIO_SECONDS",
+    "MODELS_OFFLINE",
+    "LOG_LEVEL",
+    "DATABASE_PATH",
+    "AUDIO_ROOT",
+    "MODELS_ROOT",
+}
+
+
+@pytest.fixture(autouse=True)
+def clean_env(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    """Remove do ambiente do teste toda variável lida pelo Settings."""
+    for name in list(os.environ):
+        if name.startswith(_ENV_PREFIXES) or name in _ENV_NAMES:
+            monkeypatch.delenv(name)
+    yield
+
+
+_HUB_ENV = (
+    "HF_HOME",
+    "HF_HUB_CACHE",
+    "HF_HUB_OFFLINE",
+    "HF_HUB_DISABLE_TELEMETRY",
+    "PYANNOTE_CACHE",
+)
+
+
+@pytest.fixture
+def hub_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`hub.configure` escreve no ambiente; o monkeypatch devolve o valor original no fim."""
+    for name in _HUB_ENV:
+        monkeypatch.delenv(name, raising=False)
+
+
+@pytest.fixture
+def settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Settings:
+    monkeypatch.setenv("SNOOK_MASTER_KEY", VALID_MASTER_KEY)
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "data" / "snook.db"))
+    monkeypatch.setenv("AUDIO_ROOT", str(tmp_path / "audios"))
+    monkeypatch.setenv("MODELS_ROOT", str(tmp_path / "models"))
+    monkeypatch.setenv("BCRYPT_ROUNDS", "4")  # ADR-0021: custo baixo só nos testes
+    (tmp_path / "data").mkdir()
+    return load_settings(env_file=None)
+
+
+class InertTranscription:
+    """Dispatcher parado: fora de `tests/diarized_transcription`, a Reunião fica em `pending`."""
+
+    def start(self, *_args: object) -> None: ...
+
+    def stop(self) -> None: ...
+
+    def on_event(self, _event: object) -> None: ...
+
+
+@pytest.fixture
+def app(settings: Settings) -> FastAPI:
+    created = create_app(settings)
+    created.state.transcription = InertTranscription()
+    created.state.generate_backlog = lambda event: None  # `tests/backlog_generation` liga
+    return created
+
+
+@pytest.fixture
+def client(app: FastAPI) -> Iterator[TestClient]:
+    # Host e Origin locais: passam pela checagem de SEC-04 e SEC-14.
+    with TestClient(
+        app, base_url="http://localhost", headers={"Origin": "http://localhost:8080"}
+    ) as test_client:
+        yield test_client

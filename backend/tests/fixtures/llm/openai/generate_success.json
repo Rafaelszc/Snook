@@ -1,0 +1,29 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "id": "chatcmpl-AbC123",
+    "object": "chat.completion",
+    "created": 1761200000,
+    "model": "gpt-5-mini-2025-08-07",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"epics\": [{\"title\": \"Login\", \"user_stories\": []}]}"
+        },
+        "finish_reason": "stop",
+        "logprobs": null
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 120,
+      "completion_tokens": 18,
+      "total_tokens": 138
+    },
+    "system_fingerprint": null
+  }
+}

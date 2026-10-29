@@ -1,0 +1,51 @@
+/* ADR-0024, "Mouse-tracking": só no realce da borda da área de upload. usePointerSpotlight
+   grava --pointer-x/--pointer-y; o ::before pinta um radial em --signal recortado à faixa
+   da borda por mask-composite, com o miolo transparente. Único gradiente permitido.
+   Sem hover fino, com movimento reduzido, forced-colors ou sem mask-composite: sem realce. */
+
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+
+.spotlight::before {
+  display: none;
+}
+
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .spotlight::before {
+      content: "";
+      display: block;
+      position: absolute;
+      inset: 0;
+      padding: 2px;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(
+        240px circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+        var(--signal),
+        transparent 70%
+      );
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask:
+        linear-gradient(#000 0 0) content-box exclude,
+        linear-gradient(#000 0 0);
+      transition: opacity var(--motion-slow) var(--motion-ease);
+    }
+
+    .spotlight:hover::before {
+      opacity: 1;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .spotlight::before {
+    display: none;
+  }
+}

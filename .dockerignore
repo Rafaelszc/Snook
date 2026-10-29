@@ -1,0 +1,17 @@
+# Contexto do frontend é a raiz. node_modules do host (glibc) sobrescrevia o do Alpine (musl).
+**/node_modules
+**/dist
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+.git
+# Segredo, banco, áudio e modelos nunca entram na imagem (SEC-08).
+**/.env
+**/*.db
+**/*.db-*
+**/*.db.bak-*
+**/audios
+**/models
+snook-lan-ca.crt

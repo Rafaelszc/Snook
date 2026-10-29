@@ -1,0 +1,112 @@
+# Perfis: cpu (padrão do .env.example), gpu e lan. Ver docs/specs/08-deployment.md.
+# Backend nunca publica porta. Só o frontend (nginx) fica acessível (SEC-23).
+
+x-backend: &backend
+  env_file: .env
+  volumes:
+    - snook-db:/data
+    # :z = rótulo SELinux (Fedora); ignorado em host sem SELinux.
+    - ./audios:/audios:z
+    - snook-models:/models
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  healthcheck:
+    test:
+      - CMD
+      - python
+      - -c
+      - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3).status == 200 else 1)"
+    interval: 10s
+    timeout: 5s
+    retries: 6
+    start_period: 20s
+  logging: &logging
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "5"
+  restart: unless-stopped
+
+services:
+  backend:
+    <<: *backend
+    profiles: [cpu]
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    networks:
+      snook-net:
+        aliases: [backend]
+
+  backend-gpu:
+    <<: *backend
+    profiles: [gpu]
+    build:
+      context: backend
+      dockerfile: Dockerfile.gpu
+    environment:
+      # ADR-0014: float16 na GPU. Vence o valor do .env.
+      WHISPER_COMPUTE_TYPE: float16
+    networks:
+      snook-net:
+        aliases: [backend]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "${SNOOK_BIND:-127.0.0.1}:${SNOOK_PORT:-8080}:8080"
+    # Só o backend do perfil ativo existe; o outro fica fora (required: false).
+    depends_on:
+      backend:
+        condition: service_healthy
+        required: false
+      backend-gpu:
+        condition: service_healthy
+        required: false
+    networks:
+      snook-net:
+        ipv4_address: 172.28.0.10
+    logging: *logging
+    restart: unless-stopped
+
+  # HTTPS na rede (ADR-0016). Sem SNOOK_LAN_HOST, o site fica sem endereço e o Caddy não sobe.
+  caddy:
+    build:
+      context: deploy
+      dockerfile: caddy.Dockerfile
+    profiles: [lan]
+    environment:
+      SNOOK_LAN_HOST: ${SNOOK_LAN_HOST:-}
+    ports:
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro,z
+      # CA local: segredo, fora do git (SEC-08).
+      - caddy-data:/data
+    depends_on:
+      - frontend
+    networks:
+      snook-net:
+        ipv4_address: 172.28.0.11
+    logging: *logging
+    restart: unless-stopped
+
+networks:
+  snook-net:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
+volumes:
+  snook-db:
+  snook-models:
+  caddy-data:

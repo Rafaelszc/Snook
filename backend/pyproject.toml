@@ -1,0 +1,141 @@
+[project]
+name = "snook"
+version = "0.1.0"
+description = "Snook: transcrição local de reuniões e geração de backlog."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "alembic>=1.13",
+    "bcrypt>=4.2",
+    "cryptography>=44",
+    "fastapi>=0.160.0",
+    "httpx>=0.28.1",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "python-multipart>=0.0.20",
+    "sqlalchemy>=2.0",
+    "uvicorn>=0.32",
+]
+
+# Motores reais (ADR-0014). Extra por imagem: `cpu` (Dockerfile) ou `gpu` (Dockerfile.gpu).
+# Sem extra, `uv sync` fica sem torch: testes padrão e CI usam fakes (transversal 18).
+# torch < 2.9: pyannote.audio 3.x usa APIs de I/O removidas do torchaudio 2.9.
+# huggingface-hub < 1.0: pyannote.audio 3.x passa `use_auth_token`, removido no 1.0.
+# av < 19: faster-whisper passa `metadata_errors` a `av.open`, removido no 19.0.0.
+[project.optional-dependencies]
+cpu = [
+    "av>=11,<19",
+    "faster-whisper>=1.1",
+    "huggingface-hub>=0.24,<1.0",
+    "pyannote.audio>=3.3,<4",
+    "pyyaml>=6",
+    "torch>=2.5,<2.9",
+    "torchaudio>=2.5,<2.9",
+]
+gpu = [
+    "av>=11,<19",
+    "faster-whisper>=1.1",
+    "huggingface-hub>=0.24,<1.0",
+    "pyannote.audio>=3.3,<4",
+    "pyyaml>=6",
+    "torch>=2.5,<2.9",
+    "torchaudio>=2.5,<2.9",
+]
+
+[dependency-groups]
+dev = [
+    "import-linter>=2.1",
+    "mypy>=1.13",
+    "pip-audit>=2.7",
+    "pytest>=8.3",
+    "respx>=0.23.1",
+    "ruff>=0.8",
+]
+
+[tool.uv]
+conflicts = [[{ extra = "cpu" }, { extra = "gpu" }]]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu126", extra = "gpu" },
+]
+torchaudio = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu126", extra = "gpu" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/snook"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+# Suítes opcionais fora do padrão (transversal 18); `-m models_real` na linha de comando vence.
+addopts = ["-m", "not models_real and not llm_real"]
+markers = [
+    "models_real: usa modelos reais (opcional, rodado à mão)",
+    "llm_real: usa chaves reais de provedor (opcional, rodado à mão)",
+]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "S", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.mypy]
+strict = true
+files = ["src"]
+plugins = ["pydantic.mypy"]
+
+# Motores só existem com o extra `cpu` ou `gpu`; o gate roda sem eles.
+[[tool.mypy.overrides]]
+module = ["faster_whisper.*", "pyannote.*", "torch.*", "huggingface_hub.*", "yaml.*"]
+ignore_missing_imports = true
+
+[tool.importlinter]
+root_package = "snook"
+
+[[tool.importlinter.contracts]]
+name = "shared não importa modules"
+type = "forbidden"
+source_modules = ["snook.shared"]
+forbidden_modules = ["snook.modules"]
+
+[[tool.importlinter.contracts]]
+name = "core não importa modules, shared, cli nem main"
+type = "forbidden"
+source_modules = ["snook.core"]
+forbidden_modules = ["snook.modules", "snook.shared", "snook.cli", "snook.main"]
+
+[[tool.importlinter.contracts]]
+name = "módulos não importam cli nem main"
+type = "forbidden"
+source_modules = ["snook.modules", "snook.shared", "snook.core"]
+forbidden_modules = ["snook.cli", "snook.main"]
+
+# Build order de `02-architecture.md`, "Fronteiras entre módulos": de cima importa de baixo.
+# Cada módulo novo entra aqui na tarefa que o cria.
+[[tool.importlinter.contracts]]
+name = "módulos seguem a build order"
+type = "layers"
+containers = ["snook.modules"]
+layers = ["backlog_review", "backlog_generation", "transcript_split", "participants", "diarized_transcription", "llm_providers | meetings", "auth"]

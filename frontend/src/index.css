@@ -1,0 +1,88 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "./styles/tokens.css";
+@import "./styles/motion.css";
+@import "./styles/glass.css";
+@import "./styles/spotlight.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-family-serif);
+  --font-serif: var(--font-family-serif);
+  --font-sans: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
+  --text-*: initial;
+  --text-xs: var(--fs-12);
+  --text-xs--line-height: var(--lh-body);
+  --text-sm: var(--fs-14);
+  --text-sm--line-height: var(--lh-body);
+  --text-base: var(--fs-16);
+  --text-base--line-height: var(--lh-body);
+  --text-lg: var(--fs-20);
+  --text-lg--line-height: var(--lh-heading);
+  --text-xl: var(--fs-24);
+  --text-xl--line-height: var(--lh-heading);
+  --text-2xl: var(--fs-32);
+  --text-2xl--line-height: var(--lh-heading);
+  --text-3xl: var(--fs-40);
+  --text-3xl--line-height: var(--lh-heading);
+  --shadow-*: initial;
+  --shadow-overlay: var(--overlay-shadow);
+  --container-shell: var(--shell);
+  --container-reading: var(--reading);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-hairline: var(--hairline);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-signal: var(--signal);
+  --color-signal-ink: var(--signal-ink);
+  --color-signal-soft: var(--signal-soft);
+  --color-done: var(--done);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-failed: var(--failed);
+  --color-failed-soft: var(--failed-soft);
+  --color-scrim: var(--scrim);
+  --ease-standard: var(--motion-ease);
+  --duration-fast: var(--motion-fast);
+  --duration-base: var(--motion-base);
+  --duration-slow: var(--motion-slow);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-*: initial;
+  --radius-sm: var(--r-4);
+  --radius-md: var(--r-6);
+  --radius-lg: var(--r-10);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}

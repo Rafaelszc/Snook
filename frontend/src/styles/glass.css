@@ -1,0 +1,31 @@
+/* ADR-0022 e ADR-0024: único lugar com backdrop-filter, só no painel da gravação. Base opaca; vidro só com suporte e sem preferência contrária. */
+
+.glass {
+  --glass-alpha: 88%;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--overlay-shadow);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  @media (prefers-reduced-transparency: no-preference) and (forced-colors: none) {
+    .glass:not(.glass-opaque) {
+      background: color-mix(
+        in srgb,
+        var(--surface) var(--glass-alpha),
+        transparent
+      );
+      backdrop-filter: blur(12px) saturate(140%);
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .glass {
+    background: Canvas;
+    color: CanvasText;
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+}

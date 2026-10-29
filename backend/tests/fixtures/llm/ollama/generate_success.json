@@ -1,0 +1,22 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "model": "llama3.1:8b",
+    "created_at": "2026-10-23T12:00:00.000000Z",
+    "message": {
+      "role": "assistant",
+      "content": "{\"epics\": [{\"title\": \"Login\", \"user_stories\": []}]}"
+    },
+    "done_reason": "stop",
+    "done": true,
+    "total_duration": 4883583458,
+    "load_duration": 1334875,
+    "prompt_eval_count": 120,
+    "prompt_eval_duration": 342546000,
+    "eval_count": 40,
+    "eval_duration": 4535599000
+  }
+}

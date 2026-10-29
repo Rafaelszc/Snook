@@ -1,0 +1,11 @@
+# Regras padrão do gitleaks (SEC-08). Exceção só para as chaves falsas
+# dos testes (backend/tests e *.test.ts(x) do frontend), marcadas por nome.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "chaves falsas dos testes de redação de log"
+regexTarget = "match"
+regexes = ['''(?i)(Teste|Outro|Outra)(Token|Chave)''']
+paths = ['''^backend/tests/''', '''^frontend/src/.*\.test\.tsx?$''']
+condition = "AND"

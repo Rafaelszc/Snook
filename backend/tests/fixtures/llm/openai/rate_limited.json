@@ -1,0 +1,15 @@
+{
+  "status": 429,
+  "headers": {
+    "content-type": "application/json",
+    "retry-after": "20"
+  },
+  "body": {
+    "error": {
+      "message": "Rate limit reached for gpt-5-mini in organization org-XXXX on tokens per min (TPM): Limit 200000, Used 199000, Requested 5000.",
+      "type": "tokens",
+      "param": null,
+      "code": "rate_limit_exceeded"
+    }
+  }
+}

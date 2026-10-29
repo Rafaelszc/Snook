@@ -1,0 +1,59 @@
+{
+  "title": "Planejamento de Vendas",
+  "date": "2026-10-23",
+  "epics": [
+    {
+      "name": "Cadastro",
+      "user_stories": [
+        {
+          "us_id": "US-01",
+          "name": "Cadastrar cliente",
+          "as_a": "atendente",
+          "i_want": "cadastrar cliente com CPF",
+          "so_that": "eu possa abrir pedidos",
+          "requested_by": "Ana",
+          "requested_at": "00:00:05",
+          "priority": "High",
+          "story_points": 5,
+          "acceptance_criteria": [
+            {"given": "dado 1", "when": "quando 1", "then": "então 1"},
+            {"given": "dado 2", "when": "quando 2", "then": "então 2"}
+          ]
+        },
+        {
+          "us_id": "US-02",
+          "name": "Buscar cliente",
+          "as_a": "atendente",
+          "i_want": "buscar cliente com CPF",
+          "so_that": "eu possa abrir pedidos",
+          "requested_by": null,
+          "requested_at": "00:00:05",
+          "priority": "High",
+          "story_points": 5,
+          "acceptance_criteria": [
+            {"given": "dado 1", "when": "quando 1", "then": "então 1"}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Relatórios",
+      "user_stories": [
+        {
+          "us_id": "US-03",
+          "name": "Exportar vendas",
+          "as_a": "atendente",
+          "i_want": "exportar vendas com CPF",
+          "so_that": "eu possa abrir pedidos",
+          "requested_by": "Bia",
+          "requested_at": "01:02:03",
+          "priority": "High",
+          "story_points": 5,
+          "acceptance_criteria": [
+            {"given": "dado 1", "when": "quando 1", "then": "então 1"}
+          ]
+        }
+      ]
+    }
+  ]
+}
