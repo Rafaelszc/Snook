@@ -171,6 +171,36 @@ it("recolhe e expande a Epic pelo teclado (ADR-0022)", async () => {
   ).not.toBeInTheDocument()
 })
 
+it("Epic sem card, régua --ink no topo e título serif (ADR-0024)", async () => {
+  serve(meeting())
+  renderReview()
+
+  const epic = await screen.findByRole("region", { name: /Cadastro/ })
+  expect(epic).toHaveClass("border-t", "border-ink")
+  expect(epic.className).not.toMatch(
+    /\b(bg-|rounded|shadow|border-(x|b|l|r)\b)/
+  )
+  expect(within(epic).getByText("Cadastro")).toHaveClass("font-heading")
+})
+
+it("abrir e fechar a Epic anima só por classes de motion.css (ADR-0024)", async () => {
+  serve(meeting())
+  renderReview()
+
+  const toggle = await screen.findByRole("button", {
+    name: "Recolher Epic Cadastro",
+  })
+  expect(toggle.querySelector("svg")).toHaveClass("motion-rise")
+  expect(toggle.querySelector("svg")).toHaveStyle({
+    transform: "rotate(90deg)",
+  })
+  expect(
+    document.getElementById(toggle.getAttribute("aria-controls")!)
+  ).toHaveClass("motion-enter")
+  await userEvent.click(toggle)
+  expect(toggle.querySelector("svg")).toHaveStyle({ transform: "none" })
+})
+
 it("renderiza o backlog de fixture de 30 Epics e 200 US (NFR-04)", async () => {
   serve(meeting(), bigBacklog())
   renderReview()
