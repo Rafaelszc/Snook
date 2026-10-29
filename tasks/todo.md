@@ -2,7 +2,7 @@
 
 > Status: task-breaker, 2026-10-22; atualizado em 2026-10-28 com a Fase 9 "Redesign Ata" (ADR-0024). Fonte: `tasks/plan.md` (aprovado), `docs/specs/` (aceitas) e ADRs 0001 a 0024 (todas Aceita).
 > Escopo: projeto inteiro, Fases 0 a 9, 9 módulos. Sem id de módulo único.
-> Fases 0 a 8 implementadas até a Task 51.1 (tarefas `[x]`). Pendentes: Task 51.2, Fase 9 (Tasks 52 a 61) e, depois dela, Task 51.3.
+> Fases 0 a 9 implementadas (tarefas `[x]`). Pendentes: Task 51.2, checkpoints da Fase 9 e Task 51.3.
 > Sem issue tracker designado em `AGENTS.md` ou `CLAUDE.md`. Tarefas vivem só neste arquivo.
 
 ## Como ler
@@ -4641,14 +4641,14 @@
 **Description:** O plano exige "grep e teste estático global" no "Checkpoint: Redesign Ata" mas nenhuma task o cria; esta cria. Teste varre `src/**/*.{ts,tsx,css}` (sem `*.test.*`) e falha com `rounded-xl` ou acima, `text-[`, `transition-colors`, `transition: all`, `ring-ring/50`, `outline-ring/50`, e com `GlassPanel` fora de `RecordingPanel.tsx` e de `SamplePage.tsx`.
 
 **Acceptance criteria:**
-- [ ] O teste falha com cada padrão proibido e passa em `src/` inteiro, depois das Tasks 53 a 61 (ADR-0024, "Testes novos"; `02-architecture.md`, "Verificação").
-- [ ] No máximo 1 `GlassPanel` por tela (ADR-0024, "Vidro"; NFR-06 permite até 3).
-- [ ] `backdrop-filter` segue só em `glass.css` (`no-stray-backdrop.test.ts` passa).
+- [x] O teste falha com cada padrão proibido e passa em `src/` inteiro, depois das Tasks 53 a 61 (ADR-0024, "Testes novos"; `02-architecture.md`, "Verificação").
+- [x] No máximo 1 `GlassPanel` por tela (ADR-0024, "Vidro"; NFR-06 permite até 3).
+- [x] `backdrop-filter` segue só em `glass.css` (`no-stray-backdrop.test.ts` passa).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run src/styles`.
-- [ ] `git grep -nE "rounded-(xl|2xl|3xl|4xl)|text-\[|transition-colors|ring-ring/50|outline-ring/50" -- frontend/src` sem achado.
-- [ ] Gate frontend.
+- [x] `cd frontend && npm test -- --run src/styles`.
+- [x] `git grep -nE "rounded-(xl|2xl|3xl|4xl)|text-\[|transition-colors|ring-ring/50|outline-ring/50" -- frontend/src` sem achado.
+- [x] Gate frontend.
 
 **Dependencies:** Tasks 54.6, 55.3, 56.2, 57.4, 58, 59.2, 60.3, 61.3
 
