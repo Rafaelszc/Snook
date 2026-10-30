@@ -4700,13 +4700,13 @@
 **Description:** Auditoria WCAG 2.2 AA de todas as telas, polimento visual final e medições manuais de NFR-03 a NFR-06 e NFR-08, sobre o visual Ata (ADR-0024). Roda depois da Fase 9, não antes.
 
 **Acceptance criteria:**
-- [ ] Todas as telas passam `vitest-axe`, `web-design-guidelines` e revisão manual de contraste em tema claro e escuro, de 360 a 1920 px; `prefers-reduced-motion` desliga movimento e mouse-tracking.
-- [ ] Medição registrada no PR: LCP da tela de login até 2,5 s com CPU 4x mais lenta (NFR-03); CLS até 0,1 (NFR-05); no máximo 3 vidros por tela, e o Ata usa 1 (NFR-06); nenhum quadro acima de 16 ms por causa do mouse-tracking, que só existe no upload (NFR-08); INP de divisão e revisão até 200 ms (NFR-04).
-- [ ] CI confirma JS inicial até 200 KB gzip e total até 500 KB gzip (NFR-01, NFR-02).
+- [x] Todas as telas passam `vitest-axe`, `web-design-guidelines` e revisão manual de contraste em tema claro e escuro, de 360 a 1920 px; `prefers-reduced-motion` desliga movimento e mouse-tracking.
+- [x] Medição registrada no PR: LCP da tela de login até 2,5 s com CPU 4x mais lenta (NFR-03); CLS até 0,1 (NFR-05); no máximo 3 vidros por tela, e o Ata usa 1 (NFR-06); nenhum quadro acima de 16 ms por causa do mouse-tracking, que só existe no upload (NFR-08); INP de divisão e revisão até 200 ms (NFR-04).
+- [x] CI confirma JS inicial até 200 KB gzip e total até 500 KB gzip (NFR-01, NFR-02).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run && npm run build && node scripts/check-bundle-size.mjs`.
-- [ ] Manual: Lighthouse e DevTools Performance conforme `01-prd.md`, "NFRs de performance do frontend".
+- [x] `cd frontend && npm test -- --run && npm run build && node scripts/check-bundle-size.mjs`.
+- [x] Manual: Lighthouse e DevTools Performance conforme `01-prd.md`, "NFRs de performance do frontend".
 
 **Dependencies:** Checkpoint: Redesign Ata, Task 51.1
 
