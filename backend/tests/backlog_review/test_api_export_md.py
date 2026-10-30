@@ -27,7 +27,7 @@ SNAPSHOT = Path(__file__).parent / "snapshots" / "backlog.md"
 def test_markdown_matches_snapshot(
     idle: TestClient, settings: Settings, uow: Uow, generate: FakeGenerate
 ) -> None:
-    """`backlog-review` 32, 33, 35: formato da Q11, cabeçalho, solicitante e quando."""
+    """`backlog-review` 32, 33, 35: documento de Product Backlog (Q75)."""
     meeting_id = fixture_backlog(idle, settings, uow, generate)
 
     response = idle.get(export_url(meeting_id, "md"))
@@ -48,8 +48,8 @@ def test_attachment_with_sanitized_name_and_nosniff(
     response = idle.get(export_url(meeting_id, "md"))
 
     assert response.headers["content-disposition"] == (
-        'attachment; filename="reuniao-vendas-q4-script-backlog.md"; '
-        "filename*=UTF-8''reuniao-vendas-q4-script-backlog.md"
+        'attachment; filename="backlog_reuniao-vendas-q4-script_2026-10-23.md"; '
+        "filename*=UTF-8''backlog_reuniao-vendas-q4-script_2026-10-23.md"
     )
     assert response.headers["x-content-type-options"] == "nosniff"
 
@@ -57,10 +57,10 @@ def test_attachment_with_sanitized_name_and_nosniff(
 @pytest.mark.parametrize(
     ("title", "expected"),
     [
-        ("!!!", "reuniao-backlog.md"),
-        ("日本語", "reuniao-backlog.md"),
-        ("a" * 80, f"{'a' * 60}-backlog.md"),
-        ("Ação " + "b" * 58 + " c", f"acao-{'b' * 55}-backlog.md"),
+        ("!!!", "backlog_reuniao_2026-10-23.md"),
+        ("日本語", "backlog_reuniao_2026-10-23.md"),
+        ("a" * 80, f"backlog_{'a' * 60}_2026-10-23.md"),
+        ("Ação " + "b" * 58 + " c", f"backlog_acao-{'b' * 55}_2026-10-23.md"),
     ],
 )
 def test_slug_is_ascii_up_to_60_and_never_empty(
@@ -71,7 +71,7 @@ def test_slug_is_ascii_up_to_60_and_never_empty(
     title: str,
     expected: str,
 ) -> None:
-    """SEC-12; `05-api.md`: slug `[a-z0-9-]` até 60, vazio vira `reuniao`."""
+    """SEC-12; `05-api.md`: `backlog_<slug>_<data>.md`, slug `[a-z0-9-]` até 60, vazio `reuniao`."""
     meeting_id = fixture_backlog(idle, settings, uow, generate)
     set_fields(settings.database_path, meeting_id, title=title)
 
@@ -89,7 +89,15 @@ def test_empty_backlog_returns_only_header(
     response = idle.get(export_url(meeting_id, "md"))
 
     assert response.status_code == 200
-    assert response.text == "# Planejamento de Vendas\n\nData: 2026-10-23\n"
+    assert response.text == (
+        "# Product Backlog: Planejamento de Vendas\n\n"
+        "- **Reunião:** Planejamento de Vendas\n"
+        "- **Data:** 2026-10-23\n"
+        "- **Projeto:** Planejamento de Vendas\n"
+        "- **Épicos:** 0\n"
+        "- **Histórias de usuário:** 0\n"
+        "- **Story Points:** 0\n"
+    )
 
 
 @pytest.mark.parametrize("status", NOT_DONE)

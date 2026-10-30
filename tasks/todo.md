@@ -4668,6 +4668,29 @@
 - [ ] `/security-review` sobre o diff
 - [ ] Revisão humana antes de seguir
 
+### Task 62: Exportação Markdown como Product Backlog
+
+**Description:** Troca só o render Markdown de `backlog_review/export.py` pelo documento de Product Backlog da Q75. JSON, geração e leitura do backlog sem mudança. Fonte única: as Epics já gravadas (`EpicOut`), sem chamar a LLM.
+
+**Acceptance criteria:**
+- [x] Markdown segue `backlog-review` 32, 33 e 36 (Q75): cabeçalho com totais, visão geral, Epics `2.N`, resumos por prioridade e por Epic, considerações derivadas dos dados.
+- [x] Prioridade em pt-BR; campos vazios omitidos; quebra de linha e caracteres de Markdown tratados.
+- [x] Arquivo `backlog_<slug>_<data>.md`; JSON segue `<slug>-backlog.json` (`05-api.md`).
+
+**Verification:**
+- [x] `cd backend && uv run pytest tests/backlog_review`.
+- [x] Gate backend.
+
+**Dependencies:** Task 50
+
+**Skills:** `tdd`
+
+**Files likely touched:**
+- `backend/src/snook/modules/backlog_review/{export.py,service.py}`
+- `backend/tests/backlog_review/{test_api_export_md.py,test_export_markdown.py,snapshots/}`
+
+**Estimated scope:** Small
+
 ---
 
 ## Fechamento: auditoria final

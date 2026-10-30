@@ -65,7 +65,7 @@ def export_backlog(
     meeting = _with_backlog(uow, user_id, meeting_id)
     date = from_iso(meeting.created_at).date().isoformat()
     return ExportFile(
-        filename=export.filename(meeting.title, fmt),
+        filename=export.filename(meeting.title, fmt, date),
         media_type=export.MEDIA_TYPES[fmt],
         content=export.render(fmt, meeting.title, date, _epics(uow, meeting_id)),
     )
