@@ -105,7 +105,7 @@ Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ### Pull Request
 
-PR só de feature/* para develop. Nenhuma exceção.
+PR de feature segue `feature/*` → `develop`. Para `main`, só via `release/*` (seção "Release e estratégia de merge").
 
 - **Título**: < 70 char, imperativo. Exemplo: `Implement auth module foundation`
 - **Descrição**: 
@@ -143,7 +143,26 @@ Exemplo:
 - [ ] Commits descrevem a mudança?
 - [ ] Sem `.env`, segredos, banco, áudio ou volumes no git?
 
-Merge só via `Squash and merge` (um commit por PR).
+### Release e estratégia de merge
+
+| Origem → destino | Como | Merge |
+|---|---|---|
+| `feature/*` → `develop` | PR | `Squash and merge` (um commit por PR) |
+| `develop` → `release/*` | branch `release/*` criada a partir de `develop` | `Create a merge commit` |
+| `release/*` → `main` | PR | `Create a merge commit` |
+
+Nunca PR direto de `develop` ou `feature/*` para `main`.
+
+```bash
+git checkout develop
+git pull origin develop --rebase
+git checkout -b release/x.y.z
+git merge --no-ff develop     # se release/* já existe e precisa de develop atualizado
+git push -u origin release/x.y.z
+# PR release/x.y.z → main com "Create a merge commit"
+```
+
+**Padrão de branch**: `release/x.y.z` (versão semântica).
 
 ## Setup local
 
