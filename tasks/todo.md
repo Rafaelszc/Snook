@@ -3183,14 +3183,14 @@
 **Description:** Percorrer a tabela "Verificação" de `03-security.md` (SEC-01 a SEC-27), rodar as auditorias e as suítes opcionais e registrar tudo no PR de release.
 
 **Acceptance criteria:**
-- [ ] Todos os SEC-01 a SEC-27 verificados com o método da tabela "Verificação" de `03-security.md`; cada um com o resultado anotado no PR de release.
-- [ ] `cd backend && uv run pip-audit` e `cd frontend && npm audit --omit=dev` sem achado crítico ou alto alcançável (SEC-21); checklist de `security-and-hardening` percorrido.
-- [ ] Suítes `models_real` e `llm_real` rodadas à mão, com o registro no PR (`08-deployment.md`, "CI/CD"); critério transversal 2 (`down` sem `-v`) conferido.
+- [x] Todos os SEC-01 a SEC-27 verificados com o método da tabela "Verificação" de `03-security.md`; cada um com o resultado anotado no PR de release.
+- [x] `cd backend && uv run pip-audit` e `cd frontend && npm audit --omit=dev` sem achado crítico ou alto alcançável (SEC-21); checklist de `security-and-hardening` percorrido.
+- [x] Suítes `models_real` e `llm_real` rodadas à mão, com o registro no PR (`08-deployment.md`, "CI/CD"); critério transversal 2 (`down` sem `-v`) conferido.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest && uv run pip-audit && uv run ruff check . && uv run mypy src && uv run lint-imports`.
-- [ ] `cd frontend && npm ci --ignore-scripts && npm test -- --run && npm run build && npm audit --omit=dev`.
-- [ ] `docker compose exec backend id -u` imprime `1000`; `docker compose ps` sem porta do backend (SEC-23).
+- [x] `cd backend && uv run pytest && uv run pip-audit && uv run ruff check . && uv run mypy src && uv run lint-imports`.
+- [x] `cd frontend && npm ci --ignore-scripts && npm test -- --run && npm run build && npm audit --omit=dev`.
+- [x] `docker compose exec backend id -u` imprime `1000`; `docker compose ps` sem porta do backend (SEC-23).
 
 **Dependencies:** Task 51.1
 
@@ -4668,6 +4668,29 @@
 - [ ] `/security-review` sobre o diff
 - [ ] Revisão humana antes de seguir
 
+### Task 62: Exportação Markdown como Product Backlog
+
+**Description:** Troca só o render Markdown de `backlog_review/export.py` pelo documento de Product Backlog da Q75. JSON, geração e leitura do backlog sem mudança. Fonte única: as Epics já gravadas (`EpicOut`), sem chamar a LLM.
+
+**Acceptance criteria:**
+- [x] Markdown segue `backlog-review` 32, 33 e 36 (Q75): cabeçalho com totais, visão geral, Epics `2.N`, resumos por prioridade e por Epic, considerações derivadas dos dados.
+- [x] Prioridade em pt-BR; campos vazios omitidos; quebra de linha e caracteres de Markdown tratados.
+- [x] Arquivo `backlog_<slug>_<data>.md`; JSON segue `<slug>-backlog.json` (`05-api.md`).
+
+**Verification:**
+- [x] `cd backend && uv run pytest tests/backlog_review`.
+- [x] Gate backend.
+
+**Dependencies:** Task 50
+
+**Skills:** `tdd`
+
+**Files likely touched:**
+- `backend/src/snook/modules/backlog_review/{export.py,service.py}`
+- `backend/tests/backlog_review/{test_api_export_md.py,test_export_markdown.py,snapshots/}`
+
+**Estimated scope:** Small
+
 ---
 
 ## Fechamento: auditoria final
@@ -4677,13 +4700,13 @@
 **Description:** Auditoria WCAG 2.2 AA de todas as telas, polimento visual final e medições manuais de NFR-03 a NFR-06 e NFR-08, sobre o visual Ata (ADR-0024). Roda depois da Fase 9, não antes.
 
 **Acceptance criteria:**
-- [ ] Todas as telas passam `vitest-axe`, `web-design-guidelines` e revisão manual de contraste em tema claro e escuro, de 360 a 1920 px; `prefers-reduced-motion` desliga movimento e mouse-tracking.
-- [ ] Medição registrada no PR: LCP da tela de login até 2,5 s com CPU 4x mais lenta (NFR-03); CLS até 0,1 (NFR-05); no máximo 3 vidros por tela, e o Ata usa 1 (NFR-06); nenhum quadro acima de 16 ms por causa do mouse-tracking, que só existe no upload (NFR-08); INP de divisão e revisão até 200 ms (NFR-04).
-- [ ] CI confirma JS inicial até 200 KB gzip e total até 500 KB gzip (NFR-01, NFR-02).
+- [x] Todas as telas passam `vitest-axe`, `web-design-guidelines` e revisão manual de contraste em tema claro e escuro, de 360 a 1920 px; `prefers-reduced-motion` desliga movimento e mouse-tracking.
+- [x] Medição registrada no PR: LCP da tela de login até 2,5 s com CPU 4x mais lenta (NFR-03); CLS até 0,1 (NFR-05); no máximo 3 vidros por tela, e o Ata usa 1 (NFR-06); nenhum quadro acima de 16 ms por causa do mouse-tracking, que só existe no upload (NFR-08); INP de divisão e revisão até 200 ms (NFR-04).
+- [x] CI confirma JS inicial até 200 KB gzip e total até 500 KB gzip (NFR-01, NFR-02).
 
 **Verification:**
-- [ ] `cd frontend && npm test -- --run && npm run build && node scripts/check-bundle-size.mjs`.
-- [ ] Manual: Lighthouse e DevTools Performance conforme `01-prd.md`, "NFRs de performance do frontend".
+- [x] `cd frontend && npm test -- --run && npm run build && node scripts/check-bundle-size.mjs`.
+- [x] Manual: Lighthouse e DevTools Performance conforme `01-prd.md`, "NFRs de performance do frontend".
 
 **Dependencies:** Checkpoint: Redesign Ata, Task 51.1
 

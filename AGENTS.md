@@ -38,7 +38,10 @@ Instruções para agentes de código neste repo. Fonte de verdade: `docs/specs/`
 - Pipeline de agentes: `spec-writer` → `spec-reviewer` → `planner` → `spec-reviewer` → `task-breaker`.
 - Mudança de comportamento: atualizar o spec antes do código. Decisão de arquitetura nova: ADR novo.
 - TDD: teste falhando primeiro. Um teste por critério de aceite (`tests/<modulo>/test_api_*.py`).
-- GitFlow: `main`, `develop`, `feature/*`. PR para `develop`.
+- GitFlow: `main`, `develop`, `release/*`, `feature/*`.
+  - `feature/*` → `develop`: PR com squash and merge.
+  - `develop` → `release/*`: merge commit (`--no-ff`).
+  - `release/*` → `main`: PR com merge commit. Nunca PR direto para `main`.
 - PR ao término de cada task mãe (ex.: 5.1 a 5.4 = Task 5 = um PR), não por subtask. Antes: `git pull --rebase` de `develop`.
 - Checkpoint: `/security-review` no diff; checkpoint com tela também tem checagem de UI (abaixo).
 - Docs em `docs/specs/` e saídas do pipeline em voz caveman, com clareza.

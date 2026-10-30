@@ -162,7 +162,7 @@ Corpo do `GET` e do `refresh`: `status`, `split_reason`, `can_cancel`, `read_onl
 | `GET /api/meetings/{id}/export?format=md|json` | S+D | 200 anexo | 404; 409 `no_backlog`; 422 formato |
 
 - `epic_id`, `story_id`, `criterion_id`, `participant_id` de outra Reunião: 404 (SEC-02).
-- Nome do arquivo exportado: `<slug-do-titulo>-backlog.md` ou `.json`. Slug: ASCII minúsculo, `[a-z0-9-]`, até 60 caracteres; vazio vira `reuniao`. Header `Content-Disposition: attachment; filename="..."; filename*=UTF-8''...`.
+- Nome do arquivo exportado: Markdown `backlog_<slug-do-titulo>_<aaaa-mm-dd>.md` (data da Reunião, Q75); JSON `<slug-do-titulo>-backlog.json`. Slug: ASCII minúsculo, `[a-z0-9-]`, até 60 caracteres; vazio vira `reuniao`. Header `Content-Disposition: attachment; filename="..."; filename*=UTF-8''...`.
 
 ## Polling
 

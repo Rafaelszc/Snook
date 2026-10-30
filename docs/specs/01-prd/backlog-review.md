@@ -80,6 +80,7 @@ Endpoints sugeridos (planner confirma):
 | Solicitante é um único Participante ou vazio; "quando" dentro da duração do áudio. | rodada 2, Q29 |
 | Edição manual de Epic, US, prioridade, story points e critérios; regeneração total com aviso de que as edições se perdem; sem histórico. | rodada 2, Q30; rodada 3, Q37 |
 | Exportação em Markdown (formato da Q11) e JSON. | rodada 2, Q31 |
+| Markdown exportado como documento de Product Backlog: cabeçalho com totais, tabelas de visão geral, prioridade e Epic, US agrupadas por Epic, considerações derivadas dos dados; prioridade em pt-BR; projeto = título da Reunião; arquivo `backlog_<slug>_<data>.md`. | Q75 |
 | Prioridade Low, Medium ou High, exibida em inglês; story points 1, 2, 3, 5, 8 ou 13. | rodada 3, Q37 |
 | Tudo ou nada na geração; backlog anterior mantido quando a regeneração falha. | rodada 5, Q46; Q56 |
 | Mover US entre Epics; renomear uma Epic para o nome de outra junta as duas. | rodada 5, Q47 |
@@ -178,11 +179,11 @@ Edição liberada em `failed` = usuário editaria backlog que a próxima tentati
 
 ### Exportação
 
-32. `GET /meetings/{id}/export?format=md` devolve um arquivo Markdown com cada Epic no formato `Epic: <nome>` e cada US no formato da Q11. As linhas aparecem nesta ordem: `US-id: nome`, "Como", "Eu quero", "Para", "Prioridade", "Story Points" e "Critérios de aceitação", com "Dado / Quando / Então".
-33. O Markdown começa com o título e a data da Reunião. Cada US traz também as linhas "Solicitante: <nome>" e "Quando: hh:mm:ss", logo depois de "Para", e as omite quando o campo está vazio.
+32. `GET /meetings/{id}/export?format=md` devolve um documento de Product Backlog em GitHub Flavored Markdown (Q75), nesta ordem: cabeçalho; "1. Visão Geral do Backlog" (tabela ID, Épico, História de Usuário, Prioridade, Story Points, com todas as US); uma seção `## 2.N Épico: <nome>` por Epic, com cada US em `### <US-id> — <nome>`; "3. Resumo de Priorização" (tabela Prioridade, Histórias, Story Points, linhas Alta, Média, Baixa e Total); "4. Resumo por Épico" (tabela Épico, Histórias, Story Points e Total); "5. Considerações para o Desenvolvimento". Epics e US na ordem do backlog. Prioridade traduzida: High = Alta, Medium = Média, Low = Baixa. Totais calculados do backlog.
+33. O cabeçalho traz título, data, projeto (= título da Reunião), total de Epics, total de US e soma de Story Points. Cada US traz ID, solicitante, horário na Reunião, perfil (`as_a`), prioridade e Story Points em lista; a história em "Como <perfil>, quero <desejo>, para que <benefício>."; e os critérios numerados em "Dado que <given>, quando <when>, então <then>.". Solicitante e horário vazios são omitidos. Quebras de linha viram espaço e caracteres de Markdown e `|` são escapados, sem alterar o texto. As considerações saem só dos dados do backlog (ordem de prioridade, Epic de maior esforço, US de 13 pontos, US sem solicitante, número de critérios), sem LLM e sem requisito novo.
 34. `GET /meetings/{id}/export?format=json` devolve as Epics com as US e os critérios, incluindo `US-id`, solicitante (nome), quando (`hh:mm:ss`), título e data da Reunião.
 35. Nenhuma exportação traz informação de Parte nem identificadores internos do banco além do `US-id`.
-36. Com backlog gravado e vazio, a exportação devolve só o cabeçalho, sem Epics.
+36. Com backlog gravado e vazio, a exportação Markdown devolve só o cabeçalho, com totais zerados, sem Epics; a JSON devolve a lista de Epics vazia.
 
 ### Isolamento e autenticação
 
@@ -215,7 +216,7 @@ Edição liberada em `failed` = usuário editaria backlog que a próxima tentati
 ## Questões em aberto
 
 1. Respondidas pelo planner:
-   - nome do arquivo exportado: `<slug-do-titulo>-backlog.md` ou `.json`. Resolvido: `05-api.md`.
+   - nome do arquivo exportado: `backlog_<slug-do-titulo>_<data>.md` (Q75) ou `<slug-do-titulo>-backlog.json`. Resolvido: `05-api.md`.
    - como este módulo escreve nas tabelas de `backlog-generation`: interface `BacklogRepository` e `next_us_number`. Resolvido: `02-architecture.md`, "Interfaces internas".
    - edição concorrente em duas abas: último a gravar vence, sem bloqueio otimista na v1. Resolvido: `05-api.md`.
 2. Códigos HTTP 200, 201, 404, 409 e 422 e endpoints são sugestões, não decisões.
