@@ -115,3 +115,15 @@ Comandos de teste e lint em `AGENTS.md`, "Comandos".
 - `uv sync` sem extra não instala torch, faster-whisper nem pyannote: testes padrão e CI usam engines falsas.
 - Suíte `models_real` (à mão, antes da release): `cd backend && uv sync --extra cpu && uv run pytest -m models_real`. Lê `HF_TOKEN` do `.env`; cache em `MODELS_REAL_ROOT` (padrão `~/.cache/snook/models`). Teste do pipeline pede `ffmpeg` no host.
 - Fixture de voz da suíte: `backend/tests/fixtures/audio/two_voices.py` (espeak-ng, vozes sintéticas).
+
+## Checklist de release
+
+Rodar antes de abrir o PR `release/*` → `main`. Resultado de cada item vai na descrição do PR.
+
+1. Gates: `cd backend && uv run pytest && uv run ruff check . && uv run mypy src && uv run lint-imports && uv run pip-audit`; `cd frontend && npm ci --ignore-scripts && npm test -- --run && npm run build && node scripts/check-bundle-size.mjs && npm audit --omit=dev`. Testes com `ffmpeg` pulam no host sem ele; rodam no CI.
+2. Auditorias: `pip-audit` e `npm audit --omit=dev` sem crítico ou alto alcançável (SEC-21). `npm audit signatures` sem pacote sem atestado.
+3. Tabela "Verificação" de `docs/specs/03-security.md`: SEC-01 a SEC-27, um resultado por item.
+4. Docker (SEC-23): `docker compose exec backend id -u` imprime `1000`; `docker compose ps` sem porta do backend.
+5. Perfil `lan` (SEC-13, SEC-27): `curl --cacert snook-lan-ca.crt -sI https://<SNOOK_LAN_HOST>/` mostra `Strict-Transport-Security`.
+6. Persistência (critério transversal 2): `docker compose down` sem `-v`, depois `up`; Reuniões e `./audios` continuam.
+7. Suítes opcionais: `uv run pytest -m models_real` (pede `HF_TOKEN`) e `uv run pytest -m llm_real` (lê a chave de cada provedor do ambiente ou do `.env`; provedor sem chave pula).

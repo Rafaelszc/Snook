@@ -3183,14 +3183,14 @@
 **Description:** Percorrer a tabela "Verificação" de `03-security.md` (SEC-01 a SEC-27), rodar as auditorias e as suítes opcionais e registrar tudo no PR de release.
 
 **Acceptance criteria:**
-- [ ] Todos os SEC-01 a SEC-27 verificados com o método da tabela "Verificação" de `03-security.md`; cada um com o resultado anotado no PR de release.
-- [ ] `cd backend && uv run pip-audit` e `cd frontend && npm audit --omit=dev` sem achado crítico ou alto alcançável (SEC-21); checklist de `security-and-hardening` percorrido.
-- [ ] Suítes `models_real` e `llm_real` rodadas à mão, com o registro no PR (`08-deployment.md`, "CI/CD"); critério transversal 2 (`down` sem `-v`) conferido.
+- [x] Todos os SEC-01 a SEC-27 verificados com o método da tabela "Verificação" de `03-security.md`; cada um com o resultado anotado no PR de release.
+- [x] `cd backend && uv run pip-audit` e `cd frontend && npm audit --omit=dev` sem achado crítico ou alto alcançável (SEC-21); checklist de `security-and-hardening` percorrido.
+- [x] Suítes `models_real` e `llm_real` rodadas à mão, com o registro no PR (`08-deployment.md`, "CI/CD"); critério transversal 2 (`down` sem `-v`) conferido.
 
 **Verification:**
-- [ ] `cd backend && uv run pytest && uv run pip-audit && uv run ruff check . && uv run mypy src && uv run lint-imports`.
-- [ ] `cd frontend && npm ci --ignore-scripts && npm test -- --run && npm run build && npm audit --omit=dev`.
-- [ ] `docker compose exec backend id -u` imprime `1000`; `docker compose ps` sem porta do backend (SEC-23).
+- [x] `cd backend && uv run pytest && uv run pip-audit && uv run ruff check . && uv run mypy src && uv run lint-imports`.
+- [x] `cd frontend && npm ci --ignore-scripts && npm test -- --run && npm run build && npm audit --omit=dev`.
+- [x] `docker compose exec backend id -u` imprime `1000`; `docker compose ps` sem porta do backend (SEC-23).
 
 **Dependencies:** Task 51.1
 
